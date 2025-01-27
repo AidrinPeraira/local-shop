@@ -4,9 +4,12 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 
+
 //import our utils here
 import { connectDB } from './config/db.js'
 import exp from 'constants'
+import userRouter from './routes/userRoutes.js'
+
 
 
 dotenv.config() //load dot env data into 'process.env' by default
@@ -21,10 +24,10 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())
 
+
+
 //add necessary routing
-app.get('/', (req, res)=>{
-    res.send('This is a message from the server')
-})
+app.use('/api/users', userRouter)
 
 //start thr server
 app.listen(port, ()=>{

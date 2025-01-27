@@ -7,7 +7,7 @@ export const connectDB = async () => {
         await mongoose.connect(process.env.MONGO_URI)
         console.log('Succesfully connected to the database')
     } catch (error) {
-        console.err(`DB Connection Error: `, error.message)
+        console.error('DB Connection Error: ', error.message)
         process.exit(1) //this will terminate the server with the corresponding error code
     }
 }

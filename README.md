@@ -34,3 +34,11 @@ my-mern-app/
 │   └── package.json           # Backend-specific dependencies and scripts
 ├── .gitignore                 # Git ignore file (to exclude node_modules, .env, etc.)
 └── README.md                  # Project overview and instructions
+
+-Who will use te platform? (types of logins and dashboards required)
+    - Buyers / Users
+    - Sellers
+    - Dellivery AGents
+    - Employees
+    - Admins
+    - Super Admins
