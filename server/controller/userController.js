@@ -49,3 +49,53 @@ export const createUser = asyncHandler(
         
     }
 )
+
+export const loginUser = asyncHandler(
+    async (req, res) => {
+        
+        //get login credentials from request
+        const {email, password} = req.body;
+        
+        //check for corresponding user
+        const existingUser = await User.findOne({email})
+        console.log(email, password, existingUser)
+
+        //login if exist eroor message if not
+        if(existingUser){
+            //let user login
+            console.log('loggedHere')
+            //compare password first
+            const isPasswordValid = await bcrypt.compare(password, existingUser.password)
+
+            if(isPasswordValid){
+                generateToken(res, existingUser._id)
+
+                res.status(HTTP_CODES.ACCEPTED).json({
+                    _id : existingUser._id,
+                    username : existingUser.username,
+                    email : existingUser.email,
+                    role : existingUser.role,
+                })
+
+                return //to exit the function
+            } else {
+                //another error message
+                res.status(HTTP_CODES.BAD_REQUEST).json({message : 'Invalid Credentials. Try Again'})
+            }
+
+        } else {
+            //revert with an error message
+            res.status(HTTP_CODES.BAD_REQUEST).json({message : 'Invalid Credentials. Try Again'})
+        }    }
+)
+
+export const logoutController = asyncHandler(
+    async (req, res) => {
+        res.cookie('jwt', '', {
+            httpOnly : true,
+            expires : new Date(0) //a point in the past as an expiration date
+        })
+
+        res.status(HTTP_CODES.OK).json({message : 'Logged out successfully'})
+    }
+)
