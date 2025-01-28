@@ -141,7 +141,7 @@ export const updateCurrentUser = asyncHandler(
     
             const updatedUser = await user.save()
     
-            res.json({
+            res.status(HTTP_CODES.OK).json({
                 _id : updatedUser._id,
                 username : updatedUser.username,
                 email : updatedUser.email,
@@ -153,5 +153,27 @@ export const updateCurrentUser = asyncHandler(
         }
 
 
+    }
+)
+
+
+export const deleteUserById = asyncHandler(
+    async (req, res) => {
+        const user = await User.findById(req.params.id) 
+        
+        if(user){
+
+            //prevent deleting an adminf
+            if(user.role == 'admin'){
+                res.status(HTTP_CODES.BAD_REQUEST)
+                throw new Error('Cannot delete admin user')
+            }
+
+            await User.deleteOne({_id: user._id})
+            res.status(HTTP_CODES.OK).json({message : "User removed"})
+        } else {
+            res.status(HTTP_CODES.NOT_FOUND)
+            throw new Error ("User not found")
+        }
     }
 )
