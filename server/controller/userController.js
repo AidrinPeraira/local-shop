@@ -63,7 +63,7 @@ export const loginUser = asyncHandler(
         //login if exist eroor message if not
         if(existingUser){
             //let user login
-            console.log('loggedHere')
+
             //compare password first
             const isPasswordValid = await bcrypt.compare(password, existingUser.password)
 
@@ -97,5 +97,61 @@ export const logoutController = asyncHandler(
         })
 
         res.status(HTTP_CODES.OK).json({message : 'Logged out successfully'})
+    }
+)
+
+export const getAllUsers = asyncHandler(
+    async (req, res) => {
+        const users = await User.find({})
+        res.json(users)
+    }
+)
+
+export const getCurrentUserProfile = asyncHandler(
+    async (req, res) => {
+        const user = await User.findById({_id : req.user._id})
+        if(user){
+            res.status(HTTP_CODES.OK).json({
+                _id : user._id,
+                username : user.username,
+                email : user.email,
+            })
+        } else {
+            res.status(HTTP_CODES.NOT_FOUND)
+            throw new Error("User not found")
+        }
+    }
+)
+
+export const updateCurrentUser = asyncHandler(
+    async (req, res) => {
+        const user = await User.findById(req.user._id)
+
+        if(user){
+            user.username = req.body.username || user.username;
+            user.email = req.body.email || user.email;
+
+            if(req.body.password){
+
+                const salt = await bcrypt.genSalt(10)
+                const hashedPassword = bcrypt.hashSync(req.body.password, salt)
+
+                user.password =  hashedPassword
+            }
+    
+            const updatedUser = await user.save()
+    
+            res.json({
+                _id : updatedUser._id,
+                username : updatedUser.username,
+                email : updatedUser.email,
+                role : updatedUser.role,
+            })
+        } else {
+            res.status(HTTP_CODES.NOT_FOUND)
+            throw new Error('User not found')
+        }
+
+
     }
 )

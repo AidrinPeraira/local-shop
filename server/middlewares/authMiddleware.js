@@ -1,18 +1,18 @@
 //the middleware to handle authentication and authorisation
 
 import jwt from "jsonwebtoken";
-import User from "../models/userModel";
-import { asyncHandler } from "./asyncHandler";
-import { HTTP_CODES } from "../utils/responseCodes";
+import User from "../models/userModel.js";
+import { asyncHandler } from "./asyncHandler.js";
+import { HTTP_CODES } from "../utils/responseCodes.js";
 
 
 //authentication middleware to handle validating the user
-export const authenticate = async(
+export const authenticate = asyncHandler(
     async (req, res, next) => {
         let token;
 
         //read jwt form the cookie
-        token = req.cookie.jwt;
+        token = req.cookies.jwt;
 
         if (token) {
             try {
