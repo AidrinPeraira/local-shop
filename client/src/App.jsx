@@ -7,12 +7,13 @@ import Home from './pages/home/home'
 const App = () => {
 
   return (
-    <div>
+    <>
       {/* <SignIn/> */}
-      {/* <SignUp/> */}
-      {/* <AdminDashboard/> */}
+      <SignUp/>
       {/* <Home/> */}
-    </div>
+      {/* <AdminDashboard/> */}
+    </>
+
   )
 }
 

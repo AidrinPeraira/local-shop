@@ -11,8 +11,7 @@ export function LocalShopIcon() {
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      width="25"
-      height="25"
+      width="200"
       fill='none'
       viewBox="0 0 400 148.061"
     >

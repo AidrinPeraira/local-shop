@@ -8,8 +8,8 @@ import { customTheme } from './customThemeMUI.js'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ThemeProvider theme={customTheme}>
-      <App />
-    </ThemeProvider>
+      <ThemeProvider theme={customTheme}>
+        <App />
+      </ThemeProvider>
   </StrictMode>
 )
