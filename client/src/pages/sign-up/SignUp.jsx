@@ -67,6 +67,8 @@ export default function SignUp(props) {
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
 
+
+
   const validateInputs = () => {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
