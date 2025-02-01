@@ -1,31 +1,32 @@
 import { useState } from 'react'
 import './App.css'
-import { Typography, Button, Container } from '@mui/material'
+import { BrowserRouter, Routes, Route } from "react-router";
+import { Home } from './pages/user/Home';
+import { Login } from './pages/user/Login';
+import { Register } from './pages/user/Register';
+import { Profile } from './pages/user/Profile';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { UserManagement } from './pages/admin/UserManagement';
 
 function App() {
 
-  console.log('hello')
+  
   return (
     <>
-    <Container/>
-      <Typography>Hello Guys</Typography>
-      <Typography variant="h4" gutterBottom>
-          Welcome to My Material-UI App!
-        </Typography>
-        
-        <Typography variant="h6" gutterBottom>
-          This is a sample app demonstrating custom themes.
-        </Typography>
-        
-        {/* Buttons with custom primary and secondary colors */}
-        <Button color="primary" variant="contained" style={{ marginBottom: 20 }}>
-          Primary Button
-        </Button>
-        
-        <Button color="secondary" variant="contained">
-          Secondary Button
-        </Button>
-    <Container/>
+
+    {/* This is where we have done the basic routing for the differnt pages */}
+      <BrowserRouter>
+        <Routes>
+          <Route index path='/' element={<Home/>} />
+          <Route path='login' element={<Login/>} />
+          <Route path='register' element={<Register/>} />
+          <Route path='profile' element={<Profile/>} />
+          
+          <Route path='admin' element={<AdminDashboard/>}>
+            <Route path='users' element={<UserManagement/>} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </>
   )
 }
