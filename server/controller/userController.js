@@ -83,6 +83,7 @@ export const loginUser = asyncHandler(
                 res.status(HTTP_CODES.BAD_REQUEST).json({message : 'Invalid Credentials. Try Again'})
             }
 
+            
         } else {
             //revert with an error message
             res.status(HTTP_CODES.BAD_REQUEST).json({message : 'Invalid Credentials. Try Again'})
