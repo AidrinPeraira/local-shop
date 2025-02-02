@@ -53,7 +53,10 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-
+      profileUpdate : (state, action)=>{
+        console.log(action, "HHH")
+        state.user = action.payload
+      }
     },
     extraReducers: (builder) => {
       builder
@@ -89,5 +92,5 @@ const authSlice = createSlice({
     },
   });
 
-  // export const {logout} = authSlice.actions;
+  export const {profileUpdate} = authSlice.actions;
   export default authSlice.reducer

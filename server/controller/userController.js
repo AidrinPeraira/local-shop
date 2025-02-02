@@ -127,8 +127,7 @@ export const getCurrentUserProfile = asyncHandler(
 
 export const updateCurrentUser = asyncHandler(
     async (req, res) => {
-        const user = await User.findById(req.user._id)
-
+        const user = await User.findById(req.body._id)
         if(user){
             user.username = req.body.username || user.username;
             user.email = req.body.email || user.email;
@@ -140,7 +139,6 @@ export const updateCurrentUser = asyncHandler(
 
                 user.password =  hashedPassword
             }
-    
             const updatedUser = await user.save()
     
             res.status(HTTP_CODES.OK).json({

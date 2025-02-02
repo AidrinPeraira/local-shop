@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Box,
@@ -11,22 +11,31 @@ import {
   IconButton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { logout, profileUpdate } from "../../redux/slices/authSlice";
+import axios from "axios";
+import { store } from "../../redux/store";
+
 
 export const Profile = () => {
   // Sample user data
+  const user = useSelector(state => state.auth.user)
   const [userData, setUserData] = useState({
-    username: "JohnDoe",
-    email: "john@example.com",
-    role: "User",
-    profilePicture: "/static/images/avatar/1.jpg",
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    profilePicture: user.imgUrl,
   });
 
   const [openModal, setOpenModal] = useState(false);
   const [newUsername, setNewUsername] = useState(userData.username);
   const [newEmail, setNewEmail] = useState(userData.email);
   const [newPassword, setNewPassword] = useState("");
-  const [newProfilePicture, setNewProfilePicture] = useState(null);
+  const [newProfilePicture, setNewProfilePicture] = useState('');
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -49,7 +58,31 @@ export const Profile = () => {
     setErrors({});
   };
 
-  const handleSubmit = (e) => {
+  const handleLogout = () => {
+    dispatch(logout()) 
+      .unwrap()
+      .then(() => {
+          navigate("/login");
+        })
+      .catch((err) => {
+        console.error("Logout error:", err)
+      });
+  }
+
+  useEffect(() => {
+    // If no user, redirect to login
+    if (!user) {
+      navigate("/login", { replace: true }); // Replace history to prevent going back
+      window.history.pushState(null, "", window.location.href);
+      window.onpopstate = () => {
+        window.history.pushState(null, "", window.location.href);
+      }
+    
+    }
+      
+  }, [user, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let validationErrors = {};
 
@@ -57,31 +90,83 @@ export const Profile = () => {
     if (!newEmail) validationErrors.email = "Email is required";
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(newEmail)) validationErrors.email = "Invalid email address";
-    if (!newPassword) validationErrors.password = "Password is required";
 
     if (Object.keys(validationErrors).length === 0) {
-      // Update user data (API call or state update)
-      setUserData({
-        username: newUsername,
-        email: newEmail,
-        role: userData.role,
-        profilePicture: newProfilePicture || userData.profilePicture,
-      });
-      handleCloseModal();
+      try {
+        const formData = new FormData();
+        formData.append("_id", user._id)
+        console.log(user._id)
+        formData.append("username", newUsername);
+        formData.append("email", newEmail);
+        
+        if (newPassword && newPassword !== "") {
+          formData.append("password", newPassword);
+        }
+        
+        if (newProfilePicture && newProfilePicture !== '') {
+          formData.append("imgUrl", user.imgUrl);
+        }
+        
+        
+  
+  
+
+        // for (let [key, value] of formData.entries()) {
+        //   console.log(`${key}: ${value}`);
+        // }
+  
+        const response = await axios.put("http://localhost:3000/api/users/profile", formData, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+
+
+        // Edit auth slice in store with new data
+        const updatedUser = {
+          _id: response.data._id,
+          username: response.data.username,
+          email: response.data.email,
+          role: response.data.role,
+          imgUrl: response.data.imgUrl,
+        }
+        
+        dispatch(profileUpdate(updatedUser))
+
+        // Optionally update the redux store if needed
+        // dispatch(updateUser(response.data));
+
+        handleCloseModal();
+      } catch (error) {
+        console.error("Error updating user data:", error);
+      }
     } else {
       setErrors(validationErrors);
     }
   };
 
-  // Handle Logout
-  const handleLogout = () => {
-    // Clear user session or authentication data
-    // You might want to clear tokens, localStorage/sessionStorage, or redirect to the login page
-    console.log("Logging out...");
-    // Example: clear localStorage, redirect to login
-    localStorage.removeItem("authToken");
-    window.location.href = "/login";  // Redirect to login page
-  };
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      const state = store.getState();
+      const updatedUser = state.auth.user;
+      
+      if (updatedUser) {
+        setUserData({
+          username: updatedUser.username,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          profilePicture: updatedUser.imgUrl,
+        });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
 
   return (
     <Container maxWidth="sm">
@@ -177,7 +262,6 @@ export const Profile = () => {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                required
                 error={!!errors.password}
                 helperText={errors.password}
               />
