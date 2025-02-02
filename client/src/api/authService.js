@@ -1,0 +1,31 @@
+import axios from "axios";
+
+const API = axios.create({
+  baseURL: "http://localhost:3000/api",
+  withCredentials: true,
+});
+
+//if using jwt token stored in local storage write the code here to add cookie to the requests
+/**
+ * 
+ * API.interceptors.request.use((config) => {
+  const token = Cookies.get("token");  // Retrieving the token from cookies
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+ */
+
+//write the functions to make the request here.
+export const registerUser = (userData) => API.post("/users", userData);
+export const loginUser = (userData) => API.post("/users/auth", userData);
+export const getCurrentUser = (userData) => API.get('/users/profile', userData)
+export const logoutUser = (userData) => API.post('/users/profile', userData)
+export const updateUserProfile = (userData) => API.put('/users/profile', userData)
+
+    //user  admin actions
+export const adminGetAllUsers = () => API.get('/users');
+export const adminDeleteUserById = (userId) => API.delete(`/users/${userId}`)
+export const getOneUserById = (userId) => API.get(`/users/${userId}`)
+export const adminUpdateUserById = (userId, userData) => API.put(`/users/${userId}`, userData)
