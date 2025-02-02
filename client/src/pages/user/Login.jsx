@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, Button, Container, Box, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +13,17 @@ export const Login = () => {
   const dispatch = useDispatch()
   const state = useSelector(state => state.auth)
 
-
+   useEffect(()=>{
+      const token = localStorage.getItem('user')
+      if(token){
+        let user = JSON.parse(token)
+        if(user.role == 'user-buyer'){
+          navigate('/home')
+        } else if (user.role == 'admin'){
+          navigate('/admin/users')
+        }
+      }
+    }, [navigate])
 
 
   //this is how we handle things without redux
@@ -59,11 +69,11 @@ export const Login = () => {
       .unwrap()
       .then((response) => {
         // Redirect after successful login along with register. else back to login
-        // if (response.data.role === "admin") {
+        if (response.data.role === "admin") {
           navigate("/admin/users");
-        // } else {
-          navigate("/login");
-        // }
+        } else {
+          navigate("/home");
+        }
       })
       .catch((err) => console.error("Login error:", err));
   };

@@ -21,7 +21,7 @@ const API = axios.create({
 export const registerUser = (userData) => API.post("/users", userData);
 export const loginUser = (userData) => API.post("/users/auth", userData);
 export const getCurrentUser = (userData) => API.get('/users/profile', userData)
-export const logoutUser = (userData) => API.post('/users/profile', userData)
+export const logoutUser = () => API.post('/users/logout')
 export const updateUserProfile = (userData) => API.put('/users/profile', userData)
 
     //user  admin actions

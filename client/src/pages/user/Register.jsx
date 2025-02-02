@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, Button, Container, Box, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -13,8 +13,18 @@ export const Register = () => {
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState(""); // To handle backend errors
 
+  useEffect(()=>{
+      const token = localStorage.getItem('user')
+      if(token){
+        let user = JSON.parse(token)
+        if(user.role == 'user-buyer'){
+          navigate('/home')
+        } else if (user.role == 'admin'){
+          navigate('/admin/users')
+        }
+      }
+    }, [navigate])
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     let validationErrors = {};

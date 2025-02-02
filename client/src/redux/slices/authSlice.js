@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUser, registerUser} from "../../api/authService";
+import { loginUser, registerUser, logoutUser} from "../../api/authService";
 import Cookies from 'js-cookie'
+import axios from "axios";
 
 
 const initialState = {
@@ -35,18 +36,24 @@ export const register = createAsyncThunk("auth/register", async (userData, thunk
     }
   });
 
+export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
+  try {
+    const response = await logoutUser(); // Call your API function to logout (optional)
+    Cookies.remove("jwt"); // Remove the JWT cookie
+    localStorage.removeItem("user"); // Remove user data from localStorage
+    return true; // Return a success flag
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response?.data?.message || "Logout failed");
+  }
+});
+
 //create authSlice
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-      logout: (state) => {
-        // Remove the JWT cookie and user info from localStorage
-        Cookies.remove("jwt");
-        localStorage.removeItem("user");
-        state.user = null;
-      },
+
     },
     extraReducers: (builder) => {
       builder
@@ -70,9 +77,17 @@ const authSlice = createSlice({
         .addCase(register.rejected, (state, action) => {
           state.error = action.payload;
           state.loading = false;
-        });
+        })
+
+        //logout case
+        .addCase(logout.fulfilled, (state) => {
+          return { ...initialState };
+        })
+        .addCase(logout.rejected, (state, action) => {
+          state.error = action.payload;
+        })
     },
   });
 
-  export const {logout} = authSlice.actions;
+  // export const {logout} = authSlice.actions;
   export default authSlice.reducer

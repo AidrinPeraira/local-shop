@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, Box, Typography, Button, Grid, Paper, AppBar, Toolbar, IconButton } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
+import Cookies from 'js-cookie';
+import { store } from "../../redux/store";
 
 export const Home = () => {
   // Dummy data for the homepage
@@ -11,6 +15,35 @@ export const Home = () => {
     { id: 3, name: "Item 3", description: "This is a dummy item 3." },
     { id: 4, name: "Item 4", description: "This is a dummy item 4." },
   ];
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
+
+  const handleLogout = () => {
+    dispatch(logout()) 
+      .unwrap()
+      .then(() => {
+        console.log('outing')
+          navigate("/login");
+        })
+      .catch((err) => {
+        console.error("Logout error:", err)
+      });
+  }
+
+  useEffect(() => {
+    // If no user, redirect to login
+    if (!user) {
+      navigate("/login", { replace: true }); // Replace history to prevent going back
+      window.history.pushState(null, "", window.location.href);
+      window.onpopstate = () => {
+        window.history.pushState(null, "", window.location.href);
+      }
+    
+    }
+      
+  }, [user, navigate]);
+
 
   return (
     <Container maxWidth="md">
@@ -32,10 +65,10 @@ export const Home = () => {
               <AccountCircleIcon />
             </IconButton>
             <Button
+              onClick={handleLogout}
               variant="outlined"
               color="white"
               component={Link}
-              to="/login"
             >
               Logout
             </Button>
