@@ -1,11 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUser, registerUser } from "../../api/authService";
+import { loginUser, registerUser} from "../../api/authService";
 import Cookies from 'js-cookie'
 
 
 const initialState = {
     user : JSON.parse(localStorage.getItem("user")) || null,
-    token : JSON.parse(Cookies.get('jwt')),
     loading : false,
     error : null
 }
@@ -16,9 +15,8 @@ export const login = createAsyncThunk("auth/login", async (userData, thunkAPI) =
     try {
         
         const response = await loginUser(userData);
-
         Cookies.set('jwt', response.cookie, {expires: 1}) //set token in cookie
-        localStorage.setItem('user', JSON.stringify(response.user)) //??CHECK
+        localStorage.setItem('user', JSON.stringify(response.data)) //??CHECK
         return response
 
     } catch (error) {
@@ -29,6 +27,8 @@ export const login = createAsyncThunk("auth/login", async (userData, thunkAPI) =
 export const register = createAsyncThunk("auth/register", async (userData, thunkAPI) => {
     try {
       const response = await registerUser(userData);
+      Cookies.set('jwt', response.cookie, {expires: 1}) //set token in cookie
+      localStorage.setItem('user', JSON.stringify(response.data))
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data.message);
@@ -46,7 +46,6 @@ const authSlice = createSlice({
         Cookies.remove("jwt");
         localStorage.removeItem("user");
         state.user = null;
-        state.token = null;
       },
     },
     extraReducers: (builder) => {
@@ -54,8 +53,7 @@ const authSlice = createSlice({
         // Login case
         .addCase(login.pending, (state) => { state.loading = true; })
         .addCase(login.fulfilled, (state, action) => {
-          state.user = action.payload.user;
-          state.token = action.payload.token;
+          state.user = action.payload.data;
           state.loading = false;
         })
         .addCase(login.rejected, (state, action) => {
@@ -66,8 +64,7 @@ const authSlice = createSlice({
         // Register case
         .addCase(register.pending, (state) => { state.loading = true; })
         .addCase(register.fulfilled, (state, action) => {
-          state.user = action.payload.user;
-          state.token = action.payload.token;
+          state.user = action.payload.data;
           state.loading = false;
         })
         .addCase(register.rejected, (state, action) => {
@@ -76,3 +73,6 @@ const authSlice = createSlice({
         });
     },
   });
+
+  export const {logout} = authSlice.actions;
+  export default authSlice.reducer
