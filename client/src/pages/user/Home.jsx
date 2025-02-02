@@ -23,7 +23,6 @@ export const Home = () => {
     dispatch(logout()) 
       .unwrap()
       .then(() => {
-        console.log('outing')
           navigate("/login");
         })
       .catch((err) => {

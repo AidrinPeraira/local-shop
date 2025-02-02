@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Container, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemText, ListItemIcon, Divider } from "@mui/material";
 import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -7,16 +7,44 @@ import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SellIcon from '@mui/icons-material/Sell';
 
+
 // Dummy components for subpages
 import {Users} from './Users';  // User Details page
 import {Products} from './Products';  // Products page (dummy)
 import {Sales} from './Sales';  // Sales page (dummy)
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
 
 export const AdminDashboard = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch()
+  const user = useSelector(store => store.auth.user)
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
+
+  const handleLogout = () => {
+      dispatch(logout()) 
+        .unwrap()
+        .then(() => {
+            navigate("/login");
+          })
+        .catch((err) => {
+          console.error("Logout error:", err)
+        });
+    }
+    
+useEffect(() => {
+  if (!user) {
+    // Redirect to login and replace the history state
+    navigate("/login", { replace: true });
+
+    // Disable back button navigation to prevent access to the dashboard after logout
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+  }
+}, [user, navigate]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -49,7 +77,7 @@ export const AdminDashboard = () => {
         </List>
         <Divider />
         <List>
-          <ListItem button onClick={() => navigate("/login")}>
+          <ListItem button onClick={handleLogout}>
             <ListItemText primary="Logout" />
           </ListItem>
         </List>
