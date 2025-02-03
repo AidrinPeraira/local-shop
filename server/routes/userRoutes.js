@@ -1,5 +1,5 @@
 import express from 'express'
-import { createUser, loginUser, logoutController, getAllUsers, getCurrentUserProfile, updateCurrentUser, deleteUserById, getUserById, updateUserById } from '../controller/userController.js'
+import { createUser, loginUser, logoutController, getAllUsers, getCurrentUserProfile, updateCurrentUser, deleteUserById, getUserById, updateUserById, adminCreateUser } from '../controller/userController.js'
 import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware.js'
 
 const userRouter = express.Router()
@@ -26,5 +26,8 @@ userRouter.route('/:id')
     .delete(authenticate, authorizeAdmin, deleteUserById)
     .get(authenticate, authorizeAdmin, getUserById)
     .put(authenticate, authorizeAdmin, updateUserById)
+
+userRouter.route('/admin/create')
+    .post(authenticate, authorizeAdmin, adminCreateUser)
 
 export default userRouter

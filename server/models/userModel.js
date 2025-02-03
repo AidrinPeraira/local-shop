@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from 'bcryptjs'
 
 //first we create a structure of the db doc using a schema
 const userSchema = mongoose.Schema({
