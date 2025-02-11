@@ -42,3 +42,29 @@ my-mern-app/
     - Employees
     - Admins
     - Super Admins
+
+
+    frontend layout
+
+/localShop (root)
+│── 📂 src
+│   │── 📂 assets          # Static assets like images, fonts, and global styles
+│   │── 📂 components      # Reusable UI components (buttons, modals, etc.)
+│   │── 📂 layouts         # Layout components (e.g., Navbar, Sidebar, etc.)
+│   │── 📂 pages           # Page components for different routes
+│   │── 📂 features        # Redux slices for different features (e.g., auth, products)
+│   │── 📂 hooks           # Custom React hooks
+│   │── 📂 services        # API calls and Axios interceptors
+│   │── 📂 utils           # Utility/helper functions
+│   │── 📂 routes          # React Router configuration
+│   │── 📂 config          # App-level configuration (e.g., constants, environment variables)
+│   │── 📂 middleware      # Middleware like authentication and error handling
+│   │── 📜 main.jsx        # Root component (renders App.jsx)
+│   │── 📜 App.jsx         # Main App component (sets up routes)
+│   │── 📜 store.js        # Redux store configuration
+│── 📂 public              # Static public assets (favicon, manifest, etc.)
+│── 📜 index.html          # Root HTML file
+│── 📜 package.json        # Dependencies and scripts
+│── 📜 vite.config.js      # Vite configuration
+│── 📜 .env                # Environment variables
+│── 📜 .gitignore          # Ignored files for Git
