@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, Heart, User } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -19,11 +19,11 @@ const MainNav = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center">
+          <Link to="/">
             <span className="text-2xl font-bold">
               local<span className="text-primary">Shop</span>
             </span>
-          </a>
+          </Link>
 
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-2xl mx-8">
@@ -70,4 +70,3 @@ const MainNav = () => {
 };
 
 export default MainNav;
-

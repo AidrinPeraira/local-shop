@@ -5,6 +5,9 @@ import { Login } from '../pages/Login'
 import { Register } from '../pages/Register'
 import { Shop } from '../pages/Shop'
 import { NotFound } from '../pages/NotFound'
+import { SavedList } from '../pages/SavedList'
+import { Cart } from '../pages/Cart'
+import { Product } from '../pages/Product'
 
 export const MainRoutes = () => {
   return (
@@ -13,6 +16,9 @@ export const MainRoutes = () => {
       <Route path='/login' element={<Login/>} />
       <Route path='/register' element={<Register/>} />
       <Route path='/shop' element={<Shop/>} />
+      <Route path='/saved' element={<SavedList/>} />
+      <Route path='/cart' element={<Cart/>} />
+      <Route path='/product' element={<Product/>} />
       <Route path="*" element={<NotFound/>} />
     </Routes>
   )

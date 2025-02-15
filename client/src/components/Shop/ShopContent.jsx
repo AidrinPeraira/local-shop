@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Star } from 'lucide-react';
-import { Button } from "../../components/ui/button";
-import { Slider } from "../../components/ui/slider";
-import { Checkbox } from "../ui/checkbox";
+import { Button } from "../../components/ui/button.jsx";
+import { Slider } from "../../components/ui/slider.jsx";
+import { Checkbox } from "../../components/ui/checkbox.jsx";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../ui/collapsible";
+} from "../../components/ui/collapsible.jsx";
 import {
   Pagination,
   PaginationContent,
@@ -16,7 +16,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../components/ui/pagination";
+} from "../../components/ui/pagination.jsx";
 
 const categories = [
   { id: 'electronics', name: 'Electronics', count: 45 },
@@ -108,14 +108,21 @@ const ShopContent = () => {
               <h3 className="font-semibold text-lg">Categories</h3>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm" className="p-0 h-auto">
-                  {expanded.categories ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  {expanded.categories ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
                 </Button>
               </CollapsibleTrigger>
             </div>
             <CollapsibleContent>
               <div className="space-y-2">
                 {categories.map((category) => (
-                  <label key={category.id} className="flex items-center space-x-2">
+                  <label
+                    key={category.id}
+                    className="flex items-center space-x-2"
+                  >
                     <Checkbox
                       checked={selectedCategories.includes(category.id)}
                       onCheckedChange={(checked) => {
@@ -135,13 +142,100 @@ const ShopContent = () => {
               </div>
             </CollapsibleContent>
           </Collapsible>
+
+          {/* Price Range */}
+          <Collapsible
+            open={expanded.price}
+            onOpenChange={(isOpen) =>
+              setExpanded((prev) => ({ ...prev, price: isOpen }))
+            }
+            className="mb-6"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold text-lg">Price Range</h3>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="p-0 h-auto">
+                  {expanded.price ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+            <CollapsibleContent>
+              <div className="px-2 pt-4">
+                <Slider
+                  defaultValue={[0, 3000]}
+                  max={3000}
+                  step={100}
+                  value={priceRange}
+                  onValueChange={setPriceRange}
+                  className="mb-4"
+                />
+                <div className="flex items-center justify-between text-sm">
+                  <span>${priceRange[0]}</span>
+                  <span>${priceRange[1]}</span>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Brands */}
+          <Collapsible
+            open={expanded.brands}
+            onOpenChange={(isOpen) =>
+              setExpanded((prev) => ({ ...prev, brands: isOpen }))
+            }
+            className="mb-6"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold text-lg">Brands</h3>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="p-0 h-auto">
+                  {expanded.brands ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+            <CollapsibleContent>
+              <div className="space-y-2">
+                {brands.map((brand) => (
+                  <label
+                    key={brand.id}
+                    className="flex items-center space-x-2"
+                  >
+                    <Checkbox
+                      checked={selectedBrands.includes(brand.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedBrands([...selectedBrands, brand.id]);
+                        } else {
+                          setSelectedBrands(
+                            selectedBrands.filter((id) => id !== brand.id)
+                          );
+                        }
+                      }}
+                    />
+                    <span className="flex-1">{brand.name}</span>
+                    <span className="text-sm text-gray-500">({brand.count})</span>
+                  </label>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </aside>
 
         {/* Main Content */}
         <div className="flex-1">
+          {/* Filters & Sort */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-gray-600">
-              Showing <span className="font-medium">1-12</span> of <span className="font-medium">48</span> products
+              Showing <span className="font-medium">1-12</span> of{" "}
+              <span className="font-medium">48</span> products
             </p>
             <select className="border rounded-md px-3 py-1.5">
               <option>Sort by latest</option>
@@ -179,7 +273,11 @@ const ShopContent = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex text-yellow-400">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className="h-4 w-4" fill={i < product.rating ? "currentColor" : "none"} />
+                      <Star
+                        key={i}
+                        className="h-4 w-4"
+                        fill={i < product.rating ? "currentColor" : "none"}
+                      />
                     ))}
                   </div>
                   <span className="text-sm text-gray-600">({product.reviews})</span>
@@ -193,6 +291,30 @@ const ShopContent = () => {
               </div>
             ))}
           </div>
+
+          {/* Pagination */}
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#" isActive>1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">2</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">3</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
     </main>
