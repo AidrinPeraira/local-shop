@@ -1,3 +1,61 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 207 58% 34%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 207 58% 34%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/90 border border-white/20 shadow-sm;
+  }
+  
+  .nav-item {
+    @apply flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors duration-200;
+  }
+  
+  .icon-button {
+    @apply p-2 text-gray-600 hover:text-primary transition-all duration-200 rounded-full hover:bg-gray-100;
+  }
+
+  .dropdown {
+    @apply absolute z-50 mt-2 glass-effect rounded-lg shadow-lg overflow-hidden min-w-[160px];
+  }
+
+  .dropdown-item {
+    @apply block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200;
+  }
+}
