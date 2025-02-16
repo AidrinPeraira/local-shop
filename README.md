@@ -27,6 +27,7 @@ The pages I need
     - order status and tracking
     - order info / invoice
     - cancellation and return
+
 - Admin
     - add edit category
     - add edit product
@@ -34,7 +35,9 @@ The pages I need
     - add edit seller
     - see sales
     - customer contact
-    - add edit remove review
+    - grievance tickets
+    - add edit remove review\
+    
     - approve sellers?
     - admin login
     - order status
@@ -54,3 +57,6 @@ Additional Features
     - notification mail and sms
     - Language
     - Chat
+    - choice of delivery option
+
+    MOQQQQQQQQQQQQ?????????????????????
