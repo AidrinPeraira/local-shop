@@ -45,23 +45,29 @@ const MainNav = () => {
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="relative">
-              <Heart className="h-6 w-6" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
-                0
-              </span>
-            </Button>
+            <Link to="/saved">
+              <Button variant="ghost" size="icon" className="relative">
+                <Heart className="h-6 w-6" />
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
+                  0
+                </span>
+              </Button>
+            </Link>
 
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="h-6 w-6" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
-                0
-              </span>
-            </Button>
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-6 w-6" />
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
+                  0
+                </span>
+              </Button>
+            </Link>
 
-            <Button variant="ghost" size="icon">
-              <User className="h-6 w-6" />
-            </Button>
+            <Link to='/login'>
+              <Button variant="ghost" size="icon">
+                <User className="h-6 w-6" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

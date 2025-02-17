@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Mail, Key, Eye, EyeOff } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -15,6 +14,11 @@ const LoginForm = () => {
     e.preventDefault();
     // Handle login logic here
     console.log("Login attempted with:", { email, password });
+  };
+
+  const handleSocialLogin = (provider) => {
+    console.log(`Login with ${provider}`);
+    // Add actual OAuth login logic here
   };
 
   return (
@@ -69,24 +73,40 @@ const LoginForm = () => {
           <input type="checkbox" className="rounded border-gray-300" />
           <span>Remember me</span>
         </label>
-        <Link
-          to="/forgot-password"
-          className="text-accent hover:text-accent/90 font-medium"
-        >
+        <Link to="/forgot-password" className="text hover:opacity-70 font-medium">
           Forgot password?
         </Link>
       </div>
 
-      <Button type="submit" className="w-full bg-accent hover:bg-accent/90">
+      <Button type="submit" className="w-full hover:opacity-90">
         Sign in
+      </Button>
+
+      <div className="flex items-center space-x-2">
+        <div className="w-full border-t border-gray-300"></div>
+        <span className="text-gray-500 text-sm">or</span>
+        <div className="w-full border-t border-gray-300"></div>
+      </div>
+
+      <Button
+        type="button"
+        className="w-full bg-red-500 text-white hover:bg-red-600"
+        onClick={() => handleSocialLogin("Google")}
+      >
+        Sign in with Google
+      </Button>
+
+      <Button
+        type="button"
+        className="w-full bg-blue-600 text-white hover:bg-blue-700"
+        onClick={() => handleSocialLogin("Facebook")}
+      >
+        Sign in with Facebook
       </Button>
 
       <p className="text-center text-sm text-gray-600">
         Don't have an account?{" "}
-        <Link
-          to="/register"
-          className="text-accent hover:text-accent/90 font-medium"
-        >
+        <Link to="/register" className="text hover:opacity-70 font-medium">
           Sign up
         </Link>
       </p>
