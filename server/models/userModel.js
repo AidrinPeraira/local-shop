@@ -9,17 +9,37 @@ const userSchema = mongoose.Schema({
     email : {
         type : String,
         required : true,
+        unique : true,
+        message: 'Email id already registered!', 
     },
     password : {
         type : String,
         required : true,
     },
+    phone : {
+        type : Number,
+        required : true,
+        unique : true,
+        message: 'Phone number already registered!', 
+    },
+    emailVerified : {
+        type : Boolean,
+        default : false
+    },
+    phoneVerified : {
+        type : Boolean,
+        default : false
+    },
+    blocked : {
+        type : Boolean,
+        default : false
+    },
     role : {
         type : String,
         required : true,
-        enum: ['user-buyer', 'user-seller', 'admin'], // Allowed values
+        enum: ['buyer', 'seller', 'admin'], // Allowed values
         message: '{VALUE} is not a valid role', // Optional error message
-        default : 'user-buyer'
+        default : 'seller'
     }
 }, {timestamps : true})
 

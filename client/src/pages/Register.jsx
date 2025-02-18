@@ -113,16 +113,38 @@ export const Register = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-accent hover:bg-accent/90"
+                className="w-full bg hover:bg/90"
               >
                 Create Account
+              </Button>
+
+              <div className="flex items-center space-x-2">
+                <div className="w-full border-t border-gray-300"></div>
+                <span className="text-gray-500 text-sm">or</span>
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+
+              <Button
+                type="button"
+                className="w-full bg-red-500 text-white hover:bg-red-600"
+                onClick={() => handleSocialLogin("Google")}
+              >
+                Sign in with Google
+              </Button>
+
+              <Button
+                type="button"
+                className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                onClick={() => handleSocialLogin("Facebook")}
+              >
+                Sign in with Facebook
               </Button>
 
               <p className="text-center text-sm text-gray-600">
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="text-accent hover:text-accent/90 font-medium"
+                  className="text hover:text/90 font-medium"
                 >
                   Sign in
                 </Link>

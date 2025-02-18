@@ -3,30 +3,45 @@ import User from "../models/userModel.js";
 import generateToken from "../utils/createToken.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import bcrypt from 'bcryptjs'
+import { validateUserData } from "../utils/validateData.js";
 
 
 export const createUser = asyncHandler(
     async (req, res) => {
-        const {username, email, password} = req.body;
+        const {username, email, password, phone} = req.body;
 
         //add some validation before putting it into DB
-        if(!username || !email || !password){
+        if(!username || !email || !password || !phone){
             throw new Error ('Please fill all the input fields')
         }
 
         //check if the user credential already exists
-        const userExists = await User.findOne({email}); // if the credentials are esisting we can find it 
-        if(userExists) {
+        const emailExists = await User.findOne({email}); // if the credentials are esisting we can find it 
+        if(emailExists) {
             res.status(HTTP_CODES.BAD_REQUEST)
-            throw new Error('User already exists!')
+            throw new Error('Email already registered')
         }
+
+        const phoneExists = await User.findOne({phone}); // if the credentials are esisting we can find it 
+        if(phoneExists) {
+            res.status(HTTP_CODES.BAD_REQUEST)
+            throw new Error('Phone number already registered')
+        }
+
+        //check for validity of received data
+        const valid = validateUserData(username, email, phone, password)
+        if(valid === true) {
+            res.status(HTTP_CODES.BAD_REQUEST)
+            throw new Error(`${valid}`)
+        }
+        
 
         // hash the password before storing it
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = bcrypt.hashSync(password, salt)
 
         // create and add new user
-        const newUser = new User({username, email, password : hashedPassword})
+        const newUser = new User({username, email, phone, password : hashedPassword})
         try {
             await newUser.save()
 
@@ -37,7 +52,7 @@ export const createUser = asyncHandler(
                 _id : newUser._id,
                 username : newUser.username,
                 email : newUser.email,
-                role : newUser.role,
+                phone : newUser.phone
             })
             
         } catch (error) {
