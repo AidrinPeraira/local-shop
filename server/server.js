@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser'
 import { connectDB } from './config/db.js'
 import exp from 'constants'
 import userRouter from './routes/userRoutes.js'
+import verifyRoute from './routes/verifyRoutes.js'
 
 
 
@@ -28,6 +29,7 @@ app.use(cookieParser())
 
 //add necessary routing
 app.use('/api/users', userRouter)
+app.use('/api/verify', verifyRoute)
 
 //start thr server
 app.listen(port, ()=>{

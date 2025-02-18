@@ -65,6 +65,7 @@ export const createUser = asyncHandler(
     }
 )
 
+
 export const loginUser = asyncHandler(
     async (req, res) => {
         
@@ -101,7 +102,8 @@ export const loginUser = asyncHandler(
         } else {
             //revert with an error message
             res.status(HTTP_CODES.BAD_REQUEST).json({message : 'Invalid Credentials. Try Again'})
-        }    }
+        }    
+    }
 )
 
 export const logoutController = asyncHandler(
