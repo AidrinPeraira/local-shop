@@ -7,10 +7,13 @@ import { SellerOrders } from "../pages/Dashboards/seller/Orders";
 import { SellerSettings } from "../pages/Dashboards/seller/Settings";
 import { SellerNotFound } from "../pages/Dashboards/seller/SellerNotFound";
 import { SellerAnalytics } from "../pages/Dashboards/seller/Analytics";
+import { SellerLogin } from "../pages/SellerLogin";
 
-export const SellerRoutes = () => {
+const SellerRoutes = () => {
   return (
       <Routes>
+        <Route path="/login" element={<SellerLogin/>}/>
+        <Route path="/register" element={<SellerRegister/>}/>
         <Route path="/" element={<SellerLayout />}>
           <Route index element={<SellerDashboard />} />
           <Route path="products" element={<SellerProducts />} />
@@ -22,3 +25,5 @@ export const SellerRoutes = () => {
       </Routes>
   );
 };
+
+export default SellerRoutes

@@ -18,7 +18,7 @@ const API = axios.create({
  */
 
 //write the functions to make the request here.
-export const registerUser = (userData) => API.post("/users", userData);
+export const registerUser = (userData) => API.post("/users/register", userData);
 export const loginUser = (userData) => API.post("/users/auth", userData);
 export const getCurrentUser = (userData) => API.get('/users/profile', userData)
 export const logoutUser = () => API.post('/users/logout')

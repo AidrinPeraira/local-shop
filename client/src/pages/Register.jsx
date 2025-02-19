@@ -1,9 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Mail, User, Key, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useToast } from "../components/hooks/use-toast";
+import { validateUserData } from "../utils/validateData";
+import axios from "axios";
+import { sendOTP, verifyOTP } from "../api/emailOtpApi.js";
+import { registerUserAction } from "../redux/slices/userSlice.js";
 
 export const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,20 +19,82 @@ export const Register = () => {
     password: "",
     phone: "",
   });
-  const [showPopup, setShowPopup] = useState(false); // To control popup visibility
+  const [showPopup, setShowPopup] = useState(false); //pop up for email otp
   const [userOTP, setUserOTP] = useState(null);
 
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("this is the form data", formData)
-    setShowPopup(true); // Show the popup for email verification
+
+    const dataValid = validateUserData(
+      formData.username,
+      formData.email,
+      formData.phone,
+      formData.password
+    );
+
+    if (dataValid !== true) {
+      toast({
+        title: "Invalid Data",
+        description: dataValid,
+        variant: "default",
+      });
+      return;
+    }
+    const mailOTP = await sendOTP({ email: formData.email });
+    if (mailOTP.data.success) {
+      toast({
+        title: "Send OTP Success",
+        description: mailOTP.data.message,
+        variant: "default",
+      });
+      setShowPopup(true); // Show the popup for email verification
+    } else {
+      toast({
+        title: "Send OTP Error",
+        description: mailOTP.data.message,
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleEmailConfirm = () => {
-    console.log("Email confirmed:", formData.email);
-    // Proceed with the registration process (send the request)
-    setShowPopup(false);
-    // Send the form data to the backend for user creation
+  const handleEmailConfirm = async () => {
+    const response = await verifyOTP({
+      email: formData.email,
+      otpRecieved: userOTP,
+    });
+
+    if (response.data.success) {
+      toast({
+        title: "OTP verified succesfully!",
+        description: response.data.message,
+        variant: "default",
+      });
+      setShowPopup(false);
+
+      //add user to the databse
+      dispatch(registerUserAction({ ...formData }))
+        .unwrap()
+        .then(() => {
+          navigate("/home");
+        })
+        .catch((err) => {
+          console.error(
+            "Login error:",
+            err || "An error occurred. Please try again."
+          );
+          setErrorMessage(err || "An error occurred. Please try again.");
+        });
+    } else {
+      toast({
+        title: "Invalid OTP",
+        description: response.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEmailCancel = () => {
@@ -59,7 +127,7 @@ export const Register = () => {
               <p className="text-gray-600 mt-2">Join us to start shopping</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} noValidate className="space-y-6 ">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <div className="relative">
@@ -72,7 +140,6 @@ export const Register = () => {
                       setFormData({ ...formData, username: e.target.value })
                     }
                     className="pl-10"
-                    required
                   />
                 </div>
               </div>
@@ -90,7 +157,6 @@ export const Register = () => {
                       setFormData({ ...formData, email: e.target.value })
                     }
                     className="pl-10"
-                    required
                   />
                 </div>
               </div>
@@ -108,7 +174,6 @@ export const Register = () => {
                       setFormData({ ...formData, phone: e.target.value })
                     }
                     className="pl-10"
-                    required
                   />
                 </div>
               </div>
@@ -126,7 +191,6 @@ export const Register = () => {
                       setFormData({ ...formData, password: e.target.value })
                     }
                     className="pl-10"
-                    required
                   />
                   <Button
                     type="button"
@@ -194,13 +258,13 @@ export const Register = () => {
             <p className="text-sm text-gray-700 mb-4">
               Please enter the OTP sent to your email: {formData.email}
             </p>
-            
+
             <Input
               id="email"
               type="password"
               placeholder="Enter OTP"
               value={userOTP}
-              onChange={(e) => setFormData(e.target.value)}
+              onChange={(e) => setUserOTP(e.target.value)}
               className="pl-10"
               required
             />

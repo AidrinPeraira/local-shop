@@ -59,4 +59,8 @@ Additional Features
     - Chat
     - choice of delivery option
 
-    MOQQQQQQQQQQQQ?????????????????????
+
+Features Added
+
+- used async thunk to handle async api calls
+- added lazy loading for all pages

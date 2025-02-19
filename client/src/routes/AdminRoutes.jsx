@@ -8,7 +8,7 @@ import { Orders } from "../pages/Dashboards/admin/Orders";
 import { Settings } from "../pages/Dashboards/admin/Settings";
 import { AdminNotFound } from "../pages/Dashboards/admin/AdminNotFound";
 
-export const AdminRoutes = () => {
+const AdminRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<AdminLayout />}>
@@ -22,3 +22,5 @@ export const AdminRoutes = () => {
     </Routes>
   );
 };
+
+export default AdminRoutes

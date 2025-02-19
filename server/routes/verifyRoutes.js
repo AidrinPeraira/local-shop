@@ -1,10 +1,9 @@
-import express from 'express'
-import { sendOTP } from '../controller/otpController.js'
+import express from "express";
+import { sendOTP, verifyOTP } from "../controller/otpController.js";
 
-const verifyRoute = express.Router()
+const verifyRoute = express.Router();
 
-verifyRoute.route('/email')
-    .get(sendOTP)
+verifyRoute.route("/email/send").post(sendOTP);
+verifyRoute.route("/email/verify").post(verifyOTP);
 
-
-export default verifyRoute
+export default verifyRoute;

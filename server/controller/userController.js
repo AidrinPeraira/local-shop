@@ -49,6 +49,8 @@ export const createUser = asyncHandler(
             generateToken(res, newUser._id)
 
             res.status(HTTP_CODES.CREATED).json({
+                success : true,
+                message : 'User Created Succesfully',
                 _id : newUser._id,
                 username : newUser.username,
                 email : newUser.email,
@@ -159,14 +161,19 @@ export const updateCurrentUser = asyncHandler(
             const updatedUser = await user.save()
     
             res.status(HTTP_CODES.OK).json({
+                success : true,
+                message : 'User Updated Succesfully',
                 _id : updatedUser._id,
                 username : updatedUser.username,
                 email : updatedUser.email,
                 role : updatedUser.role,
             })
+
         } else {
+
             res.status(HTTP_CODES.NOT_FOUND)
             throw new Error('User not found')
+
         }
 
 

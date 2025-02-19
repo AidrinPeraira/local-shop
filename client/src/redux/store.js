@@ -1,4 +1,5 @@
 import {configureStore} from '@reduxjs/toolkit';
+import userReducer from './slices/userSlice.js'
 
 const store = configureStore({
     reducer : {
@@ -8,4 +9,4 @@ const store = configureStore({
     }
 })
 
-export default store
+export  {store}

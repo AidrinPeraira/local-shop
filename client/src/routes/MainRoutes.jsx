@@ -9,7 +9,7 @@ import { SavedList } from '../pages/SavedList'
 import { Cart } from '../pages/Cart'
 import { Product } from '../pages/Product'
 
-export const MainRoutes = () => {
+const MainRoutes = () => {
   return (
     <Routes>
       <Route path='/' element={<Home/>} />
@@ -23,3 +23,5 @@ export const MainRoutes = () => {
     </Routes>
   )
 }
+
+export default MainRoutes
