@@ -82,13 +82,12 @@ export const Register = () => {
             title: "Registered and Logged In",
             description: "Happy Shopping",
             variant: "default",
-          });
+          }); 
           navigate('/')
         })
         .catch((error)=>{
           console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again") 
-          toast({
-            
+          toast({            
             title: "Registration Error!",
             description: error,
             variant: "destructive",

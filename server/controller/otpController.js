@@ -4,7 +4,6 @@ import { generateOTP, sendOTPEmail } from "../utils/emailOTP.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import bcrypt from "bcryptjs";
 import otpSchema from "../models/otpModel.js";
-import User from "../models/userModel.js";
 
 export const sendOTP = asyncHandler(async (req, res) => {
   try {
@@ -62,7 +61,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
       await otpSchema.deleteOne({ email });
       res.json({
         success: true,
-        message: "Welcome to localShop! Happy Shopping!",
+        message: "OTP Verified Succesfully",
       });
     } else {
       res.status(HTTP_CODES.BAD_REQUEST);

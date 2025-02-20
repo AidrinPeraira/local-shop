@@ -10,6 +10,7 @@ const MainNav = () => {
   const [showProfile, setShowProfile] = useState(false);
 
   const isLoggedIn = false; // Replace with actual auth state
+  
   const navigate = useNavigate();
 
   const cartRef = useRef();
@@ -20,9 +21,12 @@ const MainNav = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        cartRef.current && !cartRef.current.contains(event.target) &&
-        wishlistRef.current && !wishlistRef.current.contains(event.target) &&
-        profileRef.current && !profileRef.current.contains(event.target)
+        cartRef.current &&
+        !cartRef.current.contains(event.target) &&
+        wishlistRef.current &&
+        !wishlistRef.current.contains(event.target) &&
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
       ) {
         setShowCart(false);
         setShowWishlist(false);

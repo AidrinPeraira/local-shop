@@ -10,27 +10,28 @@ export const createUser = asyncHandler(
     async (req, res) => {
         const {username, email, password, phone} = req.body;
 
+        
         //add some validation before putting it into DB
         if(!username || !email || !password || !phone){
             throw new Error ('Please fill all the input fields')
         }
-
+        
         //check if the user credential already exists
         const emailExists = await User.findOne({email}); // if the credentials are esisting we can find it 
         if(emailExists) {
             res.status(HTTP_CODES.BAD_REQUEST)
             throw new Error('Email already registered')
         }
-
+        
         const phoneExists = await User.findOne({phone}); // if the credentials are esisting we can find it 
         if(phoneExists) {
             res.status(HTTP_CODES.BAD_REQUEST)
             throw new Error('Phone number already registered')
         }
-
+        
         //check for validity of received data
         const valid = validateUserData(username, email, phone, password)
-        if(valid === true) {
+        if(valid !== true) {
             res.status(HTTP_CODES.BAD_REQUEST)
             throw new Error(`${valid}`)
         }
@@ -49,8 +50,6 @@ export const createUser = asyncHandler(
             generateToken(res, newUser._id)
 
             res.status(HTTP_CODES.CREATED).json({
-                success : true,
-                message : 'User Created Succesfully',
                 _id : newUser._id,
                 username : newUser.username,
                 email : newUser.email,

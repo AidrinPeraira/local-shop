@@ -1,19 +1,42 @@
-import { useState } from "react";
+import { useDebugValue, useState } from "react";
 import { Mail, Key, Eye, EyeOff } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../redux/features/userSlice";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempted with:", { email, password });
+    
+    dispatch(loginUser({email, password}))
+      .unwrap()
+      .then(({response})=>{
+        toast({
+          title: "Logged In",
+          description: `${response.message}`,
+          variant: "default",
+        });
+        navigate('/')
+      })
+      .catch((error)=>{
+        console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again") 
+          toast({            
+            title: "Registration Error!",
+            description: error.response.data.message,
+            variant: "destructive",
+          });
+      })
+
   };
 
   const handleSocialLogin = (provider) => {
