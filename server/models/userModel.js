@@ -39,7 +39,7 @@ const userSchema = mongoose.Schema({
         required : true,
         enum: ['buyer', 'seller', 'admin'], // Allowed values
         message: '{VALUE} is not a valid role', // Optional error message
-        default : 'seller'
+        default : 'buyer'
     }
 }, {timestamps : true})
 

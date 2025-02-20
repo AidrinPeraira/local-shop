@@ -7,9 +7,8 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useToast } from "../components/hooks/use-toast";
 import { validateUserData } from "../utils/validateData";
-import axios from "axios";
 import { sendOTP, verifyOTP } from "../api/emailOtpApi.js";
-import { registerUserAction } from "../redux/slices/userSlice.js";
+import { registerUser } from "../redux/features/userSlice.js";
 
 export const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,9 +21,9 @@ export const Register = () => {
   const [showPopup, setShowPopup] = useState(false); //pop up for email otp
   const [userOTP, setUserOTP] = useState(null);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { toast } = useToast();
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,18 +75,26 @@ export const Register = () => {
       setShowPopup(false);
 
       //add user to the databse
-      dispatch(registerUserAction({ ...formData }))
-        .unwrap()
-        .then(() => {
-          navigate("/home");
+      dispatch(registerUser(formData))
+        .unwrap() //breaks open the promise to give value if success and throw rejectWithVakue error if rejected
+        .then((response)=>{
+          toast({
+            title: "Registered and Logged In",
+            description: "Happy Shopping",
+            variant: "default",
+          });
+          navigate('/')
         })
-        .catch((err) => {
-          console.error(
-            "Login error:",
-            err || "An error occurred. Please try again."
-          );
-          setErrorMessage(err || "An error occurred. Please try again.");
-        });
+        .catch((error)=>{
+          console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again") 
+          toast({
+            
+            title: "Registration Error!",
+            description: error,
+            variant: "destructive",
+          });
+        })
+
     } else {
       toast({
         title: "Invalid OTP",

@@ -2,3 +2,4 @@
 ☐ make the dashboard side nav autoclose for responsiveness
 ☐ after verifying email. set the verification status to global state in redux
 ☐ add a count for the number of invalid otp attempts
+☐ check if otp doc is being deleted form mongodb collection

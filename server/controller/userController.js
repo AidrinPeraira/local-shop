@@ -54,7 +54,8 @@ export const createUser = asyncHandler(
                 _id : newUser._id,
                 username : newUser.username,
                 email : newUser.email,
-                phone : newUser.phone
+                phone : newUser.phone,
+                role : "buyer"
             })
             
         } catch (error) {

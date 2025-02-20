@@ -7,7 +7,7 @@ const userRouter = express.Router()
 userRouter.route('/register')
     .post(createUser)
 
-userRouter.route('/auth')
+userRouter.route('/login')
     .post(loginUser)
 
 userRouter.route('/logout')
