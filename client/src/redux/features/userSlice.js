@@ -17,7 +17,7 @@ export const registerUser = createAsyncThunk(
 )
 
 export const loginUser = createAsyncThunk(
-    "user/login",
+    "user/loginUser",
     async (userData, {rejectWithValue}) => {
         try {
             const response = await userLoginApi(userData) //this is the aasync api call
@@ -54,7 +54,6 @@ const userSlice = createSlice({
             })
             .addCase(registerUser.fulfilled, (state, action)=>{
                 state.loading = false,
-                console.log(action)
                 state.user = action.payload
             })
             .addCase(registerUser.rejected, (state, action)=>{

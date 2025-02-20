@@ -76,8 +76,6 @@ export const loginUser = asyncHandler(
         
         //check for corresponding user
         const existingUser = await User.findOne({email})
-        console.log(email, password, existingUser)
-
         //login if exist eroor message if not
         if(existingUser){
             //let user login

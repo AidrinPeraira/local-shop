@@ -41,7 +41,6 @@ export const sendOTP = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     res.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
-    console.log(error);
     throw new Error("Failed to send OTP");
   }
 });

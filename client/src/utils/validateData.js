@@ -25,11 +25,3 @@ export function validateUserData(username, email, phone, password) {
   return true;
 }
 
-// Example usage
-// const username = "user_123";
-// const email = "user@example.com";
-// const phone = "9876543210";
-// const password = "Password@123";
-
-// const validationMessage = validateUserData(username, email, phone, password);
-// console.log(validationMessage);

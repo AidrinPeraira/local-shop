@@ -6,6 +6,7 @@ import { Label } from "../components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../redux/features/userSlice";
+import { useToast } from "./hooks/use-toast";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,7 @@ const LoginForm = () => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const {toast} = useToast()
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,7 +25,7 @@ const LoginForm = () => {
       .then(({response})=>{
         toast({
           title: "Logged In",
-          description: `${response.message}`,
+          description: "Welcome back to localShop. Happy Shopping!",
           variant: "default",
         });
         navigate('/')

@@ -77,7 +77,7 @@ export const Register = () => {
       //add user to the databse
       dispatch(registerUser(formData))
         .unwrap() //breaks open the promise to give value if success and throw rejectWithVakue error if rejected
-        .then((response)=>{
+        .then(()=>{
           toast({
             title: "Registered and Logged In",
             description: "Happy Shopping",
