@@ -1,30 +1,24 @@
-import express from 'express'
-import { createUser, loginUser, logoutController, getAllUsers, getCurrentUserProfile, updateCurrentUser, deleteUserById, getUserById, updateUserById } from '../controller/userController.js'
-import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware.js'
+import express from "express";
+import {
+  createUser,
+  loginUser,
+  logoutController,
+} from "../controller/userController.js";
+import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
-const userRouter = express.Router()
+const userRouter = express.Router();
 
-userRouter.route('/register')
-    .post(createUser)
+userRouter.route("/register").post(createUser);
 
-userRouter.route('/login')
-    .post(loginUser)
+userRouter.route("/login").post(loginUser);
 
-userRouter.route('/logout')
-    .post(logoutController)
+userRouter.route("/logout").post(logoutController);
 
-userRouter.route('/profile')
-    .get(authenticate, getCurrentUserProfile)
-    .put(authenticate, updateCurrentUser)
+//------------------------
 
-    //admin actions below
+//add user actions to get put and delete account / details
+//what about cart and wishlist? do we need a seperate controller for tha? that would be better
 
-userRouter.route('/')
-    .get(authenticate, authorizeAdmin, getAllUsers)
 
-userRouter.route('/:id')
-    .delete(authenticate, authorizeAdmin, deleteUserById)
-    .get(authenticate, authorizeAdmin, getUserById)
-    .put(authenticate, authorizeAdmin, updateUserById)
 
-export default userRouter
+export default userRouter;

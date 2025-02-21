@@ -88,7 +88,7 @@ export const SellerLogin = () => {
             <div className="flex items-center justify-between">
               <Link
                 to="/seller/forgot-password"
-                className="text-sm text-accent hover:underline"
+                className="text-sm text-primary hover:underline"
               >
                 Forgot Password?
               </Link>
@@ -103,7 +103,7 @@ export const SellerLogin = () => {
               Don't have a seller account?{" "}
               <Link
                 to="/seller/register"
-                className="text-accent hover:underline"
+                className="text-primary hover:underline"
               >
                 Register here
               </Link>

@@ -5,6 +5,10 @@ const API = axios.create({
   withCredentials: true,
 });
 
-
+//buyer apis
 export const userRegApi = (data) => API.post("/users/register", data)
 export const userLoginApi = (data) => API.post("/users/login", data)
+export const userLogoutApi = () => API.post("/users/logout")
+
+//admin apis
+export const adminLoginApi = (data) => API.post("/admin/login", data)

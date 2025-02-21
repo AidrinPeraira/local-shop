@@ -2,8 +2,12 @@
 import React from 'react';
 import { Phone, MapPin, Mail, ArrowRight, Store } from 'lucide-react';
 import { Button } from "../ui/button";
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+
+  const navigate = useNavigate()
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Main Footer Content */}
@@ -82,7 +86,7 @@ const Footer = () => {
                 <a href="#" className="hover:text-primary transition-colors">Customer Help</a>
               </li>
               <li>
-                <a href="#" className="text-primary hover:text-primary/80 transition-colors">Register as Seller</a>
+                <a href="#" className="text-primary hover:text-primary/80 transition-colors" onClick={navigate('/seller/login')}>Login as Seller</a>
               </li>
             </ul>
           </div>

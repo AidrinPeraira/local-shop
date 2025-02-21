@@ -7,8 +7,12 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const BottomNav = () => {
+
+  const navigate = useNavigate()
+
   return (
     <div className="w-full bg-white shadow-sm">
       <div className="container mx-auto px-4">

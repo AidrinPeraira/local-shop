@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 //first we create a structure of the db doc using a schema
-const userSchema = mongoose.Schema({
+const adminSchema = mongoose.Schema({
     username : {
         type : String,
         required : true,
@@ -22,14 +22,7 @@ const userSchema = mongoose.Schema({
         unique : true,
         message: 'Phone number already registered!', 
     },
-    emailVerified : {
-        type : Boolean,
-        default : false
-    },
-    phoneVerified : {
-        type : Boolean,
-        default : false
-    },
+    
     blocked : {
         type : Boolean,
         default : false
@@ -37,11 +30,11 @@ const userSchema = mongoose.Schema({
     role : {
         type : String,
         required : true,
-        default : 'buyer'
+        default : 'admin'
     }
 }, {timestamps : true})
 
 //now we creatte a model based on this schema
 
-const User = mongoose.model('User', userSchema);
-export default User;
+const Admin = mongoose.model('Admin', adminSchema);
+export default Admin;

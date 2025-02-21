@@ -10,6 +10,7 @@ import cors from 'cors'
 import { connectDB } from './config/db.js'
 import exp from 'constants'
 import userRouter from './routes/userRoutes.js'
+import adminRouter from './routes/adminRoutes.js'
 import verifyRoute from './routes/verifyRoutes.js'
 
 
@@ -34,6 +35,7 @@ app.use(cors({
 
 //add necessary routing
 app.use('/api/users', userRouter)
+app.use('/api/admin', adminRouter)
 app.use('/api/verify', verifyRoute)
 
 //start thr server
