@@ -1,5 +1,5 @@
 
-import { Card } from "../../../components/ui/card";
+import { Card } from "../../components/ui/card";
 import { BarChart3, DollarSign, ShoppingCart, Users } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 

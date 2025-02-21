@@ -1,5 +1,5 @@
 
-import { Card } from "../../../components/ui/card";
+import { Card } from "../../components/ui/card";
 
 const users = [
   { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "Active" },

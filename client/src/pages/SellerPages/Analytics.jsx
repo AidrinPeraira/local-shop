@@ -1,5 +1,5 @@
 
-import { Card } from "../../../components/ui/card";
+import { Card } from "../../components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from "recharts";
 
 const monthlyData = [

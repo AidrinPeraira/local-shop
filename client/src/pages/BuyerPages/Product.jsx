@@ -1,11 +1,11 @@
 
 import { useState } from "react";
-import ProductGallery from "../components/Product/ProductGallery";
-import ProductInfo from "../components/Product/ProductInfo";
-import ShippingInfo from "../components/Product/ShippingInfo";
-import ProductSpecs from "../components/Product/ProductSpecs";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer/Footer";
+import ProductGallery from "../../components/Product/ProductGallery";
+import ProductInfo from "../../components/Product/ProductInfo";
+import ShippingInfo from "../../components/Product/ShippingInfo";
+import ProductSpecs from "../../components/Product/ProductSpecs";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 
 // Mock data (replace with real data from your backend)
 const mockProduct = {

@@ -4,3 +4,6 @@
 ☐ add a count for the number of invalid otp attempts
 ☐ check if otp doc is being deleted form mongodb collection
 ☐ add cart and wishlist to global state on signup or login
+☐ when buyer registers there is a small delay before showing the model for email verification
+☐ need to re arrange seller registration to give it a proper structure
+☐ how do we use the remember me function?

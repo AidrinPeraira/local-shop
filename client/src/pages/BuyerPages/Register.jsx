@@ -1,14 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+import { Button } from "../../components/ui/button.jsx";
+import { Input } from "../../components/ui/input.jsx";
+import { Label } from "../../components/ui/label.jsx";
 import { Mail, User, Key, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useToast } from "../components/hooks/use-toast";
-import { validateUserData } from "../utils/validateData";
-import { sendOTP, verifyOTP } from "../api/emailOtpApi.js";
-import { registerUser } from "../redux/features/userSlice.js";
+import { useToast } from "../../components/hooks/use-toast.js";
+import { validateUserData } from "../../utils/validateData.js";
+import { sendOTP, verifyOTP } from "../../api/emailOtpApi.js";
+import { registerUser } from "../../redux/features/userSlice.js";
 
 export const Register = () => {
   const [showPassword, setShowPassword] = useState(false);

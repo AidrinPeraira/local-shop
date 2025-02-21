@@ -1,13 +1,13 @@
 import React from 'react'
 import {Routes, Route} from 'react-router-dom'
-import { Home } from '../pages/Home'
-import { Login } from '../pages/Login'
-import { Register } from '../pages/Register'
-import { Shop } from '../pages/Shop'
-import { NotFound } from '../pages/NotFound'
-import { SavedList } from '../pages/SavedList'
-import { Cart } from '../pages/Cart'
-import { Product } from '../pages/Product'
+import { Home } from '../pages/BuyerPages/Home'
+import { Login } from '../pages/BuyerPages/Login'
+import { Register } from '../pages/BuyerPages/Register'
+import { Shop } from '../pages/BuyerPages/Shop'
+import { NotFound } from '../pages/BuyerPages/NotFound'
+import { SavedList } from '../pages/BuyerPages/SavedList'
+import { Cart } from '../pages/BuyerPages/Cart'
+import { Product } from '../pages/BuyerPages/Product'
 
 const MainRoutes = () => {
   return (

@@ -1,5 +1,5 @@
 
-import { Card } from "../../../components/ui/card";
+import { Card } from "../../components/ui/card";
 
 const orders = [
   { id: "#ORD001", product: "Gaming Mouse", customer: "John Doe", date: "2024-02-20", status: "Shipped" },

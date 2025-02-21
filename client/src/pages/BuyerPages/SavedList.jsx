@@ -1,9 +1,9 @@
 
-import { Button } from "../components/ui/button";
+import { Button } from "../../components/ui/button";
 import { ShoppingCart, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer/Footer";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 
 export const SavedList = () => {
   // Mock wishlist data

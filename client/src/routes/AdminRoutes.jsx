@@ -1,16 +1,18 @@
 import React from "react";
 import { Routes, Route, Outlet } from "react-router-dom";
-import { AdminDashboard } from "../pages/Dashboards/admin/AdminDashboard";
+import { AdminDashboard } from "../pages/AdminPages/AdminDashboard";
 import { AdminLayout } from "../components/admin/AdminLayout";
-import { Products } from "../pages/Dashboards/admin/Products";
-import { Users } from "../pages/Dashboards/admin/Users";
-import { Orders } from "../pages/Dashboards/admin/Orders";
-import { Settings } from "../pages/Dashboards/admin/Settings";
-import { AdminNotFound } from "../pages/Dashboards/admin/AdminNotFound";
+import { Products } from "../pages/AdminPages/Products";
+import { Users } from "../pages/AdminPages/Users";
+import { Orders } from "../pages/AdminPages/Orders";
+import { Settings } from "../pages/AdminPages/Settings";
+import { AdminNotFound } from "../pages/AdminPages/AdminNotFound";
+import AdminLogin from "../pages/AdminPages/AdminLogin";
 
 const AdminRoutes = () => {
   return (
     <Routes>
+      <Route path="login" element={<AdminLogin />} />
       <Route path="/" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="products" element={<Products />} />
@@ -23,4 +25,4 @@ const AdminRoutes = () => {
   );
 };
 
-export default AdminRoutes
+export default AdminRoutes;

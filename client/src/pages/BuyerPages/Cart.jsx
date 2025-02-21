@@ -1,10 +1,10 @@
-import Footer from "../components/Footer/Footer";
-import Header from "../components/Header/Header";
-import CartHeader from "../components/cart/CartHeader";
-import CartSummary from "../components/cart/CartSummary";
-import { Button } from "../components/ui/button";
-import { Checkbox } from "../components/ui/checkbox";
-import { Input } from "../components/ui/input";
+import Footer from "../../components/Footer/Footer";
+import Header from "../../components/Header/Header";
+import CartHeader from "../../components/cart/CartHeader";
+import CartSummary from "../../components/cart/CartSummary";
+import { Button } from "../../components/ui/button";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Input } from "../../components/ui/input";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 

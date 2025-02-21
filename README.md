@@ -64,3 +64,4 @@ Features Added
 
 - used async thunk to handle async api calls
 - added lazy loading for all pages
+- send a mail to customer on order and cancel and chat

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
-import Header from '../components/Header/Header';
-import Footer from '../components/Footer/Footer';
-import { Button } from "../components/ui/button";
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+import { Button } from "../../components/ui/button";
 import { Truck, RefreshCw, ShieldCheck, Headphones, ArrowLeft, ArrowRight } from 'lucide-react';
 import {
   Carousel,
@@ -9,7 +9,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "../components/ui/carousel";
+} from "../../components/ui/carousel";
 
 export const Home = () => {
   const categories = [
