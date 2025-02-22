@@ -1,11 +1,12 @@
 import express from "express";
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
-import { loginAdmin, registerAdmin } from "../controller/adminController.js";
+import { loginAdmin, logOutAdmin, registerAdmin } from "../controller/adminController.js";
 
 const adminRouter = express.Router();
 
 adminRouter.route("/register").post(registerAdmin);
 adminRouter.route("/login").post(loginAdmin);
+adminRouter.route("/logout").post(logOutAdmin);
 
 
 //------------------------

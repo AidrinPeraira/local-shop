@@ -34,7 +34,7 @@ const LoginForm = () => {
         console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again") 
           toast({            
             title: "Registration Error!",
-            description: error.response.data.message,
+            description: error,
             variant: "destructive",
           });
       })

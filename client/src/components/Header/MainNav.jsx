@@ -44,7 +44,13 @@ const MainNav = () => {
   
 
   useEffect(() => {
-    setIsLoggedIn(!!user); // Update isLoggedIn based on user existence
+    if(user){
+      setIsLoggedIn(true)
+      console.log("set log in true")
+    } else {
+      setIsLoggedIn(false)
+      console.log("set log in false")
+    }
   }, [user]);
   
 
@@ -233,7 +239,7 @@ const MainNav = () => {
                           <User />
                         </div>
                         <h3 className="text-sm font-medium text-gray-800">
-                          {user.username }
+                          {user ? user.username : "" }
                         </h3>
                       </div>
                       <div className="mt-2 space-y-2">

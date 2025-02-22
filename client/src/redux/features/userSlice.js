@@ -13,6 +13,7 @@ export const registerUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data.message);
       /**Instead of throwing an error, rejectWithValue returns the error in the action.payload of the rejected case */
+      //this why we cam directly show the error in the componenct'
     }
   }
 );
@@ -21,12 +22,12 @@ export const loginUser = createAsyncThunk(
   "user/loginUser",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await userLoginApi(userData); //this is the aasync api call
+      const response = await userLoginApi(userData); 
       localStorage.setItem("user", JSON.stringify(response.data));
-      return response.data; //this is the payload given when the dispatch is called
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
-      /**Instead of throwing an error, rejectWithValue returns the error in the action.payload of the rejected case */
+      
     }
   }
 );
@@ -35,29 +36,26 @@ export const logoutUser = createAsyncThunk(
   "user/logoutUser",
   async (_,{ rejectWithValue }) => {
     try {
-      const response = await userLogoutApi(); // Call your API function to logout (optional)
-      Cookies.remove("jwt"); // Remove the JWT cookie
-      localStorage.removeItem("user"); // Remove user data from localStorage
-      return true; // Return a success flag
+      const response = await userLogoutApi();
+      Cookies.remove("jwt"); 
+      localStorage.removeItem("user"); 
+      return true; 
     } catch (error) {
       return rejectWithValue(error.message);
-      /**Instead of throwing an error, rejectWithValue returns the error in the action.payload of the rejected case */
     }
   }
 );
 
 //admin
-
 export const loginAdmin = createAsyncThunk(
   "user/loginAdmin",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await userLoginApi(userData); //this is the aasync api call
+      const response = await userLoginApi(userData); 
       localStorage.setItem("user", JSON.stringify(response.data));
-      return response.data; //this is the payload given when the dispatch is called
+      return response.data; 
     } catch (error) {
       return rejectWithValue(error.response.data.message);
-      /**Instead of throwing an error, rejectWithValue returns the error in the action.payload of the rejected case */
     }
   }
 );
@@ -119,6 +117,21 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      //login admin
+      .addCase(loginAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(loginAdmin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.data;
+      })
+      
   },
 });
 

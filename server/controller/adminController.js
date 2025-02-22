@@ -72,7 +72,7 @@ export const loginAdmin = asyncHandler(
         
         //get login credentials from request
         const {email, password} = req.body;
-        
+        console.log(email, password)
         //check for corresponding user
         const registeredAdmin = await Admin.findOne({email})
         //login if exist eroor message if not
@@ -106,7 +106,14 @@ export const loginAdmin = asyncHandler(
 )
 
 export const logOutAdmin = asyncHandler(
-    
+    async (req, res) => {
+        res.cookie('jwt', '', {
+            httpOnly : true,
+            expires : new Date(0) //a point in the past as an expiration date
+        })
+
+        res.status(HTTP_CODES.OK).json({message : 'Logged out successfully'})
+    }
 )
 
 //----------------

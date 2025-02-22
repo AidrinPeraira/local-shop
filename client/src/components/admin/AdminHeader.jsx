@@ -1,5 +1,4 @@
-
-import { Bell, Menu, Search, User } from "lucide-react";
+import { Bell, Link, LogIn, Menu, Search, User } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import {
   DropdownMenu,
@@ -9,9 +8,50 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
+import { useCallback, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { NotificationsDropdown } from "../ui/notification-dropdown";
+import ProfileDropdown from "../ui/profile-dropdown";
+import { useNavigate } from "react-router-dom";
 
+const AdminHeader = ({ onMenuClick }) => {
+  const [showProfile, setShowProfile] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-export default function AdminHeader({ onMenuClick }) {
+  const profileRef = useRef();
+  const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const handleSubmit = () => {};
+  const handleSignout = useCallback(() => {
+
+  },[]);
+
+  const notifications = [
+    {
+      id: 1,
+      title: "New Order Received",
+      message: "Order #1234 has been placed",
+      timestamp: "2 minutes ago",
+      read: false,
+    },
+    {
+      id: 2,
+      title: "Low Stock Alert",
+      message: "Gaming Mouse is running low on stock",
+      timestamp: "1 hour ago",
+      read: false,
+    },
+    {
+      id: 3,
+      title: "Payment Received",
+      message: "Payment for Order #1233 confirmed",
+      timestamp: "3 hours ago",
+      read: true,
+    },
+  ];
+
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -29,26 +69,12 @@ export default function AdminHeader({ onMenuClick }) {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <NotificationsDropdown notifications={notifications} />
+          <ProfileDropdown user={user} onSignOut={handleSignout} />
         </div>
       </div>
     </header>
   );
-}
+};
+
+export default AdminHeader;
