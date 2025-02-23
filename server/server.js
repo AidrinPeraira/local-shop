@@ -1,14 +1,13 @@
 //import the necesasry packages here
-import path from 'path'
 import express from 'express'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 
 
+
 //import our utils here
 import { connectDB } from './config/db.js'
-import exp from 'constants'
 import userRouter from './routes/userRoutes.js'
 import adminRouter from './routes/adminRoutes.js'
 import verifyRoute from './routes/verifyRoutes.js'
@@ -17,8 +16,9 @@ import verifyRoute from './routes/verifyRoutes.js'
 
 dotenv.config() //load dot env data into 'process.env' by default
 const port = process.env.PORT || 5000;
-
 connectDB() //estabilish a connection to the db
+
+
 
 const app = express() //initialise an instance of express
 
@@ -30,7 +30,6 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true // Allow sending cookies
   }))
-
 
 
 //add necessary routing

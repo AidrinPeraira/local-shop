@@ -7,11 +7,16 @@ The pages i have
  - Saved List
  - Login
  - Register
+ - email verification
+ - Seller
+    - seller registration
+    - seller login
+    
 
 
 The pages I need
 
-- email verification
+
 - phone verification
 - forgot password
 - google facebook login
@@ -47,8 +52,6 @@ The pages I need
     - see sales
     - sell cash in
     - see respond review
-    - seller registration
-    - seller login
     - order status
     - stock & inventory
     - cancellation and returns
@@ -58,10 +61,16 @@ Additional Features
     - Language
     - Chat
     - choice of delivery option
+    - send a mail to customer on order and cancel and chat
+
+
 
 
 Features Added
 
 - used async thunk to handle async api calls
-- added lazy loading for all pages
-- send a mail to customer on order and cancel and chat
+- added lazy loading for all pages (working??)
+- added slug to make url seo friendly
+- Security Features Added
+    - Authentication & Authorisation using JWT and HTTP Onlcy cookies
+    - used express-rate-limit to handle bruteforce attcaks. used in login and register routes
