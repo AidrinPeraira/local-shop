@@ -13,6 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { NotificationsDropdown } from "../ui/notification-dropdown";
 import ProfileDropdown from "../ui/profile-dropdown";
 import { useNavigate } from "react-router-dom";
+import { logoutAdmin } from "../../redux/features/userSlice";
+import { useToast } from "../hooks/use-toast";
 
 const AdminHeader = ({ onMenuClick }) => {
   const [showProfile, setShowProfile] = useState(false);
@@ -20,13 +22,38 @@ const AdminHeader = ({ onMenuClick }) => {
 
   const profileRef = useRef();
   const user = useSelector((state) => state.user.user);
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {toast} = useToast()
 
   const handleSubmit = () => {};
-  const handleSignout = useCallback(() => {
 
-  },[]);
+  const handleSignout = useCallback(() => {
+    console.log("trying to logout");
+    dispatch(logoutAdmin())
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Logged Out",
+          description: "See you later!",
+          variant: "default",
+        });
+        navigate("/admin/login");
+      })
+      .catch((error) => {
+        console.error(
+          "Logout Error: ",
+          error || "Some error occured. Please try again"
+        );
+        toast({
+          title: "Logout Error!",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+  }, []);
+
+
 
   const notifications = [
     {

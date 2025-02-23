@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
+import { adminLogoutApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
 import Cookies from 'js-cookie'
 
 //first we will create an async thunk midelware
@@ -59,6 +59,20 @@ export const loginAdmin = createAsyncThunk(
     }
   }
 );
+
+export const logoutAdmin = createAsyncThunk(
+  'user/logoutAdmin',
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await adminLogoutApi();
+      Cookies.remove("jwt"); 
+      localStorage.removeItem("user")
+      return true
+    } catch (error) {
+      return rejectWithValue(error.response.data.message)
+    }
+  }
+)
 
 //now create a slice and set the reducer in the slice.
 //the state will have the data field, status field and the eroor feild
@@ -130,6 +144,19 @@ const userSlice = createSlice({
       .addCase(loginAdmin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.data;
+      })
+
+      //logout admin
+      .addCase(logoutAdmin.pending, (state)=>{
+        state.loading = true;
+        state.error = null
+      })
+      .addCase(logoutAdmin.fulfilled, (state)=>{
+        return {...initialState}
+      })
+      .addCase(logoutAdmin.rejected, (state, action)=>{
+        state.loading = false;
+        state.error = action.payload;
       })
       
   },

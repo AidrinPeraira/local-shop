@@ -72,7 +72,6 @@ export const loginAdmin = asyncHandler(
         
         //get login credentials from request
         const {email, password} = req.body;
-        console.log(email, password)
         //check for corresponding user
         const registeredAdmin = await Admin.findOne({email})
         //login if exist eroor message if not

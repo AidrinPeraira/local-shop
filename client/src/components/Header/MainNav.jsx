@@ -11,18 +11,17 @@ const MainNav = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
-  const {toast} = useToast()
+  const { toast } = useToast();
 
   //pop up logic
   const [showCart, setShowCart] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const cartRef = useRef();
   const wishlistRef = useRef();
   const profileRef = useRef();
-
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -37,22 +36,20 @@ const MainNav = () => {
         setShowProfile(false);
       }
     };
-  
+
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
-  
 
   useEffect(() => {
-    if(user){
-      setIsLoggedIn(true)
-      console.log("set log in true")
+    if (user) {
+      setIsLoggedIn(true);
+      console.log("set log in true");
     } else {
-      setIsLoggedIn(false)
-      console.log("set log in false")
+      setIsLoggedIn(false);
+      console.log("set log in false");
     }
   }, [user]);
-  
 
   //search logic
   const handleSearch = (e) => {
@@ -66,7 +63,7 @@ const MainNav = () => {
     dispatch(logoutUser())
       .unwrap()
       .then(() => {
-        setIsLoggedIn(false)
+        setIsLoggedIn(false);
         toast({
           title: "Logged Out",
           description: "See you later!",
@@ -239,7 +236,7 @@ const MainNav = () => {
                           <User />
                         </div>
                         <h3 className="text-sm font-medium text-gray-800">
-                          {user ? user.username : "" }
+                          {user ? user.username : ""}
                         </h3>
                       </div>
                       <div className="mt-2 space-y-2">
