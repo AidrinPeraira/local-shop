@@ -56,12 +56,14 @@ The pages I need
     - stock & inventory
     - cancellation and returns
 
-Additional Features
+Additional Features to add
     - notification mail and sms
     - Language
     - Chat
     - choice of delivery option
-    - send a mail to customer on order and cancel and chat
+    - send a mail to customer on order and cancel and chat\
+    - Keep count of category visits in local storage. show recomendations
+    - keep last 10 search in local storage. Show recent searchs
 
 
 
@@ -74,3 +76,36 @@ Features Added
 - Security Features Added
     - Authentication & Authorisation using JWT and HTTP Onlcy cookies
     - used express-rate-limit to handle bruteforce attcaks. used in login and register routes
+
+
+
+//initial categories to add
+
+Category 1: Construction Materials
+    Subcategory: Cement & Concrete
+        🧱 Sub-subcategory: Portland Cement
+        🏗 Sub-subcategory: Ready-Mix Concrete
+    Subcategory: Steel & Rebar
+        🔩 Sub-subcategory: Reinforced Steel Bars
+        🛠 Sub-subcategory: Wire Mesh
+🔧 Category 2: Hardware & Tools
+    Subcategory: Hand Tools
+        🔨 Sub-subcategory: Hammers
+        🔧 Sub-subcategory: Wrenches
+    Subcategory: Fasteners
+        🔩 Sub-subcategory: Screws
+        ⚙ Sub-subcategory: Bolts
+👕 Category 3: Apparel & Textiles
+    Subcategory: Clothing
+        👕 Sub-subcategory: T-Shirts
+        👖 Sub-subcategory: Pants
+    Subcategory: Fabric Materials
+        🏠 Sub-subcategory: Cotton Fabric
+        🎽 Sub-subcategory: Polyester Fabric
+🛋 Category 4: Home & Furniture
+    Subcategory: Furniture
+        🪑 Sub-subcategory: Office Chairs
+        🛏 Sub-subcategory: Beds
+    Subcategory: Home Decor
+        🖼 Sub-subcategory: Wall Art
+        🏮 Sub-subcategory: Lamps & Lighting

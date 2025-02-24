@@ -5,19 +5,24 @@ import slugify from "slugify";
 
 export const addCategory = asyncHandler(async (req, res) => {
     const { name, parentCategory } = req.body;
-
+    const adminId = req.user._id
+    
     // Validate input
     if (!name) {
-        return res.status(HTTP_CODES.BAD_REQUEST).json({ message: "Category name is required" });
+        res.status(HTTP_CODES.BAD_REQUEST)
+        throw new Error("Category name is required");
     }
 
-    // Check if category already exists at the same level
-    const existingCategory = await Category.findOne({ name, parentCategory });
+    
+    
+    //lets throw an error if the category exists
+    const existingCategory = await Category.findOne({ name, parentCategory }); 
     if (existingCategory) {
-        return res.status(HTTP_CODES.CONFLICT).json({ message: "Category already exists at this level" });
+        res.status(HTTP_CODES.CONFLICT)
+        throw new Error("Category already exists at this level")
     }
 
-    // Determine category level
+    // if we get paretn id then search for parent and add sub category
     let level = 1;
     if (parentCategory) {
         const parent = await Category.findById(parentCategory);
@@ -30,12 +35,14 @@ export const addCategory = asyncHandler(async (req, res) => {
         }
     }
 
-    // Create new category
+    // if don't get parent then we create level 1 category
     const newCategory = new Category({
         name,
         parentCategory: parentCategory || null,
         level,
         slug: slugify(name, { lower: true }),
+        createdBy: adminId, //added and updated is smae person when creating the category. 
+        updatedBy: adminId,
     });
 
     await newCategory.save();

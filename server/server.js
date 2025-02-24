@@ -10,7 +10,8 @@ import cors from 'cors'
 import { connectDB } from './config/db.js'
 import userRouter from './routes/userRoutes.js'
 import adminRouter from './routes/adminRoutes.js'
-import verifyRoute from './routes/verifyRoutes.js'
+import verifyRouter from './routes/verifyRoutes.js'
+import categoryRouter from './routes/categoryRoutes.js'
 
 
 
@@ -35,7 +36,11 @@ app.use(cors({
 //add necessary routing
 app.use('/api/users', userRouter)
 app.use('/api/admin', adminRouter)
-app.use('/api/verify', verifyRoute)
+app.use('/api/verify', verifyRouter)
+
+//actions to manipulate categories
+app.use('/api/category', categoryRouter)
+
 
 //start thr server
 app.listen(port, ()=>{

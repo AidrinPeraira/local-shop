@@ -1,8 +1,7 @@
 import express from "express";
-import { authenticateAdmin, authorizeAdmin } from "../middlewares/authMiddleware.js";
 import { loginAdmin, logOutAdmin, registerAdmin,  } from "../controller/adminController.js";
-import { addCategory } from "../controller/categoryController.js";
 import rateLimit from "express-rate-limit";
+import categoryRouter from "./categoryRoutes.js";
 
 const adminRouter = express.Router();
 
@@ -19,14 +18,6 @@ const apiLimiter = rateLimit({
 adminRouter.route("/register", rateLimit).post(registerAdmin);
 adminRouter.route("/login", rateLimit).post(loginAdmin);
 adminRouter.route("/logout", rateLimit).post(logOutAdmin);
-
-//admin actions to manipulate categories
-adminRouter.route('/cateegory')
-    .get()
-    .post(authenticateAdmin, authorizeAdmin, addCategory)
-
-
-//add user actions to get put and delete account / details
 
 
 
