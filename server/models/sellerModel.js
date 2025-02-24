@@ -46,6 +46,12 @@ const sellerSchema = new mongoose.Schema(
         type : String,
         required : true,
         default : 'admin'
+    },
+    status : {
+      type: String,
+      required: true,
+      enum: ["active", "inactive"], 
+      default: "active"
     }
   },
   

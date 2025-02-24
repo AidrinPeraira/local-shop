@@ -4,11 +4,10 @@ import { AdminDashboard } from "../pages/AdminPages/AdminDashboard";
 import { AdminLayout } from "../components/admin/AdminLayout";
 import { Products } from "../pages/AdminPages/Products";
 import { Users } from "../pages/AdminPages/Users";
-import { Orders } from "../pages/AdminPages/Orders";
-import { Settings } from "../pages/AdminPages/Settings";
 import { AdminNotFound } from "../pages/AdminPages/AdminNotFound";
 import AdminLogin from "../pages/AdminPages/AdminLogin";
 import ProtectedRoute from "./ProtectedRoutes";
+import Categories from "../pages/AdminPages/Categories";
 
 
 const AdminRoutes = () => {
@@ -20,8 +19,7 @@ const AdminRoutes = () => {
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<Products />} />
           <Route path="users" element={<Users />} />
-          <Route path="orders" element={<Orders />} />
-          <Route path="settings" element={<Settings />} />
+          <Route path="categories" element={<Categories />} />
           <Route path="*" element={<AdminNotFound />} />
         </Route>
       </Route>

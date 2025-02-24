@@ -31,7 +31,7 @@ export function Users() {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                <tr key={user.id} className="border-b hover:bg-accent">
                   <td className="p-3">{user.id}</td>
                   <td className="p-3">{user.name}</td>
                   <td className="p-3">{user.email}</td>

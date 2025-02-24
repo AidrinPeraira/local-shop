@@ -17,13 +17,10 @@ import {
 const navigation = [
   { name: "Dashboard", icon: BarChart3, href: "/admin" },
   { name: "Categories", icon: Box, href: "/admin/categories" },
-  { name: "Products", icon: ShoppingBag, href: "/admin/products" },
   { name: "Users", icon: Users, href: "/admin/users" },
   { name: "Sellers", icon: Store, href: "/admin/sellers" },
-  { name: "Orders", icon: Truck, href: "/admin/orders" },
-  { name: "Messages", icon: MessageSquare, href: "/admin/messages" },
-  { name: "Tickets", icon: TicketIcon, href: "/admin/tickets" },
-  { name: "Reviews", icon: Star, href: "/admin/reviews" },
+  { name: "Admins", icon: Store, href: "/admin/staff" },
+  { name: "Products", icon: ShoppingBag, href: "/admin/products" },
 ];
 
 export default function AdminSidebar({ isOpen, onToggle }) {
@@ -43,10 +40,11 @@ export default function AdminSidebar({ isOpen, onToggle }) {
               <li key={item.name}>
                 <NavLink
                   to={item.href}
+                  end={item.href === "/admin"} //to prevetnt dashboard from beign always active
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
                       isActive
-                        ? "bg-p text-white"
+                        ? "bg-accent text-primary"
                         : "text-gray-700 hover:bg-gray-100"
                     }`
                   }

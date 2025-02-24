@@ -22,10 +22,11 @@ const adminSchema = mongoose.Schema({
         unique : true,
         message: 'Phone number already registered!', 
     },
-    
-    blocked : {
-        type : Boolean,
-        default : false
+    status : {
+      type: String,
+      required: true,
+      enum: ["active", "inactive"], 
+      default: "active"
     },
     role : {
         type : String,
