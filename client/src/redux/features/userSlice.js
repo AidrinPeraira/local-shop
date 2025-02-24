@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { adminLogoutApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
+import { adminLoginApi, adminLogoutApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
 import Cookies from 'js-cookie'
 
 //first we will create an async thunk midelware
@@ -51,7 +51,7 @@ export const loginAdmin = createAsyncThunk(
   "user/loginAdmin",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await userLoginApi(userData); 
+      const response = await adminLoginApi(userData); 
       localStorage.setItem("user", JSON.stringify(response.data));
       return response.data; 
     } catch (error) {

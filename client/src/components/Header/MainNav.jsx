@@ -44,10 +44,8 @@ const MainNav = () => {
   useEffect(() => {
     if (user) {
       setIsLoggedIn(true);
-      console.log("set log in true");
     } else {
       setIsLoggedIn(false);
-      console.log("set log in false");
     }
   }, [user]);
 
