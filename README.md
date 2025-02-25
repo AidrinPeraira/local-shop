@@ -64,6 +64,13 @@ Additional Features to add
     - send a mail to customer on order and cancel and chat\
     - Keep count of category visits in local storage. show recomendations
     - keep last 10 search in local storage. Show recent searchs
+    - Security Features TO Added
+        - Input Sanitization
+        - transaction Secure
+        - helmet
+        - morgan 
+        - CSRF
+        - 
 
 
 
@@ -76,36 +83,7 @@ Features Added
 - Security Features Added
     - Authentication & Authorisation using JWT and HTTP Onlcy cookies
     - used express-rate-limit to handle bruteforce attcaks. used in login and register routes
+    - Password Encryption 
+    
 
 
-
-//initial categories to add
-
-Category 1: Construction Materials
-    Subcategory: Cement & Concrete
-        🧱 Sub-subcategory: Portland Cement
-        🏗 Sub-subcategory: Ready-Mix Concrete
-    Subcategory: Steel & Rebar
-        🔩 Sub-subcategory: Reinforced Steel Bars
-        🛠 Sub-subcategory: Wire Mesh
-🔧 Category 2: Hardware & Tools
-    Subcategory: Hand Tools
-        🔨 Sub-subcategory: Hammers
-        🔧 Sub-subcategory: Wrenches
-    Subcategory: Fasteners
-        🔩 Sub-subcategory: Screws
-        ⚙ Sub-subcategory: Bolts
-👕 Category 3: Apparel & Textiles
-    Subcategory: Clothing
-        👕 Sub-subcategory: T-Shirts
-        👖 Sub-subcategory: Pants
-    Subcategory: Fabric Materials
-        🏠 Sub-subcategory: Cotton Fabric
-        🎽 Sub-subcategory: Polyester Fabric
-🛋 Category 4: Home & Furniture
-    Subcategory: Furniture
-        🪑 Sub-subcategory: Office Chairs
-        🛏 Sub-subcategory: Beds
-    Subcategory: Home Decor
-        🖼 Sub-subcategory: Wall Art
-        🏮 Sub-subcategory: Lamps & Lighting

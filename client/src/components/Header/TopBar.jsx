@@ -34,7 +34,7 @@ const TopBar = () => {
             {/* Language & Currency Selectors */}
             <div className="flex items-center space-x-4">
               <DropdownMenu>
-                <DropdownMenuTrigger asChild className="flex items-center text-sm text-gray-600 hover:text-primary">
+                <DropdownMenuTrigger  className="flex items-center text-sm text-gray-600 hover:text-primary">
                   ENG
                   <ChevronDown size={16} className="ml-1" />
                 </DropdownMenuTrigger>
@@ -46,7 +46,7 @@ const TopBar = () => {
               </DropdownMenu>
 
               <DropdownMenu>
-                <DropdownMenuTrigger asChild className="flex items-center text-sm text-gray-600 hover:text-primary">
+                <DropdownMenuTrigger  className="flex items-center text-sm text-gray-600 hover:text-primary">
                   USD
                   <ChevronDown size={16} className="ml-1" />
                 </DropdownMenuTrigger>

@@ -10,10 +10,17 @@
 ☐ how do we use the remember me function?
 ☐ lazy loading not working
 ☐ make a profile page for user
-☐ small bug on nav bar pop ups
+☐ small bug on nav bar pop ups - pop ups not closing on outside click
 ☐ need to add small preview for wishlist and cart
 ☐ should we add phone number login or phone/email login
 ☐ should we make the profile and other dropdowns a seperate component? do this for normal user homwpage
 ☐ should we add a field to record the details of the user who updated the category ot other fields?
-☐ make some components reusable
+☐ make some components reusab
 ☐ block access to blocked users
+☐ make blocking parent category block all child category??
+☐ category page edit and delte button not responsive
+
+☐ how do we cache pages to optimise loding times and reduce the number of requests?
+☐ do we cache it in the browser or 
+
+

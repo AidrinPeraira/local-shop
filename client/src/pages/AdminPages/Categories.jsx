@@ -222,13 +222,11 @@ export default function Categories() {
 
   const handleCreate = (e) => {
     e.preventDefault();
-    setIsCreateModalOpen(false);
     toast.success("Category created successfully");
   };
 
   const handleEdit = (e) => {
     e.preventDefault();
-    setIsEditModalOpen(false);
     toast.success("Category updated successfully");
   };
 
@@ -249,7 +247,7 @@ export default function Categories() {
         <h1 className="text-2xl font-bold">Manage Categories</h1>
 
         {/* Modal component to add news categories. This is made using dialouge. not modal.*/}
-        <CategoryDialog allCategories={allCategories} handleCreate={handleCreate}/>
+        <CategoryDialog allCategories={allCategories} onSubmit={handleCreate} />
         {/* add props for data and handle function */}
       </div>
 
@@ -378,11 +376,14 @@ export default function Categories() {
                       {category.productsCount} Products
                     </span>
                     <div className="flex items-center gap-2">
-
-                        {/* modal/ pop up to edit and dlete */}
-                        <CategoryDialog type='edit' category={selectedCategory} allCategories={allCategories} handleCreate={handleCreate}/>
-                      <DeleteCategoryDialog/>
-                      
+                      {/* modal/ pop up to edit and dlete */}
+                      <CategoryDialog
+                        type="edit"
+                        category={selectedCategory}
+                        allCategories={allCategories}
+                        onSubmit={handleCreate}
+                      />
+                      <DeleteCategoryDialog handleDelete={handleDelete} />
                     </div>
                   </div>
                 </div>

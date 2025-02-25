@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
 import { lazy, Suspense } from "react";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const BuyerRoutes = lazy(()=>import('./routes/BuyerRoutes'))
 const SellerRoutes = lazy(()=> import('./routes/SellerRoutes'))
@@ -15,6 +16,7 @@ const PageLoading = () => (
 function App() {
   return (
     <>
+    <ErrorBoundary>
     <Toaster/>
     <Suspense fallback={<PageLoading/>}>
     <Router>
@@ -25,6 +27,7 @@ function App() {
       </Routes>
     </Router>
     </Suspense>
+    </ErrorBoundary>
     </>
   );
 }

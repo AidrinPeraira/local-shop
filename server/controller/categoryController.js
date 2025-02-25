@@ -3,7 +3,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import slugify from "slugify"; 
 
-export const addCategory = asyncHandler(async (req, res) => {
+export const createCategory = asyncHandler(async (req, res) => {
     const { name, parentCategory } = req.body;
     const adminId = req.user._id
     
@@ -52,3 +52,107 @@ export const addCategory = asyncHandler(async (req, res) => {
         category: newCategory,
     });
 });
+
+//constroller to get both active and inactive categories in nested fashion
+export const getAllCategories = asyncHandler(async (req, res) => {
+  const categories = await Category.aggregate([
+      { $match: { level: 1 } }, // Get only top-level categories (Level 1)
+
+      // Lookup forlevel 2
+      {
+          $lookup: {
+              from: "categories",
+              localField: "_id",
+              foreignField: "parentCategory",
+              as: "subCategories",
+          },
+      },
+
+      //we should unwind to remove nesting. later we can nest themn back in group
+      { $unwind: { path: "$subCategories", preserveNullAndEmptyArrays: true } },
+
+      // Lookup level3
+      {
+          $lookup: {
+              from: "categories",
+              localField: "subCategories._id",
+              foreignField: "parentCategory",
+              as: "subCategories.subSubCategories",
+          },
+      },
+
+      // Group back to get nested structure 
+      /**
+       * level 3 is already nested. we unwinded only level 2. $push will group and push all level 2 int o single leevl 1
+       */
+      {
+          $group: {
+              _id: "$_id",
+              name: { $first: "$name" },
+              slug: { $first: "$slug" },
+              level: { $first: "$level" },
+              parentCategory: { $first: "$parentCategory" },
+              subCategories: { $push: "$subCategories" },
+          },
+      },
+  ]);
+
+  res.status(200).json(categories);
+});
+
+//controller to get only active categories in nested fashion
+export const getCategories = asyncHandler(async (req, res) => {
+  const categories = await Category.aggregate([
+
+
+      { $match : { level: 1, status : "active" } }, // Get only top-level categories (Level 1)
+    
+
+      // Lookup forlevel 2
+      {
+          $lookup: {
+              from: "categories",
+              localField: "_id",
+              foreignField: "parentCategory",
+              as: "subCategories",
+              pipeline : [
+                { $match : { status : "active" } }
+              ]
+          },
+      },
+
+      //we should unwind to remove nesting. later we can nest themn back in group
+      { $unwind: { path: "$subCategories", preserveNullAndEmptyArrays: true } },
+
+      // Lookup level3
+      {
+          $lookup: {
+              from: "categories",
+              localField: "subCategories._id",
+              foreignField: "parentCategory",
+              as: "subCategories.subSubCategories",
+              pipeline : [
+                { $match : { status : "active" } }
+              ]
+          },
+      },
+
+      // Group back to get nested structure 
+      /**
+       * level 3 is already nested. we unwinded only level 2. $push will group and push all level 2 int o single leevl 1
+       */
+      {
+          $group: {
+              _id: "$_id",
+              name: { $first: "$name" },
+              slug: { $first: "$slug" },
+              level: { $first: "$level" },
+              parentCategory: { $first: "$parentCategory" },
+              subCategories: { $push: "$subCategories" },
+          },
+      },
+  ]);
+
+  res.status(200).json(categories);
+});
+
