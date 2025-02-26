@@ -3,8 +3,6 @@ import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import slugify from "slugify";
 
-
-
 export const createCategory = asyncHandler(async (req, res) => {
   const { name, parentCategory, status } = req.body;
   const adminId = req.user._id;
@@ -47,7 +45,7 @@ export const createCategory = asyncHandler(async (req, res) => {
     slug: slugify(name, { lower: true }),
     createdBy: adminId, //added and updated is smae person when creating the category.
     updatedBy: adminId,
-    status
+    status,
   });
 
   await newCategory.save();
@@ -62,12 +60,10 @@ export const createCategory = asyncHandler(async (req, res) => {
 
 //need to add pagination
 export const getAllCategories = asyncHandler(async (req, res) => {
-
-
   const categories = await Category.aggregate([
     { $match: { level: 1 } }, // Get only top-level categories (Level 1)
 
-    // Lookup forlevel 2
+    // Lookup for level 2
     {
       $lookup: {
         from: "categories",
@@ -77,45 +73,79 @@ export const getAllCategories = asyncHandler(async (req, res) => {
       },
     },
 
-    //we should unwind to remove nesting. later we can nest themn back in group
-    { $unwind: { path: "$subCategories", preserveNullAndEmptyArrays: true } },
+    // Add a new field that will process each subcategory
+    {
+      $addFields: {
+        subCategories: {
+          $map: {
+            input: "$subCategories",
+            as: "subCat",
+            in: {
+              $mergeObjects: [
+                "$$subCat",
+                { subSubCategories: [] } // Initialize with empty array
+              ]
+            }
+          }
+        }
+      }
+    },
 
-    // Lookup level3
+    // For each subcategory, lookup its subcategories (level 3)
     {
       $lookup: {
         from: "categories",
-        localField: "subCategories._id",
-        foreignField: "parentCategory",
-        as: "subCategories.subSubCategories",
-      },
+        let: { subCategoryIds: "$subCategories._id" },
+        pipeline: [
+          { 
+            $match: { 
+              $expr: { $in: ["$parentCategory", "$$subCategoryIds"] } 
+            } 
+          }
+        ],
+        as: "allSubSubCategories"
+      }
     },
 
-    // Group back to get nested structure
-    /**
-     * level 3 is already nested. we unwinded only level 2. $push will group and push all level 2 int o single leevl 1
-     */
+    // Properly nest level 3 categories under their respective level 2 parents
     {
-      $group: {
-        _id: "$_id",
-        name: { $first: "$name" },
-        slug: { $first: "$slug" },
-        parentCategory: { $first: "$parentCategory" },
-        level: { $first: "$level" },
-        updatedBy: { $first: "$updatedBy" },
-        createdBy: { $first: "$createdBy" },
-        status: { $first: "$status" },
-        createdAt: { $first: "$createdAt" },
-        updatedAt: { $first: "$updatedAt" },
-        subCategories: { $push: "$subCategories" },
-      },
+      $addFields: {
+        subCategories: {
+          $map: {
+            input: "$subCategories",
+            as: "subCat",
+            in: {
+              $mergeObjects: [
+                "$$subCat",
+                {
+                  subSubCategories: {
+                    $filter: {
+                      input: "$allSubSubCategories",
+                      as: "subSubCat",
+                      cond: { $eq: ["$$subSubCat.parentCategory", "$$subCat._id"] }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
     },
+
+    // Clean up the temporary field
+    {
+      $project: {
+        allSubSubCategories: 0
+      }
+    }
   ]);
 
   res.status(200).json(categories);
 });
 
 //paginated code
- /**
+/**
  export const getAllCategories = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1; // Default to page 1
   const limit = parseInt(req.query.limit) || 10; // Default to 10 per page
@@ -187,8 +217,6 @@ export const getAllCategories = asyncHandler(async (req, res) => {
 });
 
  */
-
-
 
 //controller to get only active categories in nested fashion
 export const getCategories = asyncHandler(async (req, res) => {
