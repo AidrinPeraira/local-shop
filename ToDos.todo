@@ -21,6 +21,14 @@
 ☐ category page edit and delte button not responsive
 
 ☐ how do we cache pages to optimise loding times and reduce the number of requests?
-☐ do we cache it in the browser or 
+☐ do we cache it in the browser or where?
+☐ should we do pagination form backend or front end when using react
+☐ how do i verify the varients submitted by the user
+
+☐ back to ligin restriction
+☐ add use memo for pages
+
+PRON
+
 
 

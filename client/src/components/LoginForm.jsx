@@ -32,7 +32,7 @@ const LoginForm = () => {
       })
       .catch((error)=>{
         console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again") 
-          toast({            
+            ({            
             title: "Registration Error!",
             description: error,
             variant: "destructive",

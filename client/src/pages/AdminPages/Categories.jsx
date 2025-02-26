@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import {
@@ -24,206 +24,69 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../../components/ui/accordion";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../../components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../../components/ui/alert-dialog";
-import { Label } from "../../components/ui/label";
-import { Switch } from "../../components/ui/switch";
 import { useToast } from "../../components/hooks/use-toast";
 import { CategoryDialog } from "../../components/admin/CategoryDialog";
 import { DeleteCategoryDialog } from "../../components/admin/DeleteCategoryDialog";
-
+import {
+  createNewCategoryAPI,
+  getAllCategoriesAPI,
+} from "../../api/categoryApi";
 // Enhanced mock data with three levels
-const allCategories = [
-  {
-    id: 1,
-    name: "Electronics",
-    parentCategory: null,
-    isActive: true,
-    productsCount: 450,
-    subcategories: [
-      {
-        id: 4,
-        name: "Smartphones & Tablets",
-        parentCategory: "Electronics",
-        isActive: true,
-        productsCount: 145,
-        subcategories: [
-          {
-            id: 10,
-            name: "Android Phones",
-            parentCategory: "Smartphones & Tablets",
-            isActive: true,
-            productsCount: 85,
-          },
-          {
-            id: 11,
-            name: "iPhones",
-            parentCategory: "Smartphones & Tablets",
-            isActive: true,
-            productsCount: 35,
-          },
-          {
-            id: 12,
-            name: "Tablets",
-            parentCategory: "Smartphones & Tablets",
-            isActive: true,
-            productsCount: 25,
-          },
-        ],
-      },
-      {
-        id: 5,
-        name: "Computers",
-        parentCategory: "Electronics",
-        isActive: true,
-        productsCount: 230,
-        subcategories: [
-          {
-            id: 13,
-            name: "Laptops",
-            parentCategory: "Computers",
-            isActive: true,
-            productsCount: 120,
-          },
-          {
-            id: 14,
-            name: "Desktop PCs",
-            parentCategory: "Computers",
-            isActive: true,
-            productsCount: 80,
-          },
-          {
-            id: 15,
-            name: "Computer Accessories",
-            parentCategory: "Computers",
-            isActive: false,
-            productsCount: 30,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Fashion",
-    parentCategory: null,
-    isActive: true,
-    productsCount: 350,
-    subcategories: [
-      {
-        id: 6,
-        name: "Men's Fashion",
-        parentCategory: "Fashion",
-        isActive: true,
-        productsCount: 180,
-        subcategories: [
-          {
-            id: 16,
-            name: "Formal Wear",
-            parentCategory: "Men's Fashion",
-            isActive: true,
-            productsCount: 60,
-          },
-          {
-            id: 17,
-            name: "Casual Wear",
-            parentCategory: "Men's Fashion",
-            isActive: true,
-            productsCount: 90,
-          },
-        ],
-      },
-      {
-        id: 7,
-        name: "Women's Fashion",
-        parentCategory: "Fashion",
-        isActive: true,
-        productsCount: 170,
-        subcategories: [
-          {
-            id: 18,
-            name: "Dresses",
-            parentCategory: "Women's Fashion",
-            isActive: true,
-            productsCount: 75,
-          },
-          {
-            id: 19,
-            name: "Accessories",
-            parentCategory: "Women's Fashion",
-            isActive: false,
-            productsCount: 95,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Home & Living",
-    parentCategory: null,
-    isActive: false,
-    productsCount: 275,
-    subcategories: [
-      {
-        id: 8,
-        name: "Furniture",
-        parentCategory: "Home & Living",
-        isActive: false,
-        productsCount: 150,
-        subcategories: [
-          {
-            id: 20,
-            name: "Living Room",
-            parentCategory: "Furniture",
-            isActive: false,
-            productsCount: 50,
-          },
-          {
-            id: 21,
-            name: "Bedroom",
-            parentCategory: "Furniture",
-            isActive: false,
-            productsCount: 100,
-          },
-        ],
-      },
-    ],
-  },
-];
 
 export default function Categories() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("latest");
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const { toast } = useToast();
+  const [allCategories, setAllCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
 
-  const toast = useToast();
+  //get all categories form the sever
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await getAllCategoriesAPI();
+      setAllCategories(response.data);
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error!",
+        description: "Error fetching Categories!",
+        variant: "destructive",
+      });
+    }
+  })
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
-  const handleCreate = (e) => {
-    e.preventDefault();
-    toast.success("Category created successfully");
-  };
+  useEffect(() => {
+    setFilteredCategories(allCategories);
+  }, [allCategories]);
+
+  const handleCreate = useCallback(async (newCategory) => {
+    console.log(newCategory);
+    try {
+      const response = await createNewCategoryAPI({
+        name: newCategory.name,
+        parentCategory: newCategory.parentCategory, // Ensure this is the correct ID
+      });
+      fetchCategories()
+      toast({
+        title: "Success!",
+        description: "Category Successfully Created!",
+        type: "default",
+      });
+    } catch (error) {
+      console.error("Create Category Error: ", error.response.data.message);
+      toast({
+        title: "Error!",
+        description: `${error.response.data.message}`,
+        type: "destructive",
+      });
+    } 
+  }, []);
+  
 
   const handleEdit = (e) => {
     e.preventDefault();
@@ -234,20 +97,16 @@ export default function Categories() {
     toast.success("Category deleted successfully");
   };
 
-  const filteredCategories = allCategories.filter((category) => {
-    if (selectedStatus !== "all") {
-      return category.isActive === (selectedStatus === "active");
-    }
-    return true;
-  });
-
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Manage Categories</h1>
 
         {/* Modal component to add news categories. This is made using dialouge. not modal.*/}
-        <CategoryDialog allCategories={allCategories} onSubmit={handleCreate} />
+        <CategoryDialog
+          allCategories={allCategories}
+          submitAction={handleCreate}
+        />
         {/* add props for data and handle function */}
       </div>
 
@@ -282,8 +141,8 @@ export default function Categories() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuItem>All Categories</DropdownMenuItem>
-              {allCategories.map((category) => (
-                <DropdownMenuItem key={category.id}>
+              {filteredCategories.map((category) => (
+                <DropdownMenuItem key={category._id}>
                   {category.name}
                 </DropdownMenuItem>
               ))}
@@ -348,161 +207,166 @@ export default function Categories() {
       {/* Categories Accordion */}
       <Card className="p-4">
         <Accordion type="single" collapsible className="space-y-4">
-          {filteredCategories.map((category) => (
-            <AccordionItem
-              key={category.id}
-              value={category.id.toString()}
-              className="border rounded-lg px-4"
-            >
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center justify-between w-full pr-4">
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-muted-foreground">
-                      #{category.id}
-                    </span>
-                    <span className="font-medium">{category.name}</span>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        category.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {category.isActive ? "Active" : "Inactive"}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      {category.productsCount} Products
-                    </span>
-                    <div className="flex items-center gap-2">
-                      {/* modal/ pop up to edit and dlete */}
-                      <CategoryDialog
-                        type="edit"
-                        category={selectedCategory}
-                        allCategories={allCategories}
-                        onSubmit={handleCreate}
-                      />
-                      <DeleteCategoryDialog handleDelete={handleDelete} />
+          {filteredCategories
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((category, index) => (
+              <AccordionItem
+                key={category._id}
+                value={category._id}
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center justify-between w-full pr-4">
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-muted-foreground">
+                        #{index + 1}
+                      </span>
+                      <span className="font-medium">{category.name}</span>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          category.status == "active"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {category.status == "active" ? "Active" : "Inactive"}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        Level {category.level}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {/* modal/ pop up to edit and dlete */}
+                        <CategoryDialog
+                          type="edit"
+                          category={selectedCategory}
+                          allCategories={allCategories}
+                          onSubmit={handleCreate}
+                        />
+                        <DeleteCategoryDialog handleDelete={handleDelete} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                {category.subcategories.length > 0 ? (
-                  <Accordion type="single" collapsible className="space-y-2">
-                    {category.subcategories.map((subcategory) => (
-                      <AccordionItem
-                        key={subcategory.id}
-                        value={subcategory.id.toString()}
-                        className="border rounded-md px-4"
-                      >
-                        <AccordionTrigger className="hover:no-underline py-3 ">
-                          <div className="flex items-center justify-between w-full pr-4">
-                            <div className="flex items-center gap-4">
-                              {/* categoty number goes herer */}
-                              <span className="text-sm text-muted-foreground">
-                                #{subcategory.id}
-                              </span>
-                              {/* category name goes here */}
-                              <span className="font-medium">
-                                {subcategory.name}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-6">
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs ${
-                                  subcategory.isActive
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
-                                }`}
-                              >
-                                {subcategory.isActive ? "Active" : "Inactive"}
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                {subcategory.productsCount} Products
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <Button variant="ghost" size="icon">
-                                  <Pen className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-red-600"
+                </AccordionTrigger>
+                <AccordionContent>
+                  {category.subCategories.length > 0 ? (
+                    <Accordion type="single" collapsible className="space-y-2">
+                      {category.subCategories.map((subcategory, index) => (
+                        <AccordionItem
+                          key={subcategory._id}
+                          value={subcategory._id}
+                          className="border rounded-md px-4"
+                        >
+                          <AccordionTrigger className="hover:no-underline py-3 ">
+                            <div className="flex items-center justify-between w-full pr-4">
+                              <div className="flex items-center gap-4">
+                                {/* categoty number goes herer */}
+                                <span className="text-sm text-muted-foreground">
+                                  #{index + 1}
+                                </span>
+                                {/* category name goes here */}
+                                <span className="font-medium">
+                                  {subcategory.name}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-6">
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs ${
+                                    subcategory.status == "active"
+                                      ? "bg-green-100 text-green-700"
+                                      : "bg-red-100 text-red-700"
+                                  }`}
                                 >
-                                  <Trash className="h-4 w-4" />
-                                </Button>
+                                  {subcategory.status == "active"
+                                    ? "Active"
+                                    : "Inactive"}
+                                </span>
+                                <span className="text-sm text-muted-foreground">
+                                  Level {subcategory.level}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <Button variant="ghost" size="icon">
+                                    <Pen className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-red-600"
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          {subcategory.subcategories?.length > 0 ? (
-                            <div className="space-y-2 py-2">
-                              {subcategory.subcategories.map(
-                                (subSubCategory) => (
-                                  <div
-                                    key={subSubCategory.id}
-                                    className="flex items-center justify-between p-3 rounded-md bg-muted/50"
-                                  >
-                                    <div className="flex items-center gap-4">
-                                      <span className="text-sm text-muted-foreground">
-                                        #{subSubCategory.id}
-                                      </span>
-                                      <span className="font-medium">
-                                        {subSubCategory.name}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center gap-6">
-                                      <span
-                                        className={`px-2 py-1 rounded-full text-xs ${
-                                          subSubCategory.isActive
-                                            ? "bg-green-100 text-green-700"
-                                            : "bg-red-100 text-red-700"
-                                        }`}
-                                      >
-                                        {subSubCategory.isActive
-                                          ? "Active"
-                                          : "Inactive"}
-                                      </span>
-                                      <span className="text-sm text-muted-foreground">
-                                        {subSubCategory.productsCount} Products
-                                      </span>
-                                      <div className="flex items-center gap-2">
-                                        <Button variant="ghost" size="icon">
-                                          <Pen className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="text-red-600"
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            {subcategory.subSubCategories?.length > 0 ? (
+                              <div className="space-y-2 py-2">
+                                {subcategory.subSubCategories.map(
+                                  (subSubCategory, index) => (
+                                    <div
+                                      key={subSubCategory._id}
+                                      className="flex items-center justify-between p-3 rounded-md bg-muted/50"
+                                    >
+                                      <div className="flex items-center gap-4">
+                                        <span className="text-sm text-muted-foreground">
+                                          #{index + 1}
+                                        </span>
+                                        <span className="font-medium">
+                                          {subSubCategory.name}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-6">
+                                        <span
+                                          className={`px-2 py-1 rounded-full text-xs ${
+                                            subSubCategory.status == "active"
+                                              ? "bg-green-100 text-green-700"
+                                              : "bg-red-100 text-red-700"
+                                          }`}
                                         >
-                                          <Trash className="h-4 w-4" />
-                                        </Button>
+                                          {subSubCategory.status == "active"
+                                            ? "Active"
+                                            : "Inactive"}
+                                        </span>
+                                        <span className="text-sm text-muted-foreground">
+                                          Level {subSubCategory.level}
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                          <Button variant="ghost" size="icon">
+                                            <Pen className="h-4 w-4" />
+                                          </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="text-red-600"
+                                          >
+                                            <Trash className="h-4 w-4" />
+                                          </Button>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-muted-foreground py-2">
-                              No sub-subcategories found
-                            </p>
-                          )}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                ) : (
-                  <p className="text-sm text-muted-foreground py-2">
-                    No subcategories found
-                  </p>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+                                  )
+                                )}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-muted-foreground py-2">
+                                No sub-subcategories found
+                              </p>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  ) : (
+                    <p className="text-sm text-muted-foreground py-2">
+                      No subcategories found
+                    </p>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
         </Accordion>
       </Card>
 

@@ -23,25 +23,30 @@ import {
 } from "../ui/dropdown-menu";
 import { Switch } from "../ui/switch";
 
-const CategoryDialog = ({ type, category, allCategories, onSubmit }) => {
+const CategoryDialog = ({ type, category, allCategories, submitAction }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    parentCategory: "None",
-    parentCategoryId: null,
-    isActive: true,
+    parentCategoryName: "None",
+    parentCategory: null,
+    status: "active",
   });
 
   useEffect(() => {
     if (type === "edit" && category) {
       setFormData({
         name: category.name || "",
-        parentCategory: category.parentCategory || "None",
-        parentCategoryId: category.parentCategoryId || null,
-        isActive: category.isActive || false,
+        parentCategoryName: category.parentCategoryName || "None",
+        parentCategory: category.parentCategory || null,
+        status: category.status || "active",
       });
     } else {
-      setFormData({ name: "", parentCategory: "None", parentCategoryId: null, isActive: true });
+      setFormData({
+        name: "",
+        parentCategoryName: "None",
+        parentCategory: null,
+        status: "active",
+      });
     }
   }, [category, type]);
 
@@ -50,13 +55,12 @@ const CategoryDialog = ({ type, category, allCategories, onSubmit }) => {
   };
 
   const handleCategorySelect = (name, id) => {
-    setFormData({ ...formData, parentCategory: name, parentCategoryId: id });
+    setFormData({ ...formData, parentCategoryName: name, parentCategory: id });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    setIsModalOpen(false);
+    submitAction({ ...formData });
   };
 
   return (
@@ -77,14 +81,17 @@ const CategoryDialog = ({ type, category, allCategories, onSubmit }) => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{type === "edit" ? "Edit Category" : "Create New Category"}</DialogTitle>
+          <DialogTitle>
+            {type === "edit" ? "Edit Category" : "Create New Category"}
+          </DialogTitle>
           <DialogDescription>
-            {type === "edit" ? "Make changes to your category." : "Add a new category to your product catalog."}
+            {type === "edit"
+              ? "Make changes to your category."
+              : "Add a new category to your product catalog."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
-            
             {/* Category name*/}
             <div className="space-y-2">
               <Label htmlFor="name">Category Name</Label>
@@ -98,44 +105,90 @@ const CategoryDialog = ({ type, category, allCategories, onSubmit }) => {
               />
             </div>
 
-            {/* Selecting theparent */}
+            {/* Selecting the parent */}
             <div className="space-y-2">
-              <Label htmlFor="parentCategory">Parent Category</Label>
+              <Label htmlFor="parentCategoryName">Parent Category</Label>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <span>
-                    <Button variant="outline" className="w-full justify-between">
-                      {formData.parentCategory}
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                    >
+                      {formData.parentCategoryName}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </span>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full" onMouseEnter={() => setIsDropdownOpen(true)} onMouseLeave={() => setIsDropdownOpen(false)}>
-                  <DropdownMenuItem onClick={() => handleCategorySelect("None", null)}>None</DropdownMenuItem>
-                  {allCategories.map((cat) => (
-                    cat.subCategories && cat.subCategories.length > 0 ? (
-                      <DropdownMenuSub key={cat.id}>
-                        <DropdownMenuSubTrigger>
+                <DropdownMenuContent className="w-full max-h-80 overflow-y-auto">
+                  <DropdownMenuItem
+                    onClick={() => handleCategorySelect("None", null)}
+                  >
+                    None
+                  </DropdownMenuItem>
+                  {allCategories
+                    .slice()
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((cat) => (
+                      <div key={cat._id}>
+                        {/* Level 1 Categories */}
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleCategorySelect(cat.name, cat._id)
+                          }
+                        >
                           {cat.name}
-                          <ChevronRight className="ml-auto h-4 w-4" />
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          {cat.subCategories.map((subCat) => (
-                            <DropdownMenuItem
-                              key={subCat.id}
-                              onClick={() => handleCategorySelect(subCat.name, subCat.id)}
-                            >
-                              {subCat.name}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                    ) : (
-                      <DropdownMenuItem key={cat.id} onClick={() => handleCategorySelect(cat.name, cat.id)}>
-                        {cat.name}
-                      </DropdownMenuItem>
-                    )
-                  ))}
+                        </DropdownMenuItem>
+
+                        {/* Level 2 Categories (subCategories) */}
+                        {cat.subCategories && cat.subCategories.length > 0 && (
+                          <div className="pl-4">
+                            {cat.subCategories
+                              .slice()
+                              .sort((a, b) => a.name.localeCompare(b.name))
+                              .map((subCat) => (
+                                <div key={subCat._id}>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleCategorySelect(
+                                        subCat.name,
+                                        subCat._id
+                                      )
+                                    }
+                                  >
+                                    {subCat.name}
+                                  </DropdownMenuItem>
+
+                                  {/* Level 3 Categories (subSubCategories) */}
+                                  {subCat.subSubCategories &&
+                                    subCat.subSubCategories.length > 0 && (
+                                      <div className="pl-4">
+                                        {subCat.subSubCategories
+                                          .slice()
+                                          .sort((a, b) =>
+                                            a.name.localeCompare(b.name)
+                                          )
+                                          .map((subSubCat) => (
+                                            <DropdownMenuItem
+                                              key={subSubCat._id}
+                                              onClick={() =>
+                                                handleCategorySelect(
+                                                  subSubCat.name,
+                                                  subSubCat._id
+                                                )
+                                              }
+                                            >
+                                              {subSubCat.name}
+                                            </DropdownMenuItem>
+                                          ))}
+                                      </div>
+                                    )}
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -143,16 +196,23 @@ const CategoryDialog = ({ type, category, allCategories, onSubmit }) => {
             {/* Category Active Status Switch */}
             <div className="flex items-center space-x-2">
               <Switch
-                id="isActive"
-                checked={formData.isActive}
-                onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                id="status"
+                checked={formData.status == "active"}
+                onCheckedChange={(checked) =>
+                  setFormData({
+                    ...formData,
+                    status: checked ? "active" : "inactive",
+                  })
+                }
               />
-              <Label htmlFor="isActive">Active</Label>
+              <Label htmlFor="status">Active</Label>
             </div>
           </div>
 
           <DialogFooter>
-            <Button type="submit">{type === "edit" ? "Save Changes" : "Create Category"}</Button>
+            <Button type="submit">
+              {type === "edit" ? "Save Changes" : "Create Category"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
