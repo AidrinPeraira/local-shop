@@ -31,8 +31,10 @@ export default function AdminSidebar({ isOpen, onToggle }) {
       }`}
     >
       <div className="flex flex-col h-full">
-        <div className="h-16 flex items-center justify-center border-b border-gray-200">
+        <div className="h-16 flex items-center justify-center border-b border-gray-200" onClick={onToggle}>
           <span className={`font-bold text-xl ${!isOpen && "hidden"}`}>Admin</span>
+          <span className={`font-bold text-xl ${isOpen && "hidden"}`}>A</span>
+          
         </div>
         <nav className="flex-1 overflow-y-auto py-4">
           <ul className="space-y-1 px-3">

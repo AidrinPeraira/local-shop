@@ -12,7 +12,7 @@ export function AdminLayout() {
       <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       <main className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         <AdminHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-        <div className="p-6">
+        <div className="p-6 mt">
           <Outlet />
         </div>
       </main>
