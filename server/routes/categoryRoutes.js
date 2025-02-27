@@ -7,6 +7,8 @@ import {
   createCategory,
   getAllCategories,
   getCategories,
+  editCategory,
+  deleteCategory
 } from "../controller/categoryController.js";
 
 const categoryRoute = express.Router();
@@ -19,14 +21,22 @@ categoryRoute
     .get(getCategories)
 
 //admin actions to manipulate categories
+
 categoryRoute
   .route("/create")
   .post(authenticateAdmin, authorizeAdmin, createCategory);
 
 categoryRoute
-  .route("/")
-  .get(authenticateAdmin, authorizeAdmin, getAllCategories); // admin only since inactive categories are also provided.
+  .route("/edit/:id")
+  .patch(authenticateAdmin, authorizeAdmin, editCategory);
 
-//add user actions to get put and delete account / details
+categoryRoute
+  .route("/delete/:id")
+  .delete(authenticateAdmin, authorizeAdmin, deleteCategory);
+
+categoryRoute
+  .route("/")
+  .get(authenticateAdmin, authorizeAdmin, getAllCategories); 
+
 
 export default categoryRoute;

@@ -60,7 +60,8 @@ const CategoryDialog = ({ type, category, allCategories, submitAction }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    submitAction({ ...formData });
+    let status = submitAction({ ...formData, _id : category._id });
+    if(status) setIsModalOpen(!isModalOpen)
   };
 
   return (

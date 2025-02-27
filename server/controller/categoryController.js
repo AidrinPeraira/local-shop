@@ -56,8 +56,116 @@ export const createCategory = asyncHandler(async (req, res) => {
   });
 });
 
-//constroller to get both active and inactive categories in nested fashion
+export const editCategory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  console.log(req.params)
+  const { name, parentCategory, status } = req.body;
+  const adminId = req.user._id;
 
+  // Check if category exists
+  const category = await Category.findById(id);
+  if (!category) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("Category not found");
+  }
+
+  // Check if the new name already exists at the same level (except for this category)
+  if (name && name !== category.name) {
+    const existingCategory = await Category.findOne({
+      name,
+      parentCategory: parentCategory || category.parentCategory,
+      _id: { $ne: id } // Exclude the current category
+    });
+
+    if (existingCategory) {
+      res.status(HTTP_CODES.CONFLICT);
+      throw new Error("Category with this name already exists at this level");
+    }
+  }
+
+  // If changing parent category, verify the level constraint
+  let level = category.level;
+  if (parentCategory && parentCategory !== category.parentCategory?.toString()) {
+    const parent = await Category.findById(parentCategory);
+    if (!parent) {
+      res.status(HTTP_CODES.NOT_FOUND);
+      throw new Error("Parent category not found");
+    }
+    
+    level = parent.level + 1;
+    if (level > 3) {
+      res.status(HTTP_CODES.BAD_REQUEST);
+      throw new Error("Only 3 levels of categories are allowed");
+    }
+
+    // Check if this category has subcategories
+    const hasSubcategories = await Category.exists({ parentCategory: id });
+    if (hasSubcategories && level === 3) {
+      res.status(HTTP_CODES.BAD_REQUEST);
+      throw new Error("Cannot move category to level 3 as it has subcategories");
+    }
+  }
+
+  // Update category
+  const updatedCategory = await Category.findByIdAndUpdate(
+    id,
+    {
+      name: name || category.name,
+      parentCategory: parentCategory || category.parentCategory,
+      level,
+      slug: name ? slugify(name, { lower: true }) : category.slug,
+      updatedBy: adminId,
+      status: status || category.status
+    },
+    { new: true }
+  );
+
+  res.status(HTTP_CODES.OK).json({
+    message: "Category updated successfully",
+    category: updatedCategory
+  });
+});
+
+export const deleteCategory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const adminId = req.user._id;
+
+  // Check if category exists
+  const category = await Category.findById(id);
+  if (!category) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("Category not found");
+  }
+
+  // Check if this category has subcategories
+  const hasSubcategories = await Category.exists({ parentCategory: id });
+  if (hasSubcategories) {
+    // Update all subcategories to inactive as well
+    await Category.updateMany(
+      { parentCategory: id },
+      { status: "inactive", updatedBy: adminId }
+    );
+  }
+
+  // Soft delete by setting status to inactive
+  const updatedCategory = await Category.findByIdAndUpdate(
+    id,
+    {
+      status: "inactive",
+      updatedBy: adminId
+    },
+    { new: true }
+  );
+
+  res.status(HTTP_CODES.OK).json({
+    message: "Category deleted successfully",
+    category: updatedCategory
+  });
+});
+
+
+
+//controller to get active and inactive categories
 //need to add pagination
 export const getAllCategories = asyncHandler(async (req, res) => {
   const categories = await Category.aggregate([
@@ -144,79 +252,6 @@ export const getAllCategories = asyncHandler(async (req, res) => {
   res.status(200).json(categories);
 });
 
-//paginated code
-/**
- export const getAllCategories = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // Default to page 1
-  const limit = parseInt(req.query.limit) || 10; // Default to 10 per page
-  const skip = (page - 1) * limit;
-
-  const result = await Category.aggregate([
-    { $match: { level: 1 } }, // Get only top-level categories
-
-    // Lookup for level 2
-    {
-      $lookup: {
-        from: "categories",
-        localField: "_id",
-        foreignField: "parentCategory",
-        as: "subCategories",
-      },
-    },
-
-    { $unwind: { path: "$subCategories", preserveNullAndEmptyArrays: true } },
-
-    // Lookup level 3
-    {
-      $lookup: {
-        from: "categories",
-        localField: "subCategories._id",
-        foreignField: "parentCategory",
-        as: "subCategories.subSubCategories",
-      },
-    },
-
-    // Group back to get nested structure
-    {
-      $group: {
-        _id: "$_id",
-        name: { $first: "$name" },
-        slug: { $first: "$slug" },
-        parentCategory: { $first: "$parentCategory" },
-        level: { $first: "$level" },
-        updatedBy: { $first: "$updatedBy" },
-        createdBy: { $first: "$createdBy" },
-        status: { $first: "$status" },
-        createdAt: { $first: "$createdAt" },
-        updatedAt: { $first: "$updatedAt" },
-        subCategories: { $push: "$subCategories" },
-      },
-    },
-
-    // Apply pagination
-    {
-      $facet: {
-        metadata: [{ $count: "total" }],
-        data: [{ $skip: skip }, { $limit: limit }],
-      },
-    },
-  ]);
-
-  // Extract data and total count
-  const categories = result[0]?.data || [];
-  const total = result[0]?.metadata[0]?.total || 0;
-  const totalPages = Math.ceil(total / limit);
-
-  res.status(200).json({
-    categories,
-    total,
-    totalPages,
-    currentPage: page,
-    perPage: limit,
-  });
-});
-
- */
 
 //controller to get only active categories in nested fashion
 export const getCategories = asyncHandler(async (req, res) => {

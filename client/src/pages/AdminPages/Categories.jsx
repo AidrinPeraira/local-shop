@@ -29,6 +29,7 @@ import { CategoryDialog } from "../../components/admin/CategoryDialog";
 import { DeleteCategoryDialog } from "../../components/admin/DeleteCategoryDialog";
 import {
   createNewCategoryAPI,
+  editCurrentCategoryAPI,
   getAllCategoriesAPI,
 } from "../../api/categoryApi";
 // Enhanced mock data with three levels
@@ -55,7 +56,8 @@ export default function Categories() {
         variant: "destructive",
       });
     }
-  })
+  });
+
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
@@ -65,37 +67,58 @@ export default function Categories() {
   }, [allCategories]);
 
   const handleCreate = useCallback(async (newCategory) => {
-    console.log(newCategory);
     try {
       const response = await createNewCategoryAPI({
         name: newCategory.name,
         parentCategory: newCategory.parentCategory, // Ensure this is the correct ID
       });
-      fetchCategories()
+      fetchCategories();
       toast({
         title: "Success!",
         description: "Category Successfully Created!",
-        type: "default",
+        variant: "default",
       });
+      return true;
     } catch (error) {
       console.error("Create Category Error: ", error.response.data.message);
       toast({
         title: "Error!",
         description: `${error.response.data.message}`,
-        type: "destructive",
+        variant: "destructive",
       });
-    } 
+      return false;
+    }
   }, []);
-  
 
-  const handleEdit = (e) => {
-    e.preventDefault();
-    toast.success("Category updated successfully");
-  };
+  const handleEdit = useCallback(async (edittedCategory) => {
+    console.log("Category updated successfully", edittedCategory);
+    try {
+      const response = await editCurrentCategoryAPI({
+        ...edittedCategory
+      });
+      fetchCategories();
+      toast({
+        title: "Success!",
+        description: "Category Successfully Editted!",
+        variant: "default",
+      });
+      return true;
+    } catch (error) {
+      console.error("Create Category Error: ", error.response.data.message);
+      toast({
+        title: "Error!",
+        description: `${error.response.data.message}`,
+        variant: "destructive",
+      });
+      return false;
+    }
+  }, []);
 
   const handleDelete = () => {
     toast.success("Category deleted successfully");
   };
+
+  const handleSelectCategory = () => {};
 
   return (
     <div className="p-6 space-y-6">
@@ -110,7 +133,7 @@ export default function Categories() {
         {/* add props for data and handle function */}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-4">
         {/* Status Filter */}
         <Card className="p-4">
           <h2 className="font-semibold mb-2">Status</h2>
@@ -237,19 +260,33 @@ export default function Categories() {
                       <span className="text-sm text-muted-foreground">
                         Level {category.level}
                       </span>
-                      <div className="flex items-center gap-2">
-                        {/* modal/ pop up to edit and dlete */}
+                      <div
+                        className="flex items-center gap-2"
+                        onClick={() => {
+                          
+                          setSelectedCategory({
+                            name: category.name,
+                            parentCategory: category.parentCategory || null,
+                            status: category.status,
+                            _id : category._id
+                          });
+                        }}
+                      >
+                        {/* modal/ pop up to edit and dlete category this is the pen icon now*/}
                         <CategoryDialog
                           type="edit"
                           category={selectedCategory}
                           allCategories={allCategories}
-                          onSubmit={handleCreate}
+                          submitAction={handleEdit}
                         />
+
                         <DeleteCategoryDialog handleDelete={handleDelete} />
                       </div>
                     </div>
                   </div>
                 </AccordionTrigger>
+
+                {/* accordion for sub categories */}
                 <AccordionContent>
                   {category.subCategories.length > 0 ? (
                     <Accordion type="single" collapsible className="space-y-2">
@@ -286,17 +323,29 @@ export default function Categories() {
                                 <span className="text-sm text-muted-foreground">
                                   Level {subcategory.level}
                                 </span>
-                                <div className="flex items-center gap-2">
-                                  <Button variant="ghost" size="icon">
-                                    <Pen className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="text-red-600"
-                                  >
-                                    <Trash className="h-4 w-4" />
-                                  </Button>
+                                <div
+                                  className="flex items-center gap-2"
+                                  onClick={() => {
+                                    setSelectedCategory({
+                                      name: subcategory.name,
+                                      parentCategory:
+                                        subcategory.parentCategory,
+                                      parentCategoryName: category.name,
+                                      status: subcategory.status,
+                                      _id : subcategory._id
+                                    });
+                                  }}
+                                >
+                                  <CategoryDialog
+                                    type="edit"
+                                    category={selectedCategory}
+                                    allCategories={allCategories}
+                                    submitAction={handleEdit}
+                                  />
+
+                                  <DeleteCategoryDialog
+                                    handleDelete={handleDelete}
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -333,18 +382,34 @@ export default function Categories() {
                                         <span className="text-sm text-muted-foreground">
                                           Level {subSubCategory.level}
                                         </span>
-                                        <div className="flex items-center gap-2">
-                                          <Button variant="ghost" size="icon">
-                                            <Pen className="h-4 w-4" />
-                                          </Button>
-                                          <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-red-600"
-                                          >
-                                            <Trash className="h-4 w-4" />
-                                          </Button>
+
+                                        {/* editting and deleting sub sub categories */}
+                                        <div
+                                          className="flex items-center gap-2"
+                                          onClick={() => {
+                                            setSelectedCategory({
+                                              name: subSubCategory.name,
+                                              parentCategory:
+                                              subSubCategory.parentCategory,
+                                              parentCategoryName: subcategory.name,
+                                              status: subSubCategory.status,
+                                              _id : subSubCategory._id
+                                            });
+                                          }}
+                                        >
+                                          <CategoryDialog
+                                            type="edit"
+                                            category={selectedCategory}
+                                            allCategories={allCategories}
+                                            submitAction={handleEdit}
+                                          />
+
+                                          <DeleteCategoryDialog
+                                            handleDelete={handleDelete}
+                                          />
                                         </div>
+
+
                                       </div>
                                     </div>
                                   )
