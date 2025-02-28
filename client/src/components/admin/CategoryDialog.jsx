@@ -29,7 +29,6 @@ const CategoryDialog = ({ type, category, allCategories, submitAction }) => {
     name: "",
     parentCategoryName: "None",
     parentCategory: null,
-    status: "active",
   });
 
   useEffect(() => {
@@ -38,14 +37,14 @@ const CategoryDialog = ({ type, category, allCategories, submitAction }) => {
         name: category.name || "",
         parentCategoryName: category.parentCategoryName || "None",
         parentCategory: category.parentCategory || null,
-        status: category.status || "active",
+        isActive: category.isActive,
       });
     } else {
       setFormData({
         name: "",
         parentCategoryName: "None",
         parentCategory: null,
-        status: "active",
+        isActive: true,
       });
     }
   }, [category, type]);
@@ -60,12 +59,12 @@ const CategoryDialog = ({ type, category, allCategories, submitAction }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let status = submitAction({ ...formData, _id : category._id });
-    if(status) setIsModalOpen(!isModalOpen)
+    let submissionSuccess = submitAction({ ...formData});
+    if(submissionSuccess) setIsModalOpen(!isModalOpen)
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen} >
       <DialogTrigger asChild>
         <span>
           {type === "edit" ? (
@@ -198,11 +197,11 @@ const CategoryDialog = ({ type, category, allCategories, submitAction }) => {
             <div className="flex items-center space-x-2">
               <Switch
                 id="status"
-                checked={formData.status == "active"}
+                checked={formData.isActive}
                 onCheckedChange={(checked) =>
                   setFormData({
                     ...formData,
-                    status: checked ? "active" : "inactive",
+                    isActive: checked,
                   })
                 }
               />
@@ -211,9 +210,11 @@ const CategoryDialog = ({ type, category, allCategories, submitAction }) => {
           </div>
 
           <DialogFooter>
+            <span>
             <Button type="submit">
               {type === "edit" ? "Save Changes" : "Create Category"}
             </Button>
+            </span>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -29,6 +29,7 @@ import { CategoryDialog } from "../../components/admin/CategoryDialog";
 import { DeleteCategoryDialog } from "../../components/admin/DeleteCategoryDialog";
 import {
   createNewCategoryAPI,
+  deleteCurrentCategoryAPI,
   editCurrentCategoryAPI,
   getAllCategoriesAPI,
 } from "../../api/categoryApi";
@@ -60,7 +61,7 @@ export default function Categories() {
 
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+  }, []);
 
   useEffect(() => {
     setFilteredCategories(allCategories);
@@ -75,7 +76,7 @@ export default function Categories() {
       fetchCategories();
       toast({
         title: "Success!",
-        description: "Category Successfully Created!",
+        description: response.data.message,
         variant: "default",
       });
       return true;
@@ -94,7 +95,7 @@ export default function Categories() {
     console.log("Category updated successfully", edittedCategory);
     try {
       const response = await editCurrentCategoryAPI({
-        ...edittedCategory
+        ...edittedCategory,
       });
       fetchCategories();
       toast({
@@ -104,21 +105,34 @@ export default function Categories() {
       });
       return true;
     } catch (error) {
-      console.error("Create Category Error: ", error.response.data.message);
       toast({
-        title: "Error!",
-        description: `${error.response.data.message}`,
+        title: "Success!",
+        description: error.response.data.message,
         variant: "destructive",
       });
+      console.error("Create Category Error: ", error.response.data.message);
+
       return false;
     }
   }, []);
 
-  const handleDelete = () => {
-    toast.success("Category deleted successfully");
-  };
-
-  const handleSelectCategory = () => {};
+  const handleDelete = useCallback(async (deleteCategory) => {
+    console.log("This is delete log",deleteCategory)
+    try {
+      const response = await deleteCurrentCategoryAPI(deleteCategory)
+      toast({
+        title: "Success!",
+        description: "Category Deleted Succesfully!",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Success!",
+        description: error.response.data.message,
+        variant: "default",
+      });
+    }
+  }, []);
 
   return (
     <div className="p-6 space-y-6">
@@ -250,12 +264,12 @@ export default function Categories() {
                     <div className="flex items-center gap-6">
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
-                          category.status == "active"
+                          category.isActive
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {category.status == "active" ? "Active" : "Inactive"}
+                        {category.isActive ? "Active" : "Inactive"}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         Level {category.level}
@@ -263,12 +277,11 @@ export default function Categories() {
                       <div
                         className="flex items-center gap-2"
                         onClick={() => {
-                          
                           setSelectedCategory({
                             name: category.name,
                             parentCategory: category.parentCategory || null,
-                            status: category.status,
-                            _id : category._id
+                            isActive: category.isActive,
+                            _id: category._id,
                           });
                         }}
                       >
@@ -311,12 +324,12 @@ export default function Categories() {
                               <div className="flex items-center gap-6">
                                 <span
                                   className={`px-2 py-1 rounded-full text-xs ${
-                                    subcategory.status == "active"
+                                    subcategory.isActive
                                       ? "bg-green-100 text-green-700"
                                       : "bg-red-100 text-red-700"
                                   }`}
                                 >
-                                  {subcategory.status == "active"
+                                  {subcategory.isActive
                                     ? "Active"
                                     : "Inactive"}
                                 </span>
@@ -331,8 +344,8 @@ export default function Categories() {
                                       parentCategory:
                                         subcategory.parentCategory,
                                       parentCategoryName: category.name,
-                                      status: subcategory.status,
-                                      _id : subcategory._id
+                                      isActive: subcategory.isActive,
+                                      _id: subcategory._id,
                                     });
                                   }}
                                 >
@@ -370,12 +383,12 @@ export default function Categories() {
                                       <div className="flex items-center gap-6">
                                         <span
                                           className={`px-2 py-1 rounded-full text-xs ${
-                                            subSubCategory.status == "active"
+                                            subSubCategory.isActive
                                               ? "bg-green-100 text-green-700"
                                               : "bg-red-100 text-red-700"
                                           }`}
                                         >
-                                          {subSubCategory.status == "active"
+                                          {subSubCategory.isActive
                                             ? "Active"
                                             : "Inactive"}
                                         </span>
@@ -390,10 +403,11 @@ export default function Categories() {
                                             setSelectedCategory({
                                               name: subSubCategory.name,
                                               parentCategory:
-                                              subSubCategory.parentCategory,
-                                              parentCategoryName: subcategory.name,
-                                              status: subSubCategory.status,
-                                              _id : subSubCategory._id
+                                                subSubCategory.parentCategory,
+                                              parentCategoryName:
+                                                subcategory.name,
+                                                isActive: subSubCategory.isActive,
+                                              _id: subSubCategory._id,
                                             });
                                           }}
                                         >
@@ -408,8 +422,6 @@ export default function Categories() {
                                             handleDelete={handleDelete}
                                           />
                                         </div>
-
-
                                       </div>
                                     </div>
                                   )

@@ -33,11 +33,10 @@ const categorySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", 
     },
-    status : {
-      type: String,
+    isActive : {
+      type: Boolean,
       required: true,
-      enum: ["active", "inactive"], 
-      default: "active"
+      default: true
     }
   },
   { timestamps: true } 

@@ -4,7 +4,7 @@ import { HTTP_CODES } from "../utils/responseCodes.js";
 import slugify from "slugify";
 
 export const createCategory = asyncHandler(async (req, res) => {
-  const { name, parentCategory, status } = req.body;
+  const { name, parentCategory, isActive } = req.body;
   const adminId = req.user._id;
 
   // Validate input
@@ -45,7 +45,7 @@ export const createCategory = asyncHandler(async (req, res) => {
     slug: slugify(name, { lower: true }),
     createdBy: adminId, //added and updated is smae person when creating the category.
     updatedBy: adminId,
-    status,
+    isActive,
   });
 
   await newCategory.save();
@@ -58,8 +58,7 @@ export const createCategory = asyncHandler(async (req, res) => {
 
 export const editCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(req.params)
-  const { name, parentCategory, status } = req.body;
+  const { name, parentCategory, isActive } = req.body;
   const adminId = req.user._id;
 
   // Check if category exists
@@ -83,10 +82,13 @@ export const editCategory = asyncHandler(async (req, res) => {
     }
   }
 
+      //how to change levels for categories?????????
   // If changing parent category, verify the level constraint
   let level = category.level;
-  if (parentCategory && parentCategory !== category.parentCategory?.toString()) {
+  if (parentCategory && parentCategory !== category.parentCategory) {
     const parent = await Category.findById(parentCategory);
+    console.log("hit", parent)
+
     if (!parent) {
       res.status(HTTP_CODES.NOT_FOUND);
       throw new Error("Parent category not found");
@@ -115,7 +117,7 @@ export const editCategory = asyncHandler(async (req, res) => {
       level,
       slug: name ? slugify(name, { lower: true }) : category.slug,
       updatedBy: adminId,
-      status: status || category.status
+      isActive: isActive || category.isActive
     },
     { new: true }
   );
@@ -143,7 +145,7 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     // Update all subcategories to inactive as well
     await Category.updateMany(
       { parentCategory: id },
-      { status: "inactive", updatedBy: adminId }
+      { isActive: false, updatedBy: adminId }
     );
   }
 
@@ -151,7 +153,7 @@ export const deleteCategory = asyncHandler(async (req, res) => {
   const updatedCategory = await Category.findByIdAndUpdate(
     id,
     {
-      status: "inactive",
+      isActive: false,
       updatedBy: adminId
     },
     { new: true }
@@ -256,7 +258,7 @@ export const getAllCategories = asyncHandler(async (req, res) => {
 //controller to get only active categories in nested fashion
 export const getCategories = asyncHandler(async (req, res) => {
   const categories = await Category.aggregate([
-    { $match: { level: 1, status: "active" } }, // Get only top-level categories (Level 1)
+    { $match: { level: 1, isActive: true } }, // Get only top-level categories (Level 1)
 
     // Lookup forlevel 2
     {
@@ -265,7 +267,7 @@ export const getCategories = asyncHandler(async (req, res) => {
         localField: "_id",
         foreignField: "parentCategory",
         as: "subCategories",
-        pipeline: [{ $match: { status: "active" } }],
+        pipeline: [{ $match: { isActive: true } }],
       },
     },
 
@@ -279,7 +281,7 @@ export const getCategories = asyncHandler(async (req, res) => {
         localField: "subCategories._id",
         foreignField: "parentCategory",
         as: "subCategories.subSubCategories",
-        pipeline: [{ $match: { status: "active" } }],
+        pipeline: [{ $match: { isActive: true } }],
       },
     },
 

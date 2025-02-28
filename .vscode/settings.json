@@ -1,0 +1,9 @@
+{
+  "postman.settings.dotenv-detection-notification-visibility": false,
+  "editor.cursorStyle": "line",
+  "editor.cursorWidth": 2,
+  "editor.cursorBlinking": "expand",
+  "editor.cursorSmoothCaretAnimation": "explicit",
+  "editor.smoothScrolling": true,
+  "terminal.integrated.smoothScrolling": true
+}
