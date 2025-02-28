@@ -36,13 +36,13 @@ import {
 // Enhanced mock data with three levels
 
 export default function Categories() {
-  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("latest");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortBy, setSortBy] = useState("az");
   const { toast } = useToast();
   const [allCategories, setAllCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
+  const [selectedParentCategory, setSelectedParentCategory] = useState("All Categories");
 
   //get all categories form the sever
   const fetchCategories = useCallback(async () => {
@@ -58,15 +58,69 @@ export default function Categories() {
       });
     }
   });
-
   useEffect(() => {
     fetchCategories();
   }, []);
 
+  //to reset filters when all categoties are changed
   useEffect(() => {
     setFilteredCategories(allCategories);
   }, [allCategories]);
 
+  // Update filtered categories when filters change
+  useEffect(() => {
+    let filtered = [...allCategories];
+
+    // Filter by status
+    if (activeFilter !== "all") {
+      filtered = filtered.filter(category => 
+        activeFilter === "active" ? category.isActive : !category.isActive
+      );
+    }
+
+    // Filter by parent category
+    if (selectedParentCategory !== "All Categories") {
+      filtered = filtered.filter(category => {
+        // If category matches selected parent
+        if (category.name === selectedParentCategory) return true;
+        
+        // If category is a child of selected parent
+        const isChild = category.parentCategory && 
+          allCategories.find(c => c._id === category.parentCategory)?.name === selectedParentCategory;
+        return isChild;
+      });
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(category => 
+        category.name.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort categories
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "az":
+          return a.name.localeCompare(b.name);
+        case "za":
+          return b.name.localeCompare(a.name);
+        case "latest":
+          // Assuming _id contains timestamp information
+          return b._id.localeCompare(a._id);
+        case "most-used":
+          // If you have a usage count, use that instead
+          return (b.subCategories?.length || 0) - (a.subCategories?.length || 0);
+        default:
+          return 0;
+      }
+    });
+
+    setFilteredCategories(filtered);
+  }, [allCategories, activeFilter, selectedParentCategory, searchQuery, sortBy]);
+
+  //actions to be done
   const handleCreate = useCallback(async (newCategory) => {
     try {
       const response = await createNewCategoryAPI({
@@ -147,6 +201,7 @@ export default function Categories() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-4">
+        
         {/* Status Filter */}
         <Card className="p-4">
           <h2 className="font-semibold mb-2">Status</h2>
@@ -154,9 +209,9 @@ export default function Categories() {
             {["all", "active", "inactive"].map((status) => (
               <Button
                 key={status}
-                variant={selectedStatus === status ? "default" : "outline"}
+                variant={activeFilter === status ? "default" : "outline"}
                 size="sm"
-                onClick={() => setSelectedStatus(status)}
+                onClick={() => setActiveFilter(status)}
                 className="capitalize"
               >
                 {status}
@@ -171,17 +226,28 @@ export default function Categories() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-full justify-between">
-                All Categories
+                {selectedParentCategory}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuItem>All Categories</DropdownMenuItem>
-              {filteredCategories.map((category) => (
-                <DropdownMenuItem key={category._id}>
-                  {category.name}
-                </DropdownMenuItem>
-              ))}
+              <DropdownMenuItem 
+                onClick={() => setSelectedParentCategory("All Categories")}
+              >
+                All Categories
+              </DropdownMenuItem>
+              {allCategories
+                .filter(category => !category.parentCategory) // Only show top-level categories
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((category) => (
+                  <DropdownMenuItem 
+                    key={category._id}
+                    onClick={() => setSelectedParentCategory(category.name)}
+                  >
+                    {category.name}
+                  </DropdownMenuItem>
+                ))
+              }
             </DropdownMenuContent>
           </DropdownMenu>
         </Card>
@@ -193,34 +259,38 @@ export default function Categories() {
             <DropdownMenuTrigger asChild>
               <span>
                 <Button variant="outline" className="w-full justify-between">
-                  {sortBy === "latest" && (
-                    <>
-                      Latest <Clock className="ml-2 h-4 w-4" />
-                    </>
-                  )}
+                  
                   {sortBy === "az" && (
                     <>
                       A-Z <ArrowDownAZ className="ml-2 h-4 w-4" />
                     </>
                   )}
-                  {sortBy === "most-used" && (
+                  {sortBy === "za" && (
                     <>
-                      Most Used <ArrowUpAZ className="ml-2 h-4 w-4" />
+                      Z-A <ArrowUpAZ className="ml-2 h-4 w-4" />
                     </>
                   )}
+                  {sortBy === "latest" && (
+                    <>
+                      Latest <Clock className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                  
                 </Button>
               </span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setSortBy("latest")}>
-                <Clock className="mr-2 h-4 w-4" /> Latest
-              </DropdownMenuItem>
+              
               <DropdownMenuItem onClick={() => setSortBy("az")}>
                 <ArrowDownAZ className="mr-2 h-4 w-4" /> A-Z
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy("most-used")}>
-                <ArrowUpAZ className="mr-2 h-4 w-4" /> Most Used
+              <DropdownMenuItem onClick={() => setSortBy("za")}>
+                <ArrowUpAZ className="mr-2 h-4 w-4" /> Z-A
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("latest")}>
+                <Clock className="mr-2 h-4 w-4" /> Latest
+              </DropdownMenuItem>
+              
             </DropdownMenuContent>
           </DropdownMenu>
         </Card>
@@ -245,7 +315,7 @@ export default function Categories() {
         <Accordion type="single" collapsible className="space-y-4">
           {filteredCategories
             .slice()
-            .sort((a, b) => a.name.localeCompare(b.name))
+            // .sort((a, b) => a.name.localeCompare(b.name))
             .map((category, index) => (
               <AccordionItem
                 key={category._id}
