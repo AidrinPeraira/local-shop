@@ -92,7 +92,7 @@ export default function Categories() {
   }, []);
 
   const handleEdit = useCallback(async (edittedCategory) => {
-    console.log("Category updated successfully", edittedCategory);
+    console.log("to edit", edittedCategory)
     try {
       const response = await editCurrentCategoryAPI({
         ...edittedCategory,
@@ -100,29 +100,28 @@ export default function Categories() {
       fetchCategories();
       toast({
         title: "Success!",
-        description: "Category Successfully Editted!",
+        description: response.data.message,
         variant: "default",
       });
       return true;
     } catch (error) {
       toast({
-        title: "Success!",
+        title: "Error!",
         description: error.response.data.message,
         variant: "destructive",
       });
-      console.error("Create Category Error: ", error.response.data.message);
-
       return false;
     }
   }, []);
 
   const handleDelete = useCallback(async (deleteCategory) => {
-    console.log("This is delete log",deleteCategory)
+    console.log("This is delete log", deleteCategory);
     try {
-      const response = await deleteCurrentCategoryAPI(deleteCategory)
+      const response = await deleteCurrentCategoryAPI(deleteCategory);
+      fetchCategories();
       toast({
         title: "Success!",
-        description: "Category Deleted Succesfully!",
+        description: response.data.message,
         variant: "default",
       });
     } catch (error) {
@@ -274,26 +273,24 @@ export default function Categories() {
                       <span className="text-sm text-muted-foreground">
                         Level {category.level}
                       </span>
-                      <div
-                        className="flex items-center gap-2"
-                        onClick={() => {
-                          setSelectedCategory({
+                      <div className="flex items-center gap-2">
+                        {/* modal/ pop up to edit and dlete category this is the pen icon now*/}
+                        <CategoryDialog
+                          type="edit"
+                          category={{
                             name: category.name,
                             parentCategory: category.parentCategory || null,
                             isActive: category.isActive,
                             _id: category._id,
-                          });
-                        }}
-                      >
-                        {/* modal/ pop up to edit and dlete category this is the pen icon now*/}
-                        <CategoryDialog
-                          type="edit"
-                          category={selectedCategory}
+                          }}
                           allCategories={allCategories}
                           submitAction={handleEdit}
                         />
 
-                        <DeleteCategoryDialog handleDelete={handleDelete} />
+                        <DeleteCategoryDialog
+                          handleDelete={handleDelete}
+                          category={category}
+                        />
                       </div>
                     </div>
                   </div>
@@ -329,35 +326,29 @@ export default function Categories() {
                                       : "bg-red-100 text-red-700"
                                   }`}
                                 >
-                                  {subcategory.isActive
-                                    ? "Active"
-                                    : "Inactive"}
+                                  {subcategory.isActive ? "Active" : "Inactive"}
                                 </span>
                                 <span className="text-sm text-muted-foreground">
                                   Level {subcategory.level}
                                 </span>
-                                <div
-                                  className="flex items-center gap-2"
-                                  onClick={() => {
-                                    setSelectedCategory({
+                                <div className="flex items-center gap-2">
+                                  <CategoryDialog
+                                    type="edit"
+                                    category={{
                                       name: subcategory.name,
                                       parentCategory:
                                         subcategory.parentCategory,
                                       parentCategoryName: category.name,
                                       isActive: subcategory.isActive,
                                       _id: subcategory._id,
-                                    });
-                                  }}
-                                >
-                                  <CategoryDialog
-                                    type="edit"
-                                    category={selectedCategory}
+                                    }}
                                     allCategories={allCategories}
                                     submitAction={handleEdit}
                                   />
 
                                   <DeleteCategoryDialog
                                     handleDelete={handleDelete}
+                                    category={subcategory}
                                   />
                                 </div>
                               </div>
@@ -397,29 +388,25 @@ export default function Categories() {
                                         </span>
 
                                         {/* editting and deleting sub sub categories */}
-                                        <div
-                                          className="flex items-center gap-2"
-                                          onClick={() => {
-                                            setSelectedCategory({
+                                        <div className="flex items-center gap-2">
+                                          <CategoryDialog
+                                            type="edit"
+                                            category={{
                                               name: subSubCategory.name,
                                               parentCategory:
                                                 subSubCategory.parentCategory,
                                               parentCategoryName:
                                                 subcategory.name,
-                                                isActive: subSubCategory.isActive,
+                                              isActive: subSubCategory.isActive,
                                               _id: subSubCategory._id,
-                                            });
-                                          }}
-                                        >
-                                          <CategoryDialog
-                                            type="edit"
-                                            category={selectedCategory}
+                                            }}
                                             allCategories={allCategories}
                                             submitAction={handleEdit}
                                           />
 
                                           <DeleteCategoryDialog
                                             handleDelete={handleDelete}
+                                            category={subSubCategory}
                                           />
                                         </div>
                                       </div>

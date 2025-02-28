@@ -12,13 +12,15 @@ import {
   import { Button } from "../../components/ui/button";
   import { Trash } from "lucide-react";
   
-  const DeleteCategoryDialog = ({ handleDelete }) => {
+  const DeleteCategoryDialog = ({ handleDelete, category }) => {
     return (
       <AlertDialog>
+        <span onClick={(e) => e.stopPropagation()}>
         <AlertDialogTrigger asChild>
           <Button variant="ghost" size="icon" className="text-red-600">
             <Trash className="h-4 w-4" />
           </Button>
+          
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -32,12 +34,15 @@ import {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700"
-              onClick={handleDelete}
+              onClick={()=>{
+                handleDelete(category)
+              }}
             >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
+          </span>
       </AlertDialog>
     );
   };
