@@ -258,45 +258,90 @@ export const getAllCategories = asyncHandler(async (req, res) => {
 //controller to get only active categories in nested fashion
 export const getCategories = asyncHandler(async (req, res) => {
   const categories = await Category.aggregate([
-    { $match: { level: 1, isActive: true } }, // Get only top-level categories (Level 1)
+    { $match: { level: 1, isActive: true } }, // Get only top-level categories
 
-    // Lookup forlevel 2
+    {$project: {
+      _id: 1,   // Include field1
+      name: 1,   // Include field2
+      level: 1,   // Exclude field3
+      parentCategory : 1
+    }
+    },
+    // Lookup level 2 categories
     {
       $lookup: {
         from: "categories",
         localField: "_id",
         foreignField: "parentCategory",
         as: "subCategories",
-        pipeline: [{ $match: { isActive: true } }],
       },
     },
 
-    //we should unwind to remove nesting. later we can nest themn back in group
-    { $unwind: { path: "$subCategories", preserveNullAndEmptyArrays: true } },
+    // Only keep required fields for level 2
+    {
+      $addFields: {
+        subCategories: {
+          $map: {
+            input: "$subCategories",
+            as: "subCat",
+            in: {
+              _id: "$$subCat._id",
+              name: "$$subCat.name",
+              level: "$$subCat.level",
+              subSubCategories: [] // Initialize empty array
+            }
+          }
+        }
+      }
+    },
 
-    // Lookup level3
+    // Lookup level 3 categories
     {
       $lookup: {
         from: "categories",
-        localField: "subCategories._id",
-        foreignField: "parentCategory",
-        as: "subCategories.subSubCategories",
-        pipeline: [{ $match: { isActive: true } }],
+        let: { subCategoryIds: "$subCategories._id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $in: ["$parentCategory", "$$subCategoryIds"] },
+            },
+          },
+          {
+            $project: { _id: 1, name: 1, level: 1, parentCategory: 1 },
+          },
+        ],
+        as: "allSubSubCategories",
       },
     },
 
-    // Group back to get nested structure
-    /**
-     * level 3 is already nested. we unwinded only level 2. $push will group and push all level 2 int o single leevl 1
-     */
+    // Properly nest level 3 categories
     {
-      $group: {
-        _id: "$_id",
-        name: { $first: "$name" },
-        slug: { $first: "$slug" },
-        level: { $first: "$level" },
-        parentCategory: { $first: "$parentCategory" },
-        subCategories: { $push: "$subCategories" },
+      $addFields: {
+        subCategories: {
+          $map: {
+            input: "$subCategories",
+            as: "subCat",
+            in: {
+              _id: "$$subCat._id",
+              name: "$$subCat.name",
+              level: "$$subCat.level",
+              subSubCategories: {
+                $filter: {
+                  input: "$allSubSubCategories",
+                  as: "subSubCat",
+                  cond: { $eq: ["$$subSubCat.parentCategory", "$$subCat._id"] },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    // Remove unnecessary fields
+    {
+      $project: {
+        allSubSubCategories: 0,
       },
     },
   ]);

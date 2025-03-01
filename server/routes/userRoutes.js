@@ -13,8 +13,8 @@ const userRouter = express.Router();
 const apiLimiter = rateLimit({
   // the following limit is set as 100 requests per 15 mins per route
   //we will first add this to the authentication routes only.
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 15*60*1000, 
+  max: 15, 
   message: "Too many requests, please try again later",
 });
 

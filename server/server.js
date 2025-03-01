@@ -14,6 +14,7 @@ import userRouter from './routes/userRoutes.js'
 import adminRouter from './routes/adminRoutes.js'
 import verifyRouter from './routes/verifyRoutes.js'
 import categoryRouter from './routes/categoryRoutes.js'
+import sellerRouter from './routes/sellerRoutes.js';
 
 
 
@@ -33,13 +34,14 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true // 
   }))
-// app.use(helmet()); // To protect against the xss seAllow sending cookiescurity threarts
-// app.use(morgan("dev")); // Logs requests in 'dev' format
+app.use(helmet()); // To protect against the xss seAllow sending cookiescurity threarts
+app.use(morgan("dev")); // Logs requests in 'dev' format
 
 
 
 //add necessary routing
 app.use('/api/users', userRouter)
+app.use('/api/seller', sellerRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/verify', verifyRouter)
 

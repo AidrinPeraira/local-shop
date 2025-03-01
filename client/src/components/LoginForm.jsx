@@ -13,32 +13,34 @@ const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const {toast} = useToast()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    dispatch(loginUser({email, password}))
+
+    dispatch(loginUser({ email, password }))
       .unwrap()
-      .then(({response})=>{
+      .then(() => {
         toast({
           title: "Logged In",
           description: "Welcome back to localShop. Happy Shopping!",
           variant: "default",
         });
-        navigate('/')
+        navigate("/");
       })
-      .catch((error)=>{
-        console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again") 
-            ({            
-            title: "Registration Error!",
-            description: error,
-            variant: "destructive",
-          });
-      })
-
+      .catch((error) => {
+        console.error(
+          "Reg Dispatch Error: ",
+          error || "Some error occured. Please try again"
+        );
+        toast({
+          title: "Registration Error!",
+          description: error,
+          variant: "destructive",
+        });
+      });
   };
 
   const handleSocialLogin = (provider) => {
@@ -98,7 +100,10 @@ const LoginForm = () => {
           <input type="checkbox" className="rounded border-gray-300" />
           <span>Remember me</span>
         </label>
-        <Link to="/forgot-password" className="text hover:opacity-70 font-medium">
+        <Link
+          to="/forgot-password"
+          className="text hover:opacity-70 font-medium"
+        >
           Forgot password?
         </Link>
       </div>

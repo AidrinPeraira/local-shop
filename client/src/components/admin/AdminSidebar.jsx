@@ -1,29 +1,9 @@
 
 import { NavLink } from "react-router-dom";
-import {
-  BarChart3,
-  Box,
-  Users,
-  ShoppingBag,
-  MessageSquare,
-  TicketIcon,
-  Star,
-  Truck,
-  Store,
-} from "lucide-react";
 
 
-
-const navigation = [
-  { name: "Dashboard", icon: BarChart3, href: "/admin" },
-  { name: "Categories", icon: Box, href: "/admin/categories" },
-  { name: "Users", icon: Users, href: "/admin/users" },
-  { name: "Sellers", icon: Store, href: "/admin/sellers" },
-  { name: "Admins", icon: Store, href: "/admin/staff" },
-  { name: "Products", icon: ShoppingBag, href: "/admin/products" },
-];
-
-export default function AdminSidebar({ isOpen, onToggle }) {
+export default function AdminSidebar({ isOpen, onToggle, pages }) {
+  const navigation = pages
   return (
     <aside
       className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 ${

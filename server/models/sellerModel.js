@@ -45,7 +45,7 @@ const sellerSchema = new mongoose.Schema(
     role : {
         type : String,
         required : true,
-        default : 'admin'
+        default : 'seller'
     },
     status : {
       type: String,

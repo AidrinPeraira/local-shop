@@ -73,13 +73,16 @@ export const loginUser = asyncHandler(
         //get login credentials from request
         const {email, password} = req.body;
         
-        //check for corresponding user
+        //find the user
         const existingUser = await User.findOne({email})
         //login if exist eroor message if not
         if(existingUser){
-            //let user login
-
-            //compare password first
+            
+            if(!existingUser.isActive){
+                res.status(HTTP_CODES.BAD_REQUEST)
+                throw new Error('Account Blocked! Please contact admin!')
+            }
+     
             const isPasswordValid = await bcrypt.compare(password, existingUser.password)
 
             if(isPasswordValid){
@@ -92,10 +95,11 @@ export const loginUser = asyncHandler(
                     role : existingUser.role,
                 })
 
-                return //to exit the function
+                return 
             } else {
                 //another error message
-                res.status(HTTP_CODES.BAD_REQUEST).json({message : 'Invalid Credentials. Try Again'})
+                res.status(HTTP_CODES.BAD_REQUEST)
+                throw new Error('Invalid Credentials. Try Again')
             }
 
         } else {

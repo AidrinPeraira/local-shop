@@ -30,11 +30,10 @@ const userSchema = mongoose.Schema({
         type : Boolean,
         default : false
     },
-    status : {
-      type: String,
+    isActive : {
+      type: Boolean,
       required: true,
-      enum: ["active", "inactive"], 
-      default: "active"
+      default: true
     },
     role : {
         type : String,

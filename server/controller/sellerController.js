@@ -6,24 +6,33 @@ import bcrypt from 'bcryptjs'
 import { validateUserData } from "../utils/validateData.js";
 
 
-export const registerAdmin = asyncHandler(
+export const registerSeller = asyncHandler(
     async (req, res) => {
-        const {username, email, password, phone} = req.body;
 
+        const {
+            companyName,
+            phone,
+            email,
+            address,
+            taxId,
+            productCategories,
+            bankDetails,
+            password,
+          } = req.body;
         
-        //add some validation before putting it into DB
+        //check fgor empty data
         if(!username || !email || !password || !phone ){
             throw new Error ('Please fill all the input fields')
         }
         
-        //check for existing admin
-        const emailExists = await Admin.findOne({email}); 
+        //check for existing Seller
+        const emailExists = await Seller.findOne({email}); 
         if(emailExists) {
             res.status(HTTP_CODES.BAD_REQUEST)
             throw new Error('Email already registered')
-        }
-        
-        const phoneExists = await Admin.findOne({phone}); 
+        }        
+
+        const phoneExists = await Seller.findOne({phone}); 
         if(phoneExists) {
             res.status(HTTP_CODES.BAD_REQUEST)
             throw new Error('Phone number already registered')
@@ -42,19 +51,19 @@ export const registerAdmin = asyncHandler(
         const hashedPassword = bcrypt.hashSync(password, salt)
 
         // create and add new user
-        const newAdmin = new Admin({username, email, phone, password : hashedPassword})
+        const newSeller = new Seller({username, email, phone, password : hashedPassword})
         try {
-            await newAdmin.save()
+            await newSeller.save()
 
             //call a utility function to create a jwt token and store it in a cookie
-            generateToken(res, newAdmin._id)
+            generateToken(res, newSeller._id)
 
             res.status(HTTP_CODES.CREATED).json({
-                _id : newAdmin._id,
-                username : newAdmin.username,
-                email : newAdmin.email,
-                phone : newAdmin.phone,
-                role : "buyer"
+                _id : newSeller._id,
+                username : newSeller.username,
+                email : newSeller.email,
+                phone : newSeller.phone,
+                role : "seller"
             })
             
         } catch (error) {
@@ -67,7 +76,7 @@ export const registerAdmin = asyncHandler(
     }
 )
 
-export const loginAdmin = asyncHandler(
+export const loginSeller = asyncHandler(
     async (req, res) => {
         
         //get login credentials from request
@@ -77,10 +86,6 @@ export const loginAdmin = asyncHandler(
         //login if exist eroor message if not
         if(registeredAdmin){
             //let user login
-            if(!registeredAdmin.isActive){
-                res.status(HTTP_CODES.BAD_REQUEST)
-                throw new Error('Account Blocked! Please contact your supervisor!')
-            }
 
             //compare password first
             const isPasswordValid = await bcrypt.compare(password, registeredAdmin.password)
@@ -108,7 +113,7 @@ export const loginAdmin = asyncHandler(
     }
 )
 
-export const logOutAdmin = asyncHandler(
+export const logOutSeller = asyncHandler(
     async (req, res) => {
         res.cookie('jwt', '', {
             httpOnly : true,
@@ -119,11 +124,3 @@ export const logOutAdmin = asyncHandler(
     }
 )
 
-//----------------
-
-
-//get current user profile
-
-//update current user profile
-
-//delete current user account
