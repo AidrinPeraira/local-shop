@@ -32,8 +32,8 @@ export function validateUserData(username, email, phone, password) {
 
 export function validateSellerData(data) {
   // Field validations
-  if (!nameRegex.test(data.companyName)) {
-    return "Invalid company name. Must be 3-50 characters long.";
+  if (!nameRegex.test(data.sellerName)) {
+    return "Invalid seller name. Must be 3-50 characters long.";
   }
 
   if (!emailRegex.test(data.email)) {
@@ -45,43 +45,42 @@ export function validateSellerData(data) {
   }
 
   if (!passwordRegex.test(data.password)) {
-    return;
-    ("Password must be at least 6 characters long, contain one uppercase letter, one number, and one special character.");
+    return "Password must be at least 6 characters long, contain one uppercase letter, one number, and one special character.";
   }
 
   // GST/PAN validation (either one must be valid)
-  if (!panRegex.test(data.gstPan) && !gstRegex.test(data.gstPan)) {
+  if (!panRegex.test(data.taxId) && !gstRegex.test(data.taxId)) {
     return "Invalid GST or PAN format.";
   }
 
-  if (!pinCodeRegex.test(data.pinCode)) {
+  if (!pinCodeRegex.test(data.address.pincode)) {
     return "Invalid pin code. Must be 6 digits.";
   }
 
-  if (!nameRegex.test(data.city)) {
+  if (!nameRegex.test(data.address.city)) {
     return "Invalid city name.";
   }
 
-  if (!nameRegex.test(data.state)) {
+  if (!nameRegex.test(data.address.state)) {
     return "Invalid state name.";
   }
 
-  if (!nameRegex.test(data.bankName)) {
+  if (!nameRegex.test(data.bankDetails.bankingName)) {
     return "Invalid bank name.";
   }
 
-  if (!nameRegex.test(data.accountHolderName)) {
+  if (!nameRegex.test(data.bankDetails.accountHolderName)) {
     return "Invalid account holder name.";
   }
 
-  if (!ifscRegex.test(data.ifscCode)) {
+  if (!ifscRegex.test(data.bankDetails.ifscCode)) {
     return "Invalid IFSC code format.";
   }
 
   if (
-    !data.categories ||
-    !Array.isArray(data.categories) ||
-    data.categories.length === 0
+    !data.productCategories ||
+    !Array.isArray(data.productCategories) ||
+    data.productCategories.length === 0
   ) {
     return "At least one category must be selected.";
   }

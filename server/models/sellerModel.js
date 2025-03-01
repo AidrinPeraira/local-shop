@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const sellerSchema = new mongoose.Schema(
   {
-    companyName: {
+    sellerName: {
       type: String,
       required: true,
     },
@@ -47,11 +47,10 @@ const sellerSchema = new mongoose.Schema(
         required : true,
         default : 'seller'
     },
-    status : {
-      type: String,
+    isActive : {
+      type: Boolean,
       required: true,
-      enum: ["active", "inactive"], 
-      default: "active"
+      default: true
     }
   },
   

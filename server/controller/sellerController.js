@@ -1,16 +1,16 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
-import Admin from "../models/adminModel.js";
+import Seller from "../models/sellerModel.js";
 import generateToken from "../utils/createToken.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import bcrypt from 'bcryptjs'
-import { validateUserData } from "../utils/validateData.js";
+import { validateSellerData, validateUserData } from "../utils/validateData.js";
 
 
 export const registerSeller = asyncHandler(
     async (req, res) => {
 
         const {
-            companyName,
+            sellerName,
             phone,
             email,
             address,
@@ -21,7 +21,7 @@ export const registerSeller = asyncHandler(
           } = req.body;
         
         //check fgor empty data
-        if(!username || !email || !password || !phone ){
+        if(!sellerName || !email || !password || !phone || !address || !taxId || !productCategories || !bankDetails){
             throw new Error ('Please fill all the input fields')
         }
         
@@ -39,7 +39,16 @@ export const registerSeller = asyncHandler(
         }
         
         //check for validity of received data
-        const valid = validateUserData(username, email, phone, password)
+        const valid = validateSellerData({
+            sellerName, 
+            email, 
+            phone, 
+            password, 
+            taxId, 
+            address, 
+            bankDetails,
+            productCategories 
+        })
         if(valid !== true) {
             res.status(HTTP_CODES.BAD_REQUEST)
             throw new Error(`${valid}`)
@@ -51,7 +60,16 @@ export const registerSeller = asyncHandler(
         const hashedPassword = bcrypt.hashSync(password, salt)
 
         // create and add new user
-        const newSeller = new Seller({username, email, phone, password : hashedPassword})
+        const newSeller = new Seller({
+            sellerName, 
+            email, 
+            phone, 
+            taxId, 
+            address, 
+            bankDetails,
+            productCategories,
+            password : hashedPassword})
+
         try {
             await newSeller.save()
 
@@ -69,7 +87,7 @@ export const registerSeller = asyncHandler(
         } catch (error) {
 
             res.status(HTTP_CODES.BAD_REQUEST);
-            throw new Error('Invalid user data')
+            throw new Error(`${error}`)
             
         }
         
