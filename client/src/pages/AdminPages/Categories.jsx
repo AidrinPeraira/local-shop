@@ -42,7 +42,8 @@ export default function Categories() {
   const { toast } = useToast();
   const [allCategories, setAllCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
-  const [selectedParentCategory, setSelectedParentCategory] = useState("All Categories");
+  const [selectedParentCategory, setSelectedParentCategory] =
+    useState("All Categories");
 
   //get all categories form the sever
   const fetchCategories = useCallback(async () => {
@@ -67,39 +68,38 @@ export default function Categories() {
     setFilteredCategories(allCategories);
   }, [allCategories]);
 
-  // Update filtered categories when filters change
+  // filtering the categories
   useEffect(() => {
     let filtered = [...allCategories];
 
-    // Filter by status
+    // isActive
     if (activeFilter !== "all") {
-      filtered = filtered.filter(category => 
+      filtered = filtered.filter((category) =>
         activeFilter === "active" ? category.isActive : !category.isActive
       );
     }
 
-    // Filter by parent category
+    // level 1 parent
     if (selectedParentCategory !== "All Categories") {
-      filtered = filtered.filter(category => {
-        // If category matches selected parent
+      filtered = filtered.filter((category) => {
         if (category.name === selectedParentCategory) return true;
-        
-        // If category is a child of selected parent
-        const isChild = category.parentCategory && 
-          allCategories.find(c => c._id === category.parentCategory)?.name === selectedParentCategory;
+        const isChild =
+          category.parentCategory &&
+          allCategories.find((c) => c._id === category.parentCategory)?.name ===
+            selectedParentCategory;
         return isChild;
       });
     }
 
-    // Filter by search query
+    // search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(category => 
+      filtered = filtered.filter((category) =>
         category.name.toLowerCase().includes(query)
       );
     }
 
-    // Sort categories
+    ///applying the filters
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "az":
@@ -107,18 +107,20 @@ export default function Categories() {
         case "za":
           return b.name.localeCompare(a.name);
         case "latest":
-          // Assuming _id contains timestamp information
-          return b._id.localeCompare(a._id);
-        case "most-used":
-          // If you have a usage count, use that instead
-          return (b.subCategories?.length || 0) - (a.subCategories?.length || 0);
+          return b.createdAt.localeCompare(a.createdAt);
         default:
           return 0;
       }
     });
 
     setFilteredCategories(filtered);
-  }, [allCategories, activeFilter, selectedParentCategory, searchQuery, sortBy]);
+  }, [
+    allCategories,
+    activeFilter,
+    selectedParentCategory,
+    searchQuery,
+    sortBy,
+  ]);
 
   //actions to be done
   const handleCreate = useCallback(async (newCategory) => {
@@ -146,7 +148,7 @@ export default function Categories() {
   }, []);
 
   const handleEdit = useCallback(async (edittedCategory) => {
-    console.log("to edit", edittedCategory)
+    console.log("to edit", edittedCategory);
     try {
       const response = await editCurrentCategoryAPI({
         ...edittedCategory,
@@ -201,7 +203,6 @@ export default function Categories() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-4">
-        
         {/* Status Filter */}
         <Card className="p-4">
           <h2 className="font-semibold mb-2">Status</h2>
@@ -231,23 +232,22 @@ export default function Categories() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => setSelectedParentCategory("All Categories")}
               >
                 All Categories
               </DropdownMenuItem>
               {allCategories
-                .filter(category => !category.parentCategory) // Only show top-level categories
+                .filter((category) => !category.parentCategory) // Only show top-level categories
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((category) => (
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     key={category._id}
                     onClick={() => setSelectedParentCategory(category.name)}
                   >
                     {category.name}
                   </DropdownMenuItem>
-                ))
-              }
+                ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </Card>
@@ -259,7 +259,6 @@ export default function Categories() {
             <DropdownMenuTrigger asChild>
               <span>
                 <Button variant="outline" className="w-full justify-between">
-                  
                   {sortBy === "az" && (
                     <>
                       A-Z <ArrowDownAZ className="ml-2 h-4 w-4" />
@@ -275,12 +274,10 @@ export default function Categories() {
                       Latest <Clock className="ml-2 h-4 w-4" />
                     </>
                   )}
-                  
                 </Button>
               </span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              
               <DropdownMenuItem onClick={() => setSortBy("az")}>
                 <ArrowDownAZ className="mr-2 h-4 w-4" /> A-Z
               </DropdownMenuItem>
@@ -290,7 +287,6 @@ export default function Categories() {
               <DropdownMenuItem onClick={() => setSortBy("latest")}>
                 <Clock className="mr-2 h-4 w-4" /> Latest
               </DropdownMenuItem>
-              
             </DropdownMenuContent>
           </DropdownMenu>
         </Card>
@@ -504,8 +500,8 @@ export default function Categories() {
         </Accordion>
       </Card>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-center space-x-2">
+      {/* Pagination to be added*/}
+      {/* <div className="flex items-center justify-center space-x-2">
         <Button variant="outline" size="sm" disabled>
           Previous
         </Button>
@@ -525,7 +521,7 @@ export default function Categories() {
         <Button variant="outline" size="sm">
           Next
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }
