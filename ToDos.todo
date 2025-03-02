@@ -8,7 +8,7 @@
 ☐ when buyer registers there is a small delay before showing the model for email verification
 ☐ need to re arrange seller registration to give it a proper structure
 ☐ how do we use the remember me function?
-☐ lazy loading not working
+✔ lazy loading not working @done (3/2/2025, 7:12:43 PM)
 ☐ make a profile page for user
 ☐ small bug on nav bar pop ups - pop ups not closing on outside click
 ✔ need to add small preview for wishlist and cart @done (2/27/2025, 6:57:32 PM)
