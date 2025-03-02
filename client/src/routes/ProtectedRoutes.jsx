@@ -9,12 +9,13 @@ const ProtectedRoute = ({ allowedRoles }) => {
   const location = useLocation();
   const {toast } = useToast()
 
-  if (!user || !allowedRoles.includes(user.role)) {
-    // we can use nested if to redirect to correct login page 
+  //user not logged in
+  if (!user) {
     const loginPath = location.pathname.startsWith("/seller")
       ? "/seller/login"
-        : location.pathname.startsWith("/admin")
-            ? "/admin/login" : "/login";
+      : location.pathname.startsWith("/admin")
+        ? "/admin/login" 
+        : "/login";
 
     toast({
       title: "Not Authorized",
@@ -25,16 +26,24 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to={loginPath} state={{ from: location }} replace />;
   }
 
+  //user not authorised
   if (!allowedRoles.includes(user.role)) {
-    
-    const verfiedUserPath = 
+    const verifiedUserPath = 
       user.role === "seller" 
-        ? "/seller/dashboard" :
-            user.role === "admin" 
-                ? "/admin/dashboard" : "/"; 
+        ? "/seller/dashboard"
+        : user.role === "admin" 
+          ? "/admin/dashboard" 
+          : "/"; 
 
-    return <Navigate to={verfiedUserPath} replace />;
+    toast({
+      title: "Access Denied",
+      description: "You don't have permission to access this page.",
+      variant: "destructive",
+    });
+
+    return <Navigate to={verifiedUserPath} replace />;
   }
+
 
   return <Outlet />;
 };

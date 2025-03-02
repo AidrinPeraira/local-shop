@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import DashboardSidebar from "../dashboard/DashboardSidebar";
 import DashboardHeader from "../dashboard/DashboardHeader";
 
@@ -14,9 +14,15 @@ import {
   RefreshCcw,
   Store,
 } from "lucide-react";
+import { logoutSeller } from "../../redux/features/userSlice";
+import { useDispatch } from "react-redux";
+import { useToast } from "../hooks/use-toast";
 
 export function SellerLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+  const {toast} = useToast()
 
   const navigation = [
     { name: "Dashboard", icon: BarChart3, href: "/seller" },
@@ -29,13 +35,40 @@ export function SellerLayout() {
     { name: "Returns", icon: RefreshCcw, href: "/seller/returns" },
     { name: "Support", icon: AlertCircle, href: "/seller/support" },
   ];
+
+
+  const handleSignout = useCallback(() => {
+    console.log("trying to logout");
+    dispatch(logoutSeller())
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Logged Out",
+          description: "See you later!",
+          variant: "default",
+        });
+        navigate("/seller/login");
+      })
+      .catch((error) => {
+        console.error(
+          "Logout Error: ",
+          error || "Some error occured. Please try again"
+        );
+        toast({
+          title: "Logout Error!",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+  }, [dispatch, navigate]);
   
+
 
   return (
     <div className="min-h-screen bg-admi">
       <DashboardSidebar titile={'Seller'} pages={navigation} isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       <main className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
-        <DashboardHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+        <DashboardHeader handleSignout={handleSignout} />
         <div className="p-6 mt">
           <Outlet />
         </div>

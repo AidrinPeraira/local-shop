@@ -30,8 +30,8 @@
 ☐ check for bugs in delete / deactivate category by admin
 ☐ add rensend otp function and email
 ☐ add pagination from backend for categories
-☐ the logout is causing a rendering bug when logging out from admin dash. Check for other pages also
-
+☐ the logout is causing a rendering bug when logging out from admin and seller dash. Check for other pages also
+☐ the prevent accessing page causees a bug, after loggin in as seller try changing the path to try and acess the login page and then logging out
 PRON
 
 

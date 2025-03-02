@@ -7,7 +7,8 @@ import { get } from "lodash";
 import { sellerRegApi } from "../../api/userAuthApi";
 import { registerSeller } from "../../redux/features/userSlice";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useRedirectIfAuthenticated } from "../../components/hooks/useRedirectIfAuthenticated";
 
 const steps = [
   { id: 1, title: "Company Details" },
@@ -19,6 +20,7 @@ const steps = [
 // Component for the nested category dropdown
 
 export const SellerRegister = () => {
+  useRedirectIfAuthenticated()
   const [currentStep, setCurrentStep] = useState(1);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -73,7 +75,7 @@ export const SellerRegister = () => {
 
   const validationErrorToast = (field) => {
     if (!errors) return;
-    
+
     const fieldError = get(errors, field);
     if (fieldError) {
       toast({
@@ -90,10 +92,10 @@ export const SellerRegister = () => {
     } else {
       const sellerData = {
         ...data,
-        productCategories: data.productCategories.map(cat => cat.id)
+        productCategories: data.productCategories.map((cat) => cat.id),
       };
       console.log("Seller Reg Form data:", sellerData);
-      
+
       dispatch(registerSeller(sellerData))
         .unwrap() //breaks open the promise to give value if success and throw rejectWithVakue error if rejected
         .then(() => {
@@ -119,7 +121,20 @@ export const SellerRegister = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="bg-secondary">
+     {/* Header */}
+     <header className="border-b bg-white/80 backdrop-blur-md">
+        <div className="container mx-auto px-4">
+          <div className="h-16 flex items-center">
+            <Link to="/seller/login">
+              <span className="text-2xl font-bold">
+                local<span className="text-primary">Shop</span>
+              </span>
+            </Link>
+          </div>
+        </div>
+      </header>
+    <div className="container  mx-auto px-4 py-8 max-w-2xl">
       <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-center mb-4">
@@ -455,7 +470,7 @@ export const SellerRegister = () => {
 
           {/* Navigation Buttons */}
           <div className="flex justify-between pt-6">
-            {currentStep > 1 && (
+            {currentStep > 1 ? (
               <button
                 type="button"
                 onClick={() => setCurrentStep((prev) => prev - 1)}
@@ -464,7 +479,17 @@ export const SellerRegister = () => {
                 <ArrowLeft className="w-4 h-4 mr-2 inline-block" />
                 Previous
               </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => navigate('/seller/login')}
+                className="btn-secondary py-2 px-4 bg-white-300 rounded-md text-blue-800"
+              >
+                <ArrowLeft className="w-6 h-4 mr-2 inline-block" />
+                Back to Login
+              </button>
             )}
+
             <button
               type="submit"
               className="btn-primary ml-auto py-2 px-4 bg-primary text-white rounded-md flex items-center"
@@ -478,6 +503,7 @@ export const SellerRegister = () => {
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 };

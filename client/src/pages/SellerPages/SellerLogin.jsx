@@ -1,18 +1,44 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
-import { LogIn } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Key, Eye, EyeOff } from "lucide-react";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { useToast } from "../../components/hooks/use-toast";
+import { Button } from "../../components/ui/button";
+import { useDispatch } from "react-redux";
+import { loginAdmin, loginSeller } from "../../redux/features/userSlice";
+import { useRedirectIfAuthenticated } from "../../components/hooks/useRedirectIfAuthenticated";
 
 export const SellerLogin = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  useRedirectIfAuthenticated()
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const onSubmit = (data) => {
-    console.log("Login Data:", data);
-    // Add login logic here (e.g., API call)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { toast } = useToast();
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    dispatch(loginSeller({ email, password }))
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Logged In",
+          description: "Welcome back to localShop. Happy Selling!",
+          variant: "default",
+        });
+        navigate("/seller");
+      })
+      .catch((error) => {
+        console.log(error);
+        toast({
+          title: "Registration Error!",
+          description: error,
+          variant: "destructive",
+        });
+      });
   };
 
   return (
@@ -40,72 +66,78 @@ export const SellerLogin = () => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
-                  },
-                })}
-                className="form-input w-full border p-2 rounded-md"
-              />
-              {errors.email && (
-                <span className="text-red-500 text-sm">
-                  {errors.email.message}
-                </span>
-              )}
+          <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-sm">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                })}
-                className="form-input w-full border p-2 rounded-md"
-              />
-              {errors.password && (
-                <span className="text-red-500 text-sm">
-                  {errors.password.message}
-                </span>
-              )}
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Key className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </Button>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between text-sm">
               <Link
-                to="/seller/forgot-password"
-                className="text-sm text-primary hover:underline"
+                to="/forgot-password"
+                className="text hover:opacity-70 font-medium"
               >
-                Forgot Password?
+                Forgot password?
               </Link>
             </div>
 
-            <button type="submit" className="btn-primary w-full flex items-center justify-center py-2 px-4 bg-primary text-white rounded-md">
-              <LogIn className="w-4 h-4 mr-2" />
-              Sign In
-            </button>
+            <Button type="submit" className="w-full hover:opacity-90">
+              Sign in
+            </Button>
+
+            <div className="flex items-center space-x-2">
+              <div className="w-full border-t border-gray-300"></div>
+              <span className="text-gray-500 text-sm">or</span>
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
 
             <p className="text-center text-sm text-gray-600">
-              Don't have a seller account?{" "}
+              Don't have an account?{" "}
               <Link
                 to="/seller/register"
-                className="text-primary hover:underline"
+                className="text hover:opacity-70 font-medium"
               >
-                Register here
+                Sign up
               </Link>
             </p>
           </form>

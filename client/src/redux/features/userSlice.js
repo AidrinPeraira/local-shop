@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { adminLoginApi, adminLogoutApi, sellerRegApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
+import { adminLoginApi, adminLogoutApi, sellerLoginApi, sellerLogoutApi, sellerRegApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
 import Cookies from 'js-cookie'
 
 //first we will create an async thunk midelware
@@ -88,6 +88,33 @@ export const registerSeller = createAsyncThunk(
     }
   }
 );
+
+export const loginSeller = createAsyncThunk(
+  "user/loginSeller",
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await sellerLoginApi(userData); 
+      localStorage.setItem("user", JSON.stringify(response.data));
+      return response.data; 
+    } catch (error) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const logoutSeller = createAsyncThunk(
+  'user/logoutSeller',
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await sellerLogoutApi();
+      Cookies.remove("jwt"); 
+      localStorage.removeItem("user")
+      return true
+    } catch (error) {
+      return rejectWithValue(error.response.data.message)
+    }
+  }
+)
 
 //now create a slice and set the reducer in the slice.
 //the state will have the data field, status field and the eroor feild
@@ -186,6 +213,33 @@ const userSlice = createSlice({
       .addCase(registerSeller.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.data;
+      })
+
+      //loginseller
+      .addCase(loginSeller.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginSeller.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(loginSeller.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.data;
+      })
+
+      //logout seller
+      .addCase(logoutSeller.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logoutSeller.fulfilled, (state, action) => {
+        return {...initialState} // this will remove the old user form the redux store
+      })
+      .addCase(logoutSeller.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       
   },

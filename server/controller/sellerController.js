@@ -102,22 +102,22 @@ export const loginSeller = asyncHandler(
         //get login credentials from request
         const {email, password} = req.body;
         //check for corresponding user
-        const registeredAdmin = await Admin.findOne({email})
+        const registerdSeller = await Seller.findOne({email})
         //login if exist eroor message if not
-        if(registeredAdmin){
+        if(registerdSeller){
             //let user login
 
             //compare password first
-            const isPasswordValid = await bcrypt.compare(password, registeredAdmin.password)
+            const isPasswordValid = await bcrypt.compare(password, registerdSeller.password)
 
             if(isPasswordValid){
-                generateToken(res, registeredAdmin._id)
+                generateToken(res, registerdSeller._id)
 
                 res.status(HTTP_CODES.ACCEPTED).json({
-                    _id : registeredAdmin._id,
-                    username : registeredAdmin.username,
-                    email : registeredAdmin.email,
-                    role : registeredAdmin.role,
+                    _id : registerdSeller._id,
+                    username : registerdSeller.sellerName,
+                    email : registerdSeller.email,
+                    role : registerdSeller.role,
                 })
 
                 return //to exit the function

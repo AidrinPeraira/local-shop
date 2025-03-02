@@ -13,30 +13,30 @@ export const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const {toast} = useToast()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { toast } = useToast();
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(loginAdmin({email, password}))
+    dispatch(loginAdmin({ email, password }))
       .unwrap()
-      .then(()=>{
+      .then(() => {
         toast({
           title: "Logged In",
           description: "Welcome back to localShop. Happy Selling!",
           variant: "default",
         });
-        navigate('/admin')
+        navigate("/admin");
       })
-      .catch((error)=>{
-        console.log(error)
-        toast({            
+      .catch((error) => {
+        console.log(error);
+        toast({
           title: "Registration Error!",
           description: error,
           variant: "destructive",
         });
-      })
+      });
   };
 
   return (
@@ -111,10 +111,6 @@ export const AdminLogin = () => {
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span>Remember me</span>
-              </label>
               <Link
                 to="/forgot-password"
                 className="text hover:opacity-70 font-medium"
@@ -127,37 +123,7 @@ export const AdminLogin = () => {
               Sign in
             </Button>
 
-            <div className="flex items-center space-x-2">
-              <div className="w-full border-t border-gray-300"></div>
-              <span className="text-gray-500 text-sm">or</span>
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-
-            <Button
-              type="button"
-              className="w-full bg-red-500 text-white hover:bg-red-600"
-              onClick={() => handleSocialLogin("Google")}
-            >
-              Sign in with Google
-            </Button>
-
-            <Button
-              type="button"
-              className="w-full bg-blue-600 text-white hover:bg-blue-700"
-              onClick={() => handleSocialLogin("Facebook")}
-            >
-              Sign in with Facebook
-            </Button>
-
-            <p className="text-center text-sm text-gray-600">
-              Don't have an account?{" "}
-              <Link
-                to="/register"
-                className="text hover:opacity-70 font-medium"
-              >
-                Sign up
-              </Link>
-            </p>
+       
           </form>
         </div>
       </div>

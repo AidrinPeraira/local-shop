@@ -96,10 +96,6 @@ const LoginForm = () => {
       </div>
 
       <div className="flex items-center justify-between text-sm">
-        <label className="flex items-center space-x-2">
-          <input type="checkbox" className="rounded border-gray-300" />
-          <span>Remember me</span>
-        </label>
         <Link
           to="/forgot-password"
           className="text hover:opacity-70 font-medium"
@@ -126,13 +122,13 @@ const LoginForm = () => {
         Sign in with Google
       </Button>
 
-      <Button
+      {/* <Button
         type="button"
         className="w-full bg-blue-600 text-white hover:bg-blue-700"
         onClick={() => handleSocialLogin("Facebook")}
       >
         Sign in with Facebook
-      </Button>
+      </Button> */}
 
       <p className="text-center text-sm text-gray-600">
         Don't have an account?{" "}
