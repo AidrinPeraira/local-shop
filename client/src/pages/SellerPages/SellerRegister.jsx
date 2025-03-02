@@ -4,6 +4,10 @@ import { ArrowLeft, ArrowRight, Check, Plus, X } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
 import { NestedCategoryDropdown } from "../../components/seller/NestedCategoryDropdown";
 import { get } from "lodash";
+import { sellerRegApi } from "../../api/userAuthApi";
+import { registerSeller } from "../../redux/features/userSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   { id: 1, title: "Company Details" },
@@ -16,6 +20,8 @@ const steps = [
 
 export const SellerRegister = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   //react hook form to get all the data into one object efficiently
   const {
@@ -52,13 +58,13 @@ export const SellerRegister = () => {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "categories",
+    name: "productCategories",
   });
   const { toast } = useToast();
 
   const handleCategorySelect = (index, categoryId, categoryPath) => {
-    setValue(`categories.${index}.id`, categoryId);
-    setValue(`categories.${index}.path`, categoryPath);
+    setValue(`productCategories.${index}.id`, categoryId);
+    setValue(`productCategories.${index}.path`, categoryPath);
   };
 
   const addCategory = () => {
@@ -66,6 +72,8 @@ export const SellerRegister = () => {
   };
 
   const validationErrorToast = (field) => {
+    if (!errors) return;
+    
     const fieldError = get(errors, field);
     if (fieldError) {
       toast({
@@ -76,15 +84,37 @@ export const SellerRegister = () => {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (currentStep < steps.length) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      toast({
-        title: "Registration Complete",
-        description: "Your seller account has been created successfully.",
-      });
-      console.log("Form data:", data);
+      const sellerData = {
+        ...data,
+        productCategories: data.productCategories.map(cat => cat.id)
+      };
+      console.log("Seller Reg Form data:", sellerData);
+      
+      dispatch(registerSeller(sellerData))
+        .unwrap() //breaks open the promise to give value if success and throw rejectWithVakue error if rejected
+        .then(() => {
+          toast({
+            title: "Registered and Logged In",
+            description: "Happy Selling",
+            variant: "default",
+          });
+          navigate("/seller");
+        })
+        .catch((error) => {
+          console.error(
+            "Seller Reg Dispatch Error: ",
+            error || "Some error occured. Please try again"
+          );
+          toast({
+            title: "Registration Error!",
+            description: error,
+            variant: "destructive",
+          });
+        });
     }
   };
 
@@ -145,7 +175,7 @@ export const SellerRegister = () => {
                 {...register("address.officeName", {
                   required: true,
                   pattern: {
-                    value: /^[a-zA-Z\s]{3,50}$/,
+                    value: /^[a-zA-Z0-9\s,./-]{3,50}$/,
                     message:
                       "Invalid office name. Must be 3-50 characters long.",
                   },
@@ -270,7 +300,7 @@ export const SellerRegister = () => {
                   <div className="flex items-center gap-2">
                     <input
                       type="hidden"
-                      {...register(`categories.${index}.id`, {
+                      {...register(`productCategories.${index}.id`, {
                         required: true,
                       })}
                     />

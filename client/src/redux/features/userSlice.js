@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { adminLoginApi, adminLogoutApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
+import { adminLoginApi, adminLogoutApi, sellerRegApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
 import Cookies from 'js-cookie'
 
 //first we will create an async thunk midelware
@@ -73,6 +73,21 @@ export const logoutAdmin = createAsyncThunk(
     }
   }
 )
+
+//seller
+export const registerSeller = createAsyncThunk(
+  "seller/registerSeller", 
+  async (userData, { rejectWithValue }) => {
+    try {
+      console.log("from slice",userData)
+      const response = await sellerRegApi(userData); 
+      return response.data; 
+    } catch (error) {
+      console.log(error)
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 //now create a slice and set the reducer in the slice.
 //the state will have the data field, status field and the eroor feild
@@ -157,6 +172,20 @@ const userSlice = createSlice({
       .addCase(logoutAdmin.rejected, (state, action)=>{
         state.loading = false;
         state.error = action.payload;
+      })
+
+      //register seller
+      .addCase(registerSeller.pending, (state) => {
+        state.loading = true;
+        state.error = null; //for any previous errors
+      })
+      .addCase(registerSeller.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(registerSeller.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.data;
       })
       
   },
