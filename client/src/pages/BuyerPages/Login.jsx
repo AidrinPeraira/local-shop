@@ -2,7 +2,7 @@
 import LoginForm from "../../components/LoginForm";
 import { Link } from "react-router-dom";
 
-export const Login = () => {
+export default () => {
   return (
     <div className="min-h-screen bg-secondary flex flex-col">
       {/* Header */}
@@ -10,7 +10,7 @@ export const Login = () => {
         <div className="container mx-auto px-4">
           <div className="h-16 flex items-center">
             <Link to="/">
-            <span className="text-2xl font-bold">
+              <span className="text-2xl font-bold">
                 local<span className="text-primary">Shop</span>
               </span>
             </Link>

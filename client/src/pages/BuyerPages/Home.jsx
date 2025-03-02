@@ -11,7 +11,7 @@ import {
   CarouselPrevious,
 } from "../../components/ui/carousel";
 
-export const Home = () => {
+export default function Home() {
   const categories = [
     { id: 1, name: 'Laptops', image: '/placeholder.svg' },
     { id: 2, name: 'Smartphones', image: '/placeholder.svg' },
@@ -63,7 +63,7 @@ export const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -80,11 +80,10 @@ export const Home = () => {
                         Shop Now
                       </Button>
                     </div>
-                    <img 
+                    <img
                       src="/placeholder.svg"
                       alt="Xbox Series X"
-                      className="absolute right-0 h-full w-1/2 object-cover"
-                    />
+                      className="absolute right-0 h-full w-1/2 object-cover" />
                   </div>
                 </CarouselItem>
               </CarouselContent>
@@ -99,11 +98,10 @@ export const Home = () => {
                 <h3 className="text-xl font-bold mb-2">iPhone 15</h3>
                 <Button variant="default" size="sm">Learn More</Button>
               </div>
-              <img 
+              <img
                 src="/placeholder.svg"
                 alt="iPhone 15"
-                className="absolute right-0 h-full w-1/2 object-cover"
-              />
+                className="absolute right-0 h-full w-1/2 object-cover" />
             </div>
             <div className="relative rounded-2xl overflow-hidden bg-purple-100">
               <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
@@ -111,11 +109,10 @@ export const Home = () => {
                 <h3 className="text-xl font-bold mb-2">AirPods Pro</h3>
                 <Button variant="default" size="sm">Shop Now</Button>
               </div>
-              <img 
+              <img
                 src="/placeholder.svg"
                 alt="AirPods Pro"
-                className="absolute right-0 h-full w-1/2 object-cover"
-              />
+                className="absolute right-0 h-full w-1/2 object-cover" />
             </div>
           </div>
         </div>
@@ -191,8 +188,7 @@ export const Home = () => {
                     <img
                       src={category.image}
                       alt={category.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
-                    />
+                      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110" />
                   </div>
                   <h3 className="text-center font-medium">{category.name}</h3>
                 </div>
@@ -231,8 +227,7 @@ export const Home = () => {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
-                    />
+                      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110" />
                     <span className="absolute top-2 left-2 px-2 py-1 text-xs font-semibold bg-primary text-white rounded">
                       {product.badge}
                     </span>
@@ -264,5 +259,5 @@ export const Home = () => {
       <Footer />
     </div>
   );
-};
+}
 

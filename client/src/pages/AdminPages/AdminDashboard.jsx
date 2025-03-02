@@ -39,7 +39,7 @@ const stats = [
   },
 ];
 
-export function AdminDashboard() {
+export default function AdminDashboard() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

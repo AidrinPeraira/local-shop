@@ -9,7 +9,7 @@ const orders = [
   { id: "#ORD005", product: "Gaming Chair", customer: "Tom Brown", date: "2024-02-16", status: "Cancelled" },
 ];
 
-export function SellerOrders() {
+export default function SellerOrders() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">

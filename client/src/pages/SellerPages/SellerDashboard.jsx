@@ -39,7 +39,7 @@ const stats = [
   },
 ];
 
-export const SellerDashboard = () => {
+export default () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
@@ -78,8 +78,7 @@ export const SellerDashboard = () => {
                   dataKey="sales"
                   stroke="#228be6"
                   fill="#228be6"
-                  fillOpacity={0.1}
-                />
+                  fillOpacity={0.1} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -101,8 +100,7 @@ export const SellerDashboard = () => {
                   dataKey="revenue"
                   stroke="#40c057"
                   fill="#40c057"
-                  fillOpacity={0.1}
-                />
+                  fillOpacity={0.1} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -110,4 +108,4 @@ export const SellerDashboard = () => {
       </div>
     </div>
   );
-}
+};

@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
-export const SellerNotFound = () => {
+export default () => {
   const location = useLocation();
 
   useEffect(() => {

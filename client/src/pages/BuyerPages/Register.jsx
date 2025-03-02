@@ -10,7 +10,7 @@ import { validateUserData } from "../../utils/validateData.js";
 import { sendOTP, verifyOTP } from "../../api/emailOtpApi.js";
 import { registerUser } from "../../redux/features/userSlice.js";
 
-export const Register = () => {
+export default () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -22,8 +22,8 @@ export const Register = () => {
   const [userOTP, setUserOTP] = useState(null);
 
   const { toast } = useToast();
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,22 +77,22 @@ export const Register = () => {
       //add user to the databse
       dispatch(registerUser(formData))
         .unwrap() //breaks open the promise to give value if success and throw rejectWithVakue error if rejected
-        .then(()=>{
+        .then(() => {
           toast({
             title: "Registered and Logged In",
             description: "Happy Shopping",
             variant: "default",
-          }); 
-          navigate('/')
+          });
+          navigate('/');
         })
-        .catch((error)=>{
-          console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again") 
-          toast({            
+        .catch((error) => {
+          console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again");
+          toast({
             title: "Registration Error!",
             description: error,
             variant: "destructive",
           });
-        })
+        });
 
     } else {
       toast({
@@ -142,11 +142,8 @@ export const Register = () => {
                     id="username"
                     placeholder="Enter your full name"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, username: e.target.value })
-                    }
-                    className="pl-10"
-                  />
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    className="pl-10" />
                 </div>
               </div>
 
@@ -159,11 +156,8 @@ export const Register = () => {
                     type="email"
                     placeholder="Enter your email"
                     value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="pl-10"
-                  />
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="pl-10" />
                 </div>
               </div>
 
@@ -176,11 +170,8 @@ export const Register = () => {
                     type="number"
                     placeholder="Enter your phone"
                     value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    className="pl-10"
-                  />
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="pl-10" />
                 </div>
               </div>
 
@@ -193,11 +184,8 @@ export const Register = () => {
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a password"
                     value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    className="pl-10"
-                  />
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="pl-10" />
                   <Button
                     type="button"
                     variant="ghost"
@@ -272,8 +260,7 @@ export const Register = () => {
               value={userOTP}
               onChange={(e) => setUserOTP(e.target.value)}
               className="pl-10"
-              required
-            />
+              required />
             <div className="flex justify-between mt-5">
               <Button
                 onClick={handleEmailCancel}

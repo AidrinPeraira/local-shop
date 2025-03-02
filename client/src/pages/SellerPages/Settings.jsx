@@ -1,7 +1,7 @@
 
 import { Card } from "../../components/ui/card";
 
-export function SellerSettings() {
+export default function SellerSettings() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Store Settings</h1>

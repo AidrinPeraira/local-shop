@@ -19,7 +19,7 @@ const productPerformance = [
   { name: "Gaming Chair", sales: 45, revenue: 13499 },
 ];
 
-export function SellerAnalytics() {
+export default function SellerAnalytics() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Analytics</h1>

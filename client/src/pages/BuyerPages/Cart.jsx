@@ -8,7 +8,7 @@ import { Input } from "../../components/ui/input";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export const Cart = () => {
+export default () => {
   // Mock cart data with variants
   const cartItems = [
     {
@@ -41,17 +41,16 @@ export const Cart = () => {
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const shipping = 5.99;
   const discount = cartItems.reduce(
-    (acc, item) =>
-      acc + (item.originalPrice ? (item.originalPrice - item.price) * item.quantity : 0),
+    (acc, item) => acc + (item.originalPrice ? (item.originalPrice - item.price) * item.quantity : 0),
     0
   );
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <main className="container mx-auto px-4 pt-3 pb-16">
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items Section */}
           <div className="lg:col-span-2 space-y-6">
@@ -66,8 +65,7 @@ export const Cart = () => {
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-24 h-24 object-cover rounded-md"
-                    />
+                      className="w-24 h-24 object-cover rounded-md" />
                     <div className="flex-1 min-w-0">
                       <Link
                         to={`/shop/${item.id}`}
@@ -75,13 +73,13 @@ export const Cart = () => {
                       >
                         {item.name}
                       </Link>
-                      
+
                       <div className="mt-1 space-y-1 text-sm text-gray-600">
                         <p>Material: {item.variants.material}</p>
                         <p>Size: {item.variants.size}</p>
                         <p>Color: {item.variants.color}</p>
                       </div>
-                      
+
                       <div className="mt-4 flex flex-wrap items-center gap-4">
                         <div className="flex items-center border rounded-md">
                           <Button
@@ -94,8 +92,7 @@ export const Cart = () => {
                           <Input
                             type="number"
                             value={item.quantity}
-                            className="w-12 h-8 text-center border-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          />
+                            className="w-12 h-8 text-center border-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                           <Button
                             variant="ghost"
                             size="icon"
@@ -133,12 +130,11 @@ export const Cart = () => {
               itemCount={cartItems.length}
               subtotal={subtotal}
               shipping={shipping}
-              discount={discount}
-            />
+              discount={discount} />
           </div>
         </div>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

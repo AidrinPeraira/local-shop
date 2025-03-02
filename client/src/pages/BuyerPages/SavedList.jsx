@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 
-export const SavedList = () => {
+export default () => {
   // Mock wishlist data
   const wishlistItems = [
     {
@@ -19,22 +19,21 @@ export const SavedList = () => {
   return (
     <div className="min-h-screen bg-secondary">
       <Header />
-      
+
       <main className="container mx-auto px-4 pt-24 pb-16">
         <h1 className="text-3xl font-display font-bold text-primary mb-8">My Wishlist</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {wishlistItems.map((item) => (
             <div key={item.id} className="bg-white rounded-lg shadow-sm border">
               <img
                 src={item.image}
                 alt={item.name}
-                className="w-full aspect-square object-cover rounded-t-lg"
-              />
+                className="w-full aspect-square object-cover rounded-t-lg" />
               <div className="p-4">
                 <h3 className="font-medium text-primary">{item.name}</h3>
                 <p className="text-accent font-medium mt-1">${item.price}</p>
-                
+
                 <div className="flex gap-2 mt-4">
                   <Button
                     className="flex-1 bg-accent hover:bg-accent/90"
@@ -67,7 +66,7 @@ export const SavedList = () => {
         )}
       </main>
 
-      <Footer/>
+      <Footer />
     </div>
   );
 };

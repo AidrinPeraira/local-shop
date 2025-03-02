@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { loginAdmin, loginSeller } from "../../redux/features/userSlice";
 import { useRedirectIfAuthenticated } from "../../components/hooks/useRedirectIfAuthenticated";
 
-export const SellerLogin = () => {
+const SellerLogin = () => {
   useRedirectIfAuthenticated()
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");

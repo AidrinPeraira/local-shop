@@ -9,7 +9,7 @@ const products = [
   { id: 5, name: "Running Shoes", price: "$89.99", stock: 65, category: "Sports" },
 ];
 
-export function Products() {
+export default function Products() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">

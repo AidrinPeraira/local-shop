@@ -47,11 +47,11 @@ const mockProduct = {
   ],
 };
 
-export const Product = () => {
+export default () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
+
       <main className="container mx-auto px-4 pt-3 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Column - Product Gallery */}
@@ -68,17 +68,16 @@ export const Product = () => {
               description={mockProduct.description}
               colors={mockProduct.colors}
               sizes={mockProduct.sizes}
-              stock={mockProduct.stock}
-            />
-            
+              stock={mockProduct.stock} />
+
             <ShippingInfo />
-            
+
             <ProductSpecs specifications={mockProduct.specifications} />
           </div>
         </div>
       </main>
 
-      <Footer/>
+      <Footer />
     </div>
   );
 };
