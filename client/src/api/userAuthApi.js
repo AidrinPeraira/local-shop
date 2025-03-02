@@ -14,3 +14,6 @@ export const userLogoutApi = () => API.post("/users/logout")
 //admin apis
 export const adminLoginApi = (data) => API.post("/admin/login", data)
 export const adminLogoutApi = (data) => API.post("/admin/logout", data) 
+
+//seller apis
+export const sellerRegApi = (data) => API.post('/selller/register', data)

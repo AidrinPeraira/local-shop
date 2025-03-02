@@ -65,7 +65,7 @@ export function validateSellerData(data) {
     return "Invalid state name.";
   }
 
-  if (!nameRegex.test(data.bankDetails.bankingName)) {
+  if (!nameRegex.test(data.bankDetails.bankName)) {
     return "Invalid bank name.";
   }
 
