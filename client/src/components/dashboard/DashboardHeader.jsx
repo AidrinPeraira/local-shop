@@ -1,5 +1,5 @@
 import { Bell, Link, LogIn, Menu, Search, User } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NotificationsDropdown } from "../ui/notification-dropdown";

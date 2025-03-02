@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import AdminSidebar from "./AdminSidebar";
-import AdminHeader from "./AdminHeader";
+import DashboardSidebar from "../dashboard/DashboardSidebar";
+import DashboardHeader from "../dashboard/DashboardHeader";
 
 import {
   BarChart3,
@@ -27,9 +27,9 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-admin">
-      <AdminSidebar pages={navigation} isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <DashboardSidebar titile={'Admin'} pages={navigation} isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       <main className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
-        <AdminHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+        <DashboardHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
         <div className="p-6 mt">
           <Outlet />
         </div>
