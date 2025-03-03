@@ -4,26 +4,35 @@ import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PageLoading } from "./components/ui/PageLoading";
 
-const BuyerRoutes = lazy(() => import("./routes/BuyerRoutes"));
-const SellerRoutes = lazy(() => import("./routes/SellerRoutes"));
-const AdminRoutes = lazy(() => import("./routes/AdminRoutes"));
+// Lazy load route components
+const BuyerRoutes = lazy(() => import('./routes/BuyerRoutes'));
+const SellerRoutes = lazy(() => import('./routes/SellerRoutes'));
+const AdminRoutes = lazy(() => import('./routes/AdminRoutes'));
 
 function App() {
   return (
-    <>
-      <ErrorBoundary>
-        <Toaster />
-        <Router>
-          <Suspense fallback={<PageLoading />}>
-            <Routes>
-              <Route path="/*" element={<BuyerRoutes />} />
-              <Route path="/seller/*" element={<SellerRoutes />} />
-              <Route path="/admin/*" element={<AdminRoutes />} />
-            </Routes>
-          </Suspense>
-        </Router>
-      </ErrorBoundary>
-    </>
+    <ErrorBoundary>
+      <Toaster />
+      <Router>
+        <Routes>
+          <Route path="/*" element={
+            <Suspense fallback={<PageLoading />}>
+              <BuyerRoutes />
+            </Suspense>
+          } />
+          <Route path="/seller/*" element={
+            <Suspense fallback={<PageLoading />}>
+              <SellerRoutes />
+            </Suspense>
+          } />
+          <Route path="/admin/*" element={
+            <Suspense fallback={<PageLoading />}>
+              <AdminRoutes />
+            </Suspense>
+          } />
+        </Routes>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

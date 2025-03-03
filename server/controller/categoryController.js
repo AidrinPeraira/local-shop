@@ -256,7 +256,7 @@ export const getAllCategories = asyncHandler(async (req, res) => {
 
 
 //controller to get only active categories in nested fashion
-export const getCategories = asyncHandler(async (req, res) => {
+export const getActiveCategories = asyncHandler(async (req, res) => {
   const categories = await Category.aggregate([
     { $match: { level: 1, isActive: true } }, // Get only top-level categories
 
