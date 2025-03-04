@@ -15,6 +15,7 @@ import adminRouter from './routes/adminRoutes.js'
 import verifyRouter from './routes/verifyRoutes.js'
 import categoryRouter from './routes/categoryRoutes.js'
 import sellerRouter from './routes/sellerRoutes.js';
+import productRouter from './routes/productRoutes.js';
 
 
 
@@ -47,6 +48,7 @@ app.use('/api/verify', verifyRouter)
 
 //actions to manipulate categories
 app.use('/api/category', categoryRouter)
+app.use('/api/products', productRouter)
 
 
 //start thr server

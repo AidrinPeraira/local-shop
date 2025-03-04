@@ -1,5 +1,4 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
-import OTP from "../models/otpModel.js";
 import { generateOTP, sendOTPEmail } from "../utils/emailOTP.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import bcrypt from "bcryptjs";
