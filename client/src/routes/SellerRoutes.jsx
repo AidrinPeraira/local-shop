@@ -23,6 +23,8 @@ const SellerNotFound = LazyComponent(lazy(() => import("../pages/SellerPages/Sel
 
 const SellerRoutes = () => {
   return (
+
+    
     <Routes>
       <Route path="/login" element={<SellerLogin />} />
       <Route path="/register" element={<SellerRegister />} />

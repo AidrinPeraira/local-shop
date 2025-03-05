@@ -56,7 +56,6 @@ const CategoryDialog = ({ type, category, allCategories, submitAction }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("messsasdfs",category)
     let submissionSuccess = submitAction({ ...formData, _id : category._id });
     if (submissionSuccess) setIsModalOpen(!isModalOpen);
   };

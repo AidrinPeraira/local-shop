@@ -217,7 +217,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
       {
         id: Date.now().toString(),
         minQuantity: newMinQuantity,
-        price: basePrice * 0.9,
+        discout: 0,
       },
     ]);
   };
@@ -228,43 +228,42 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
 
   // Final Submit
   const handleFormSubmit = (formData) => {
-      // Create a new FormData instance
-  const submitFormData = new FormData();
-  
-  // Add all the basic form fields
-  submitFormData.append('productName', formData.productName);
-  submitFormData.append('description', formData.description);
-  submitFormData.append('category', formData.category);
-  submitFormData.append('basePrice', formData.basePrice);
-  submitFormData.append('stock', formData.stock);
-  
-  // Add the images
-  images.forEach((image) => {
-    if (image.file) {  // Only append if it's a new file
-      submitFormData.append('images', image.file);
+    // Create a new FormData instance
+    const submitFormData = new FormData();
+
+    // Add all the basic form fields
+    submitFormData.append("productName", formData.productName);
+    submitFormData.append("description", formData.description);
+    submitFormData.append("category", formData.category);
+    submitFormData.append("basePrice", formData.basePrice);
+    submitFormData.append("stock", formData.stock);
+
+    // Add the images
+    images.forEach((image) => {
+      if (image.file) {
+        // Only append if it's a new file
+        submitFormData.append("images", image.file);
+      }
+    });
+
+    // Add other complex data as JSON strings
+
+    // Add variant types data
+    if (useVariants) {
+      // Filter out empty variant types
+      const validVariantTypes = variantTypes.filter(
+        (vt) => vt.name && vt.values.length > 0
+      );
+      submitFormData.append("variantTypes", JSON.stringify(validVariantTypes));
+      submitFormData.append("variants", JSON.stringify(variants));
     }
-  });
-  
-  // Add other complex data as JSON strings
 
-   // Add variant types data
-   if (useVariants) {
-    // Filter out empty variant types
-    const validVariantTypes = variantTypes.filter(
-      vt => vt.name && vt.values.length > 0
-    );
-    submitFormData.append('variantTypes', JSON.stringify(validVariantTypes));
-    submitFormData.append('variants', JSON.stringify(variants));
-  }
+    submitFormData.append("bulkDiscount", JSON.stringify(tierPrices));
+    if (initialData.id) {
+      submitFormData.append("id", initialData.id);
+    }
 
-  
-  submitFormData.append('variants', JSON.stringify(useVariants ? variants : []));
-  submitFormData.append('tierPrices', JSON.stringify(tierPrices));
-  if (initialData.id) {
-    submitFormData.append('id', initialData.id);
-  }
-
-  onSubmit(submitFormData)
+    onSubmit(submitFormData);
   };
 
   return (
@@ -493,7 +492,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-medium">Bulk Discount Pricing</h3>
           <Button type="button" size="sm" onClick={addTierPrice}>
-            <Plus className="h-4 w-4 mr-1" /> Add Price Tier
+            <Plus className="h-4 w-4 mr-1" /> Add Bulk Discounts
           </Button>
         </div>
 
@@ -501,7 +500,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
           <div className="space-y-2">
             <div className="grid grid-cols-[1fr,1fr,auto] gap-2 items-end">
               <Label>Minimum Quantity</Label>
-              <Label>Price Per Unit ($)</Label>
+              <Label>Discount % from BasePrice</Label>
               <span></span>
 
               {tierPrices.map((tier, index) => (
@@ -523,8 +522,9 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
                   />
                   <Input
                     type="number"
-                    min="0.01"
-                    step="0.01"
+                    min="0"
+                    step="1"
+                    max="100"
                     value={tier.price}
                     onChange={(e) => {
                       const newPrice = parseFloat(e.target.value) || 0;

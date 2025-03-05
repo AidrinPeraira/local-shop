@@ -51,7 +51,7 @@ export default function Categories() {
       const response = await getAllCategoriesAPI();
       setAllCategories(response.data);
     } catch (error) {
-      console.log(error);
+      console.log("FetchingCategories: ",error);
       toast({
         title: "Error!",
         description: "Error fetching Categories!",
@@ -148,7 +148,6 @@ export default function Categories() {
   }, []);
 
   const handleEdit = useCallback(async (edittedCategory) => {
-    console.log("to edit", edittedCategory);
     try {
       const response = await editCurrentCategoryAPI({
         ...edittedCategory,
@@ -171,7 +170,6 @@ export default function Categories() {
   }, []);
 
   const handleDelete = useCallback(async (deleteCategory) => {
-    console.log("This is delete log", deleteCategory);
     try {
       const response = await deleteCurrentCategoryAPI(deleteCategory);
       fetchCategories();

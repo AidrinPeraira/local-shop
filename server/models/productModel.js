@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  name: {
+  productName: {
     type: String,
     required: true,
     trim: true,
@@ -31,40 +31,42 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  
+
   reviewCount: {
     type: Number,
     default: 0,
   },
-  
-  
-  variationTypes: [
+
+  variantTypes: [
     {
-      variationName: String, 
-      variationValues: [String], 
+      variationName: String,
+      variationValues: [String],
     },
   ],
   // Store each specific variant combination
   variants: [
     {
       // Array of attributes that make up this variant
-      variation: [
-        {
-          type: String, // e.g., "Color"
-          value: String, // e.g., "Red"
-        },
-      ],
-      sku: String, // Stock Keeping Unit
+      variantId : String,
+      attributes: [],
       stock: { type: Number, required: true },
       inStock: { type: Boolean, default: true },
       basePrice: { type: Number, required: true },
-      minOrderQty: { type: Number, default: 1 },
-      bulkPricing: [
-        {
-          minQty: Number,
-          pricePerUnit: Number,
-        },
-      ],
+    },
+  ],
+
+  // bulk pricing
+
+  bulkDiscount: [
+    {
+      minQty: {
+        type: Number,
+        default : 1
+      },
+      priceDiscountPerUnit: {
+        type : Number,
+        default: 0
+      },
     },
   ],
   // Default values for products with no variations

@@ -87,3 +87,48 @@ export function validateSellerData(data) {
 
   return true;
 }
+
+export function validateProductData(data) {
+  if (!data.productName || data.productName.trim().length < 3) {
+    return "Product name must be at least 3 characters long"
+  }
+
+  if (!data.description || data.description.trim().length < 10) {
+    return "Description must be at least 10 characters long"
+  }
+
+  if (!data.category) {
+    return "Category is required"
+  }
+
+  if (!data.basePrice || isNaN(data.basePrice) || data.basePrice <= 0) {
+    return "Valid base price is required"
+  }
+
+  // Validate images
+  if (!data.images || data.images.length < 3) {
+    return "At least 3 images are required"
+  }
+
+  // Validate variants if they exist
+  if (data.variantTypes && data.variantTypes.length > 0) {
+    const variantTypes = JSON.parse(data.variantTypes);
+    
+    for (const type of variantTypes) {
+      if (!type.name || type.values.length === 0) {
+        return `Invalid variant type: ${type.name}`
+      }
+    }
+
+    // Validate variants
+    const variants = JSON.parse(data.variants);
+    if (!variants || variants.length === 0) {
+      return "Variants are required when variant types are specified"
+    }
+  } else if (!data.stock || isNaN(data.stock) || data.stock < 0) {
+    return "Valid stock quantity is required for non-variant products"
+  }
+
+
+  return true
+}

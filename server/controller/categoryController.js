@@ -87,7 +87,6 @@ export const editCategory = asyncHandler(async (req, res) => {
   let level = category.level;
   if (parentCategory && parentCategory !== category.parentCategory) {
     const parent = await Category.findById(parentCategory);
-    console.log("hit", parent)
 
     if (!parent) {
       res.status(HTTP_CODES.NOT_FOUND);
