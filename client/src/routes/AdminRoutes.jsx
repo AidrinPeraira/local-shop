@@ -1,72 +1,35 @@
 import React, { lazy, Suspense } from "react";
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { AdminLayout } from "../components/admin/AdminLayout";
 import ProtectedRoute from "./ProtectedRoutes";
 import { PageLoading } from "../components/ui/PageLoading";
 
-const AdminLogin = lazy(() => import("../pages/AdminPages/AdminLogin"));
-const AdminDashboard = lazy(() => import("..pages/AdminPages/AdminDashboard"));
-const Products = lazy(() => import("..pages/AdminPages/Products"));
-const Users = lazy(() => import("..pages/AdminPages/Users"));
-const AdminNotFound = lazy(() => import("..pages/AdminPages/AdminNotFound"));
-const Categories = lazy(() => import("..pages/AdminPages/Categories"));
+// Lazy load components. This is easy way to wrap all components in a single go
+const LazyComponent = (Component) => (props) => (
+  <Suspense fallback={<PageLoading />}>
+    <Component {...props} />
+  </Suspense>
+);
+
+// Lazy load all pages
+const AdminLogin = LazyComponent(lazy(() => import("../pages/AdminPages/AdminLogin")));
+const AdminDashboard = LazyComponent(lazy(() => import("../pages/AdminPages/AdminDashboard")));
+const Products = LazyComponent(lazy(() => import("../pages/AdminPages/Products")));
+const Users = LazyComponent(lazy(() => import("../pages/AdminPages/Users")));
+const Categories = LazyComponent(lazy(() => import("../pages/AdminPages/AdminCategories")));
+const AdminNotFound = LazyComponent(lazy(() => import("../pages/AdminPages/AdminNotFound")));
 
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Suspense fallback={<PageLoading />}>
-        <Route path="login" element={<AdminLogin />} />
-      </Suspense>
-
+      <Route path="login" element={<AdminLogin />} />
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-        <Route
-          path="/"
-          element={
-            <Suspense fallback={<PageLoading />}>
-              <AdminLayout />
-            </Suspense>
-          }
-        >
-          <Route
-            index
-            element={
-              <Suspense fallback={<PageLoading />}>
-                <AdminDashboard />
-              </Suspense>
-            }
-          />
-          <Route
-            path="products"
-            element={
-              <Suspense fallback={<PageLoading />}>
-                <Products />
-              </Suspense>
-            }
-          />
-          <Route
-            path="users"
-            element={
-              <Suspense fallback={<PageLoading />}>
-                <Users />
-              </Suspense>
-            }
-          />
-          <Route
-            path="categories"
-            element={
-              <Suspense fallback={<PageLoading />}>
-                <Categories />
-              </Suspense>
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <Suspense fallback={<PageLoading />}>
-                <AdminNotFound />
-              </Suspense>
-            }
-          />
+        <Route path="/" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<Products />} />
+          <Route path="users" element={<Users />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="*" element={<AdminNotFound />} />
         </Route>
       </Route>
     </Routes>

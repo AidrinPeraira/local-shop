@@ -3,6 +3,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import Admin from "../models/adminModel.js";
+import Seller from "../models/sellerModel.js";
 import { asyncHandler } from "./asyncHandler.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 
@@ -58,7 +59,6 @@ export const authenticateAdmin = asyncHandler(
         }
     }
 )
-
 export const authorizeAdmin = (req, res, next) => {
     if(req.user && req.user.role == 'admin'){
         next()
@@ -66,3 +66,43 @@ export const authorizeAdmin = (req, res, next) => {
         res.status(HTTP_CODES.UNAUTHORIZED).send('Not authorized as an admin')
     }
 }
+
+
+export const authenticateSeller = asyncHandler(
+    async (req, res, next) => {
+        let token
+        token = req.cookies.jwt
+        if (!token) {
+            res.status(HTTP_CODES.UNAUTHORIZED);
+            throw new Error('Not authorized. No token.');
+        }
+    
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            
+            let user = await Admin.findById(decoded.userId).select('-password');
+            if (!user) {
+                user = await Seller.findById(decoded.userId).select('-password');
+            }
+    
+            if (!user) {
+                res.status(HTTP_CODES.UNAUTHORIZED);
+                throw new Error('User not found');
+            }
+    
+            req.user = user;
+            next();
+        } catch (error) {
+            res.status(HTTP_CODES.UNAUTHORIZED);
+            console.log("Not authorized as admin",error)
+            throw new Error('Not authorized, token failed');
+        }
+    }
+)
+export const authorizeSeller = (req, res, next) => {
+    if(req.user && (req.user.role == 'admin' || req.user.role == 'seller')){
+        next()
+    } else {
+        res.status(HTTP_CODES.UNAUTHORIZED).send('Not authorized as admin or seller')
+    }
+} 

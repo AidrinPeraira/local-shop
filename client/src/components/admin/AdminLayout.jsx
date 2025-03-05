@@ -22,7 +22,6 @@ export function AdminLayout() {
   const { toast } = useToast();
 
   const handleSignout = useCallback(() => {
-    console.log("trying to logout");
     dispatch(logoutAdmin())
       .unwrap()
       .then(() => {

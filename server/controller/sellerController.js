@@ -20,7 +20,6 @@ export const registerSeller = asyncHandler(
             password,
           } = req.body;
 
-          console.log("This is the data recieced",req.body)
         
         //check fgor empty data
         if(!sellerName || !email || !password || !phone || !address || !taxId || !productCategories || !bankDetails){

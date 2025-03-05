@@ -15,6 +15,8 @@ import adminRouter from './routes/adminRoutes.js'
 import verifyRouter from './routes/verifyRoutes.js'
 import categoryRouter from './routes/categoryRoutes.js'
 import sellerRouter from './routes/sellerRoutes.js';
+import productRouter from './routes/productRoutes.js';
+import { errorHandler } from './middlewares/errorHandlerMiddleware.js';
 
 
 
@@ -47,8 +49,12 @@ app.use('/api/verify', verifyRouter)
 
 //actions to manipulate categories
 app.use('/api/category', categoryRouter)
+app.use('/api/products', productRouter)
 
 
+
+//handle errors after evrything is done
+app.use(errorHandler)
 //start thr server
 app.listen(port, ()=>{
     console.log(`Server running on port: ${port}`)

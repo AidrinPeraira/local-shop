@@ -17,12 +17,15 @@ import {
 import { logoutSeller } from "../../redux/features/userSlice";
 import { useDispatch } from "react-redux";
 import { useToast } from "../hooks/use-toast";
+import { fetchCategories } from "../../redux/features/categoriesSlice";
 
 export function SellerLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate()
   const {toast} = useToast()
+
+  
 
   const navigation = [
     { name: "Dashboard", icon: BarChart3, href: "/seller" },

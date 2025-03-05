@@ -6,7 +6,7 @@ import {
 import {
   createCategory,
   getAllCategories,
-  getCategories,
+  getActiveCategories,
   editCategory,
   deleteCategory
 } from "../controller/categoryController.js";
@@ -18,7 +18,7 @@ const categoryRoute = express.Router();
 // need a route to get active categories only
 categoryRoute
     .route('/active')
-    .get(getCategories)
+    .get(getActiveCategories)
 
 //admin actions to manipulate categories
 

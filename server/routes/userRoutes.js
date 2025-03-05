@@ -4,7 +4,6 @@ import {
   loginUser,
   logoutController,
 } from "../controller/userController.js";
-import { authenticateUser } from "../middlewares/authMiddleware.js";
 import rateLimit from "express-rate-limit";
 
 const userRouter = express.Router();
