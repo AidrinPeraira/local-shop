@@ -6,8 +6,26 @@ import { json } from "express";
 import { validateProductData } from "../utils/validateData.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 
-export const addProduct = asyncHandler(async (req, res) => {
+export const getSellerProducts = asyncHandler(async (req, res) => {
+  const sellerId = req.user._id;
 
+  //get all products related to the seller
+
+  const products = await Product.find({
+    seller: sellerId,
+    isBlocked: false,
+  }).select("-createdAt -updatedAt -isBlocked");
+
+
+  res.status(HTTP_CODES.OK).json({
+    success: true,
+    count: products.length,
+    products: products,
+  });
+
+});
+
+export const addProduct = asyncHandler(async (req, res) => {
   const {
     productName,
     description,
@@ -79,7 +97,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     });
   }
 
-  console.log("this is the variants",productData.variants)
+  console.log("this is the variants", productData.variants);
 
   productData.bulkDiscount = JSON.parse(bulkDiscount).map((discountObj) => {
     return {
@@ -92,10 +110,19 @@ export const addProduct = asyncHandler(async (req, res) => {
   //we don't have to check for duplicate products since allowing it creates healthy competititon. better prices for customers
 
   const product = new Product(productData);
-  await product.save();
+  try {
+    await product.save();
 
-  res.status(HTTP_CODES.CREATED).json({
-    success: true,
-    message: "Product Created Sucessfully",
-  });
+    res.status(HTTP_CODES.CREATED).json({
+      success: true,
+      message: "Product Created Sucessfully",
+    });
+  } catch (error) {
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
+    throw new Error(error);
+  }
 });
+
+export const editProduct = asyncHandler(async (req, res) => {});
+
+export const deleteProduct = asyncHandler(async (req, res) => {});

@@ -8,4 +8,5 @@ const API = axios.create({
 
 
 //need apis for the following
-export const sellerAddProduct = (data) => API.post("/products/add", data)
+export const sellerAddProductApi = (data) => API.post("/products/add", data)
+export const getSellerProductsApi = () => API.get("/products/get")

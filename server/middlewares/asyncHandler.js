@@ -1,5 +1,6 @@
 //this is is where we add any additional middlewares if  needed.
 
+
 //async handler. TO handle async functions
 /**
  * WHy do we need this funtion?
@@ -10,7 +11,9 @@
 export const asyncHandler = (fn) => {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch((error) => {
-      res.json({ message: error.message });
+      res
+        .status(500)
+        .json({ message: error.message })
     });
   };
 };

@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useToast } from "../components/hooks/use-toast";
+import { useEffect, useState } from "react";
 
 
 const ProtectedRoute = ({ allowedRoles }) => {
@@ -8,39 +9,51 @@ const ProtectedRoute = ({ allowedRoles }) => {
   const user  = useSelector((state) => state.user.user);
   const location = useLocation();
   const {toast } = useToast()
+  const [redirectPath, setRedirectPath] = useState(null);
 
-  //user not logged in
-  if (!user) {
-    const loginPath = location.pathname.startsWith("/seller")
-      ? "/seller/login"
-      : location.pathname.startsWith("/admin")
-        ? "/admin/login" 
+  //putting the toast inside consition causes direct  re renders. put it in useEffect
+  
+  useEffect(() => {
+
+    if (!user) {
+
+      //checkin=g the user for being logged in
+
+      const loginPath = location.pathname.startsWith("/seller")
+        ? "/seller/login"
+        : location.pathname.startsWith("/admin")
+        ? "/admin/login"
         : "/login";
 
-    toast({
-      title: "Not Authorized",
-      description: "Please login to continue!",
-      variant: "default",
-    });
+      toast({
+        title: "Not Authorized",
+        description: "Please login to continue!",
+        variant: "default",
+      });
 
-    return <Navigate to={loginPath} state={{ from: location }} replace />;
-  }
+      setRedirectPath(loginPath);
+    } else if (!allowedRoles.includes(user.role)) {
 
-  //user not authorised
-  if (!allowedRoles.includes(user.role)) {
-    const verifiedUserPath = 
-      user.role === "seller" 
-        ? "/seller/dashboard"
-        : user.role === "admin" 
-          ? "/admin/dashboard" 
-          : "/"; 
+      //checking the user for being authorised
 
-    toast({
-      title: "Access Denied",
-      description: "You don't have permission to access this page.",
-      variant: "destructive",
-    });
+      const verifiedUserPath =
+        user.role === "seller"
+          ? "/seller/dashboard"
+          : user.role === "admin"
+          ? "/admin/dashboard"
+          : "/";
 
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access this page.",
+        variant: "destructive",
+      });
+
+      setRedirectPath(verifiedUserPath);
+    }
+  }, [user, allowedRoles, location.pathname, toast]);
+
+  if (redirectPath) {
     return <Navigate to={verifiedUserPath} replace />;
   }
 

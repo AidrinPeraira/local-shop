@@ -73,9 +73,8 @@ const productSchema = new mongoose.Schema({
   basePrice: Number,
   stock: Number,
   inStock: { type: Boolean, default: true },
+  isActive : {type : Boolean, deault : false},
   isBlocked: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+}, {timestamps : true});
 
 export default mongoose.model("Product", productSchema);

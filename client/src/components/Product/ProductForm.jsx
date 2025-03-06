@@ -53,8 +53,8 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   const [variants, setVariants] = useState(initialData.variants || []);
   const [tierPrices, setTierPrices] = useState(
     initialData.tierPrices || [
-      { id: "1", minQuantity: 5, price: 0 },
-      { id: "2", minQuantity: 10, price: 0 },
+      { id: "1", minQuantity: 1, price: 0 },
+      { id: "2", minQuantity: 1, price: 0 },
     ]
   );
 

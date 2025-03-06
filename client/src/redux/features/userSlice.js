@@ -79,7 +79,6 @@ export const registerSeller = createAsyncThunk(
   "seller/registerSeller", 
   async (userData, { rejectWithValue }) => {
     try {
-      console.log("from slice",userData)
       const response = await sellerRegApi(userData); 
       return response.data; 
     } catch (error) {
@@ -107,8 +106,8 @@ export const logoutSeller = createAsyncThunk(
   async (_, {rejectWithValue}) => {
     try {
       const response = await sellerLogoutApi();
+      localStorage.removeItem("user")      
       Cookies.remove("jwt"); 
-      localStorage.removeItem("user")
       return true
     } catch (error) {
       return rejectWithValue(error.response.data.message)

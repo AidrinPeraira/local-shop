@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import DashboardSidebar from "../dashboard/DashboardSidebar";
 import DashboardHeader from "../dashboard/DashboardHeader";
@@ -18,6 +18,8 @@ import { logoutSeller } from "../../redux/features/userSlice";
 import { useDispatch } from "react-redux";
 import { useToast } from "../hooks/use-toast";
 import { fetchCategories } from "../../redux/features/categoriesSlice";
+import { useRedirectIfAuthenticated } from "../hooks/useRedirectIfAuthenticated";
+import { getSellerProductsApi } from "../../api/productApi";
 
 export function SellerLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -25,7 +27,6 @@ export function SellerLayout() {
   const navigate = useNavigate()
   const {toast} = useToast()
 
-  
 
   const navigation = [
     { name: "Dashboard", icon: BarChart3, href: "/seller" },
@@ -41,7 +42,6 @@ export function SellerLayout() {
 
 
   const handleSignout = useCallback(() => {
-    console.log("trying to logout");
     dispatch(logoutSeller())
       .unwrap()
       .then(() => {
@@ -64,6 +64,8 @@ export function SellerLayout() {
         });
       });
   }, [dispatch, navigate]);
+
+
   
 
 
