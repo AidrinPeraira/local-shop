@@ -48,10 +48,6 @@ export function AdminLayout() {
   const navigation = [
     { name: "Dashboard", icon: BarChart3, href: "/admin" },
     { name: "Categories", icon: Box, href: "/admin/categories" },
-    { name: "Users", icon: Users, href: "/admin/users" },
-    { name: "Sellers", icon: Store, href: "/admin/sellers" },
-    { name: "Admins", icon: Computer, href: "/admin/staff" },
-    { name: "Products", icon: ShoppingBag, href: "/admin/products" },
   ];
 
   return (

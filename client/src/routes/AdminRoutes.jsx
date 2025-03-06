@@ -14,8 +14,7 @@ const LazyComponent = (Component) => (props) => (
 // Lazy load all pages
 const AdminLogin = LazyComponent(lazy(() => import("../pages/AdminPages/AdminLogin")));
 const AdminDashboard = LazyComponent(lazy(() => import("../pages/AdminPages/AdminDashboard")));
-const Products = LazyComponent(lazy(() => import("../pages/AdminPages/Products")));
-const Users = LazyComponent(lazy(() => import("../pages/AdminPages/Users")));
+const AdminUsers = LazyComponent(lazy(() => import("../pages/AdminPages/AdminUsers")));
 const Categories = LazyComponent(lazy(() => import("../pages/AdminPages/AdminCategories")));
 const AdminNotFound = LazyComponent(lazy(() => import("../pages/AdminPages/AdminNotFound")));
 
@@ -26,8 +25,7 @@ const AdminRoutes = () => {
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="products" element={<Products />} />
-          <Route path="users" element={<Users />} />
+          <Route path="users" element={<AdminUsers />} />
           <Route path="categories" element={<Categories />} />
           <Route path="*" element={<AdminNotFound />} />
         </Route>

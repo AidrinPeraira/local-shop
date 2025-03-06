@@ -41,10 +41,7 @@ const BottomNav = () => {
               <PackageSearch size={20} />
               Track Order
             </a>
-            <a href="#" className="nav-item">
-              <ArrowLeftRight size={20} />
-              Compare
-            </a>
+          
             <a href="#" className="nav-item">
               <Headphones size={20} />
               Support
@@ -58,7 +55,7 @@ const BottomNav = () => {
           {/* Contact */}
           <div className="hidden lg:flex items-center text-gray-700">
             <Phone size={20} className="mr-2 text-primary" />
-            <span className="font-medium">+1 234 567 890</span>
+            <span className="font-medium">+91 9400 40 9843</span>
           </div>
         </div>
       </div>
