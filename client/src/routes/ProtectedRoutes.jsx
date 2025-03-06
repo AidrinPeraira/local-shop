@@ -38,10 +38,11 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
       const verifiedUserPath =
         user.role === "seller"
-          ? "/seller/dashboard"
+          ? "/seller"
           : user.role === "admin"
-          ? "/admin/dashboard"
+          ? "/admin"
           : "/";
+
 
       toast({
         title: "Access Denied",
@@ -54,7 +55,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }, [user, allowedRoles, location.pathname, toast]);
 
   if (redirectPath) {
-    return <Navigate to={verifiedUserPath} replace />;
+    return <Navigate to={redirectPath} replace />;
   }
 
 

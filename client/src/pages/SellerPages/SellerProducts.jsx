@@ -41,17 +41,17 @@ export default function SellerProducts() {
     
   const {categories} = useSelector(store => store.categories)
   
+  const fetchSellerProducts = async () => {
+    try {
+      const response = await getSellerProductsApi();
+      setProducts(response.data.products);
+    } catch (error) {
+      console.error("Error fetching seller products", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchSellerProducts = async () => {
-      try {
-        const response = await getSellerProductsApi();
-        setProducts(response.data.products);
-      } catch (error) {
-        console.error("Error fetching seller products", error);
-      }
-    };
-  
+    
     fetchSellerProducts();
   }, []);
 
@@ -110,6 +110,7 @@ export default function SellerProducts() {
           description: "You just successfully added a new product!",
           variant : 'default'
         })
+        fetchSellerProducts()
       }
     } catch (error) {
       console.log("Error handling add product: ", error)

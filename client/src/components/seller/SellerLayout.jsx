@@ -17,9 +17,6 @@ import {
 import { logoutSeller } from "../../redux/features/userSlice";
 import { useDispatch } from "react-redux";
 import { useToast } from "../hooks/use-toast";
-import { fetchCategories } from "../../redux/features/categoriesSlice";
-import { useRedirectIfAuthenticated } from "../hooks/useRedirectIfAuthenticated";
-import { getSellerProductsApi } from "../../api/productApi";
 
 export function SellerLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -31,13 +28,6 @@ export function SellerLayout() {
   const navigation = [
     { name: "Dashboard", icon: BarChart3, href: "/seller" },
     { name: "Products", icon: Package, href: "/seller/products" },
-    // { name: "Orders", icon: ShoppingBag, href: "/seller/orders" },
-    // { name: "Earnings", icon: DollarSign, href: "/seller/earnings" },
-    // { name: "Reviews", icon: Star, href: "/seller/reviews" },
-    // { name: "Shipping", icon: Truck, href: "/seller/shipping" },
-    // { name: "Inventory", icon: Store, href: "/seller/inventory" },
-    // { name: "Returns", icon: RefreshCcw, href: "/seller/returns" },
-    // { name: "Support", icon: AlertCircle, href: "/seller/support" },
   ];
 
 

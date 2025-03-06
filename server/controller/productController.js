@@ -53,6 +53,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     description,
     category,
     images,
+    isActive : true,
     basePrice: parseFloat(basePrice),
     stock: parseFloat(stock),
   };

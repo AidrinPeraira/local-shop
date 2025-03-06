@@ -10,10 +10,13 @@ Admin side :
     ✔ Implement search along with cancel or clear button to reset the results (should be done from backend). @done (3/2/2025, 4:03:05 PM)
     ☐ Pagination  (should be done from backend).
     ✔ Table should be in sorted in descending order (latest data should be at first) @done (3/2/2025, 4:03:13 PM)
-☐ Product management
-    ☐ Implement Add,Edit and Delete(Soft Delete) products.
-    ☐ Product must have multiple images and should be uploaded using a single file field (Minimum 3 Images)
-    ☐ Images should be cropped and resized properly before upload.
+✔ Product management @done (3/6/2025, 3:14:27 PM)
+    ✔ Implement Add,Edit and Delete(Soft Delete) products. @done (3/6/2025, 3:13:34 PM)
+        //Delte is done by setting status as inactive. admin can set isblocked status
+    ✔ Product must have multiple images and should be uploaded using a single file field (Minimum 3 Images) @done (3/6/2025, 3:13:38 PM)
+        //set min lenght of array as 3
+    ✔ Images should be cropped and resized properly before upload. @done (3/6/2025, 3:13:43 PM)
+        //image cropping done by cloudnary settingsd in multer
 
 User side :
 ☐ Home page
@@ -39,8 +42,10 @@ User side :
         ☐ Brand (Optional).
 
 Additional Note: 
-    ☐ Search, sort, and filter should work together in combination.
-    ☐ Ensure blocked/unlisted  products are hidden.
+    ✔ Search, sort, and filter should work together in combination. @done (3/6/2025, 3:15:40 PM)
+        //done by making the mapped item the result of multiple filter stages
+    ✔ Ensure blocked/unlisted  products are hidden. @done (3/6/2025, 3:15:05 PM)
+        //user cannot see the products blocked by the admin. The data is not being sent
 
 Product Details Page:
     ☐ Product details view on the user side with image zoom.
@@ -48,7 +53,8 @@ Product Details Page:
         ☐ Breadcrumbs
         ☐ Ratings
         ☐ Price
-        ☐ Discounts or coupons applied
+        ✔ Discounts or coupons applied @done (3/6/2025, 3:17:57 PM)
+            //no discount coupons. discounted price is shown based on the quantity of itmes
         ☐ Reviews
         ☐ Stock
     ☐ Proper error handles Sold out / unavailable  and  out of stock EXAMPLE
