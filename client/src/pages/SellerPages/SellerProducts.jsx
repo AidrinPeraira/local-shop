@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
 import ProductDialogs from "../../components/Product/ProductDialog";
-import { getSellerProductsApi, sellerAddProductApi } from "../../api/productApi";
+import { getSellerProductsApi, sellerAddProductApi, sellerDeleteProductApi, sellerEditProductApi } from "../../api/productApi";
 import { useSelector } from 'react-redux'
 import { useOutletContext } from "react-router-dom";
 
@@ -55,7 +55,7 @@ export default function SellerProducts() {
     fetchSellerProducts();
   }, []);
 
-  // Toggle accordion
+  // Toggle accordion state
   const toggleAccordion = (productId) => {
     setExpandedProducts(prev => 
       prev.includes(productId) 
@@ -64,7 +64,7 @@ export default function SellerProducts() {
     );
   };
 
-  // Filter products based on status and search query
+  // Filter products status and search
   const filteredProducts = products.filter(product => {
     if (selectedStatus === "in-stock" && !product.inStock) return false;
     if (selectedStatus === "out-of-stock" && product.inStock) return false;
@@ -102,19 +102,77 @@ export default function SellerProducts() {
 
   //function to pass to add products
   const handleAddProduct = useCallback(async (data) => {
-    console.log("this is the data sent to the backend", data)
     try {
       const response = await sellerAddProductApi(data)
-      console.log(response.data)
+      if(response.data){
+        toast({
+          title: " Success",
+          description: "You just successfully added a new product!",
+          variant : 'default'
+        })
+      }
     } catch (error) {
-      
+      console.log("Error handling add product: ", error)
+      toast({
+        title: "Add Product Error",
+        description: error,
+        variant : 'destructive'
+      })
     }
   }, [])
   
-  const handleEditProduct = useCallback((data) => {
-    console.log(data)
-  }, [])
-  
+  const handleEditProduct = useCallback(async (data) => {
+    try {
+      const response = await sellerEditProductApi(data, selectedProduct._id);
+      if(response.data) {
+        toast({
+          title: "Success",
+          description: "Product updated successfully!",
+          variant: 'default'
+        });
+        // Refresh the products list
+        const updatedProducts = await getSellerProductsApi();
+        setProducts(updatedProducts.data.products);
+        setIsDialogOpen(false);
+      }
+    } catch (error) {
+      console.log("Error handling edit product: ", error);
+      toast({
+        title: "Edit Product Error",
+        description: error.response?.data?.message || "Failed to update product",
+        variant: 'destructive'
+      });
+    }
+  }, [selectedProduct]);
+
+  const handleDeleteProduct = async (id) => {
+    try {
+      const response = await sellerDeleteProductApi(id);
+      if(response.data) {
+        toast({
+          title: "Success",
+          description: "Product updated successfully!",
+          variant: 'default'
+        });
+        // Refresh the products list
+        const updatedProducts = await getSellerProductsApi();
+        setProducts(updatedProducts.data.products);
+        setIsDialogOpen(false);
+      }
+    } catch (error) {
+      console.log("Error handling edit product: ", error);
+      toast({
+        title: "Edit Product Error",
+        description: error.response?.data?.message || "Failed to update product",
+        variant: 'destructive'
+      });
+    }
+  }
+
+  const handleRestoreProduct = async (id) => {
+    handleDeleteProduct(id)
+  }
+
   const handleOpenDialog = (type, product = null) => {
     setSelectedProduct(product);
     setIsDialogOpen(true);
@@ -313,7 +371,7 @@ export default function SellerProducts() {
                           variant="outline"
                           size="sm"
                           className="text-red-600 border-red-600"
-                          onClick={() => handleOpenDialog("delete", product)}
+                          onClick={() => handleDeleteProduct(product._id)}
                         >
                           <Trash className="h-4 w-4 mr-1" /> Delete
                         </Button>
@@ -322,15 +380,7 @@ export default function SellerProducts() {
                             variant="outline"
                             size="sm"
                             className="text-green-600 border-green-600"
-                            onClick={() => {
-                              setProducts(products.map(p => 
-                                p._id === product._id ? { ...p, isBlocked: false } : p
-                              ));
-                              toast({
-                                title: "Product Restored",
-                                description: `${product.productName} has been restored successfully.`,
-                              });
-                            }}
+                            onClick={() => handleRestoreProduct(product._id)}
                           >
                             <Eye className="h-4 w-4 mr-1" /> Restore
                           </Button>

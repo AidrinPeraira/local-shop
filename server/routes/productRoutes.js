@@ -12,22 +12,20 @@ const productRoute = express.Router();
 
 productRoute
   .route("/get")
-  .get(authenticateSeller, authorizeSeller, upload, getSellerProducts);
+  .get(authenticateSeller, authorizeSeller, upload, getSellerProducts)
 
 productRoute
   .route("/add")
-  .post(authenticateSeller, authorizeSeller, upload, addProduct);
+  .post(authenticateSeller, authorizeSeller, upload, addProduct)
 
 productRoute
   .route("/edit/:id")
-  .post(authenticateSeller, authorizeSeller, upload, editProduct);
+  .patch(authenticateSeller, authorizeSeller, upload, editProduct)
+  .delete(authenticateSeller, authorizeSeller, deleteProduct)
 
-productRoute
-  .route("/delete/:id")
-  .post(authenticateSeller, authorizeSeller, deleteProduct);
 
   productRoute
   .route("/block/:id")
-  .post(authenticateAdmin, authorizeAdmin, deleteProduct);
+  .post(authenticateAdmin, authorizeAdmin, deleteProduct)
 
 export default productRoute;

@@ -123,6 +123,135 @@ export const addProduct = asyncHandler(async (req, res) => {
   }
 });
 
-export const editProduct = asyncHandler(async (req, res) => {});
+export const editProduct = asyncHandler(async (req, res) => {
+  const productId = req.params.id;
+  const {
+    productName,
+    description,
+    category,
+    basePrice,
+    stock,
+    variantTypes,
+    variants,
+    bulkDiscount,
+  } = req.body;
 
-export const deleteProduct = asyncHandler(async (req, res) => {});
+  // Check if product exists and belongs to seller
+  const existingProduct = await Product.findOne({ 
+    _id: productId,
+    seller: req.user._id 
+  });
+
+  if (!existingProduct) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("Product not found or unauthorized");
+  }
+
+  // Prepare update data
+  const productData = {
+    slug: slugify(productName, { lower: true }),
+    productName,
+    description,
+    category,
+    basePrice: parseFloat(basePrice),
+    stock: parseFloat(stock),
+  };
+
+  // Handle images only if new ones are uploaded
+  if (req.files && req.files.length > 0) {
+    productData.images = req.files.map((file) => file.path);
+  }
+
+  let valid = validateProductData({ 
+    ...req.body, 
+    images: productData.images || existingProduct.images 
+  });
+  if (valid !== true) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error(`${valid}`);
+  }
+
+  // Handle variants if provided
+  if (variantTypes) {
+    productData.variantTypes = JSON.parse(variantTypes).map((variation) => ({
+      variationName: variation.name,
+      variationValues: variation.values,
+    }));
+
+    productData.variants = JSON.parse(variants).map((variantObj) => ({
+      variantId: variantObj.id,
+      attributes: variantObj.attributes,
+      basePrice: variantObj.price,
+      stock: variantObj.stock,
+      inStock: variantObj.stock > 0,
+    }));
+  }
+
+  if (bulkDiscount) {
+    productData.bulkDiscount = JSON.parse(bulkDiscount).map((discountObj) => ({
+      minQty: discountObj.minQuantity,
+      priceDiscountPerUnit: discountObj.price,
+    }));
+  }
+
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      productData,
+      { new: true }
+    );
+
+    res.status(HTTP_CODES.OK).json({
+      success: true,
+      message: "Product Updated Successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
+    throw new Error(error);
+  }
+});
+
+
+//the function is being used to set the field to active as well
+export const deleteProduct = asyncHandler(async (req, res) => {
+  const productId = req.params.id;
+
+  // Check if product exists and belongs to seller
+  const existingProduct = await Product.findOne({ 
+    _id: productId,
+    seller: req.user._id 
+  });
+
+  if(!existingProduct) {
+    res.status(HTTP_CODES.NOT_FOUND)
+    throw new Error("Product not Found!!")
+  }
+
+
+  try {
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      {_id : productId},
+      [
+        {
+          $set: {
+            isActive: !existingProduct.isActive
+          }
+        }
+      ]
+    )
+    
+    if(updatedProduct){
+      res.status(HTTP_CODES.OK)
+        .json({
+          success : true,
+          message : "Product Deactivated Successfully"
+        })
+    }
+  } catch (error) {
+    res.status(HTTP_CODES.NOT_FOUND)
+    throw new Error(error)
+  }
+});
+

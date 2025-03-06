@@ -35,13 +35,14 @@
     @apply border-border;
   }
   body {
+    @apply select-none focus:outline-none;  
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
   }
   [data-state="open"] {
     animation: fadeIn 200ms ease-out;
   }
-  [data-state="closed"] {
+  [data-state="closed"] { 
     animation: fadeOut 150ms ease-in;
   }
 }

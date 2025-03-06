@@ -6,9 +6,39 @@ import {
   DialogTitle,
 } from "../../components/ui/dialog";
 import ProductForm from "./ProductForm";
-import { useToast } from "../hooks/use-toast";
 
 const ProductDialogs = ({ selectedProduct, isOpen, onOpenChange, onSubmit, categories }) => {
+  
+
+  //make initial data object to match the layout of the form.
+  const initialData = selectedProduct ? {
+    id: selectedProduct._id,
+    name: selectedProduct.productName,
+    description: selectedProduct.description,
+    category: selectedProduct.category,
+    basePrice: selectedProduct.basePrice, 
+    stock: selectedProduct.stock,
+    images: selectedProduct.images.map((url, index) => ({
+      id: `existing-${index}`,
+      url: url,
+      order: index,
+      isExisting: true 
+    })),
+    variants: selectedProduct.variants.map(variant => ({
+      id: variant.variantId,
+      attributes: variant.attributes[0], 
+      price: variant.basePrice , 
+      stock: variant.stock
+    })),
+    tierPrices: selectedProduct.bulkDiscount.map(tier => ({
+      id: tier._id, 
+      minQuantity: tier.minQty,
+      price: tier.priceDiscountPerUnit
+    }))
+  } : null;
+
+  console
+
   return (
     <Dialog 
       open={isOpen} 
@@ -21,7 +51,7 @@ const ProductDialogs = ({ selectedProduct, isOpen, onOpenChange, onSubmit, categ
           </DialogTitle>
         </DialogHeader>
         <ProductForm 
-          initialData={selectedProduct || {}}
+          initialData={initialData || {}}
           onSubmit={(data) => {
             onSubmit(data);
             onOpenChange(false);

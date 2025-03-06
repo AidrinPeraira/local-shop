@@ -426,7 +426,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
 
         <div className="flex flex-wrap gap-4">
           <div className="space-y-2 flex-1">
-            <Label htmlFor="basePrice">Base Price ($)</Label>
+            <Label htmlFor="basePrice">Base Price (₹)</Label>
             <Controller
               name="basePrice"
               control={control}
