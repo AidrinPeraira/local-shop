@@ -8,8 +8,6 @@ const Login = lazy(() => import("../pages/BuyerPages/Login"));
 const Register = lazy(() => import("../pages/BuyerPages/Register"));
 const Shop = lazy(() => import("../pages/BuyerPages/Shop"));
 const NotFound = lazy(() => import("../pages/BuyerPages/NotFound"));
-const SavedList = lazy(() => import("../pages/BuyerPages/SavedList"));
-const Cart = lazy(() => import("../pages/BuyerPages/Cart"));
 const Product = lazy(() => import("../pages/BuyerPages/Product"));
 
 const MainRoutes = () => {
@@ -59,7 +57,7 @@ const MainRoutes = () => {
       {/* Protected Routes */}
       <Route element={<ProtectedRoute allowedRoles={["buyer"]} />}>
       
-        <Route
+        {/* <Route
           path="/saved"
           element={
             <Suspense fallback={<PageLoading />}>
@@ -74,7 +72,7 @@ const MainRoutes = () => {
               <Cart />
             </Suspense>
           }
-        />
+        /> */}
       </Route>
 
       <Route path="*" element={<NotFound />} />

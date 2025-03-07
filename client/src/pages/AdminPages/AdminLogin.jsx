@@ -7,6 +7,7 @@ import { useToast } from "../../components/hooks/use-toast";
 import { Button } from "../../components/ui/button";
 import { useDispatch } from "react-redux";
 import { loginAdmin } from "../../redux/features/userSlice";
+import { useRedirectIfAuthenticated } from "../../components/hooks/useRedirectIfAuthenticated";
 
 export const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +17,8 @@ export const AdminLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { toast } = useToast();
+
+  useRedirectIfAuthenticated()
 
   const handleSubmit = (event) => {
     event.preventDefault();

@@ -24,13 +24,13 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Home() {
-  const categories = [
-    { id: 1, name: "Electronics", image: "/placeholder.svg" },
-    { id: 2, name: "Manufacturing", image: "/placeholder.svg" },
-    { id: 3, name: "Healthcare", image: "/placeholder.svg" },
-    { id: 4, name: "Construction", image: "/placeholder.svg" },
-    { id: 5, name: "Automotive", image: "/placeholder.svg" },
-    { id: 6, name: "Logistics", image: "/placeholder.svg" },
+  const industries = [
+    { id: 1, name: "Equipments", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163584.jpg?t=st=1741325045~exp=1741328645~hmac=3e5181756393886d0563bb0d6504f86804cb04ef13c65013486588588b92f205&w=740" },
+    { id: 2, name: "Services", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163577.jpg?ga=GA1.1.1465198438.1741275083" },
+    { id: 3, name: "Healthcare", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163569.jpg?t=st=1741324820~exp=1741328420~hmac=c6e6f2f0e2f7ab14827da271e2d442d4d50fae67d841ee487cef75b461781db9&w=740" },
+    { id: 4, name: "Organic", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163601.jpg?t=st=1741324885~exp=1741328485~hmac=10fd7beb587319b868301910c4fc26ef7194abd1709f0deddc5903ab617e31ff&w=740" },
+    { id: 5, name: "Automotive", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163610.jpg?t=st=1741324845~exp=1741328445~hmac=636a11bffa39a6317573687c62d80df5991ab3aaab199151e500577ee117e0a9&w=740" },
+    { id: 6, name: "Logistics", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163596.jpg?t=st=1741324777~exp=1741328377~hmac=0fbc98c236f2e6ba1cec50e724402ef6a89a56561eccf3b38935e7816764c5b0&w=1060" },
   ];
 
   const featuredProducts = [
@@ -82,73 +82,27 @@ export default function Home() {
           <div className="md:col-span-2 relative rounded-2xl overflow-hidden">
             <Carousel className="w-full">
               <CarouselContent>
+                {/* CAROUSEL. CAN ADD MORE IMAGES */}
                 <CarouselItem>
-                  <div className="relative h-[400px] bg-gradient-to-r from-blue-900 to-blue-700 rounded-2xl overflow-hidden">
+                  <div className="relative h-[400px] bg-gradient-to-r from-gray-950 to-gray-700 rounded-2xl overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-pattern opacity-10"
+                      className="absolute inset-0 bg-cover bg-center opacity-70"
                       style={{
                         backgroundImage:
-                          "url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')",
+                          "url('https://media.istockphoto.com/id/1413198675/photo/happy-senior-man-working-as-a-cashier-at-supermarket.jpg?s=1024x1024&w=is&k=20&c=s-7CQletxen5yfioJJP_7K0V4BEoCtZnX2oT-im7Xiw=')",
                       }}
                     />
                     <div className="absolute left-8 top-1/2 -translate-y-1/2 text-white max-w-lg">
-                      <div className="flex items-center mb-2">
-                        <Building2 className="mr-2 h-6 w-6" />
-                        <span className="text-blue-200 uppercase tracking-wider text-sm font-semibold">
-                          B2B Marketplace
-                        </span>
-                      </div>
                       <h2 className="text-4xl font-bold mb-4">
-                        Connect, Source & Grow Your Business
+                        Empower Your Business with Seamless Transactions
                       </h2>
-                      <p className="text-lg mb-6 text-blue-100">
-                        Join thousands of businesses streamlining their
-                        procurement and expanding their network on our trusted
-                        B2B platform.
-                      </p>
-                      <div className="flex gap-3">
-                        <Link to="/login">
-                          <Button size="lg" variant="default">
-                            Join Now
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                    <div className="absolute right-0 bottom-0 h-[90%] w-1/3">
-                      <Factory className="h-full w-full text-white/10" />
-                    </div>
-                  </div>
-                </CarouselItem>
-                <CarouselItem>
-                  <div className="relative h-[400px] bg-gradient-to-r from-purple-900 to-indigo-800 rounded-2xl overflow-hidden">
-                    <div
-                      className="absolute inset-0 bg-pattern opacity-10"
-                      style={{
-                        backgroundImage:
-                          "url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')",
-                      }}
-                    />
-                    <div className="absolute left-8 top-1/2 -translate-y-1/2 text-white max-w-lg">
-                      <div className="flex items-center mb-2">
-                        <Globe className="mr-2 h-6 w-6" />
-                        <span className="text-purple-200 uppercase tracking-wider text-sm font-semibold">
-                          Global Reach
-                        </span>
-                      </div>
-                      <h2 className="text-4xl font-bold mb-4">
-                        Access International Markets
-                      </h2>
-                      <p className="text-lg mb-6 text-purple-100">
-                        Connect with verified suppliers and buyers from over 120
-                        countries. Expand your business globally with our
-                        cross-border trade solutions.
+                      <p className="text-lg mb-6  text-white/80">
+                        Streamline your sales with secure and efficient checkout
+                        systems designed for modern businesses.
                       </p>
                       <Button size="lg" variant="default">
-                        Explore Markets
+                        Get Started
                       </Button>
-                    </div>
-                    <div className="absolute right-0 bottom-0 h-[90%] w-1/3">
-                      <Globe className="h-full w-full text-white/10" />
                     </div>
                   </div>
                 </CarouselItem>
@@ -157,24 +111,31 @@ export default function Home() {
               <CarouselNext />
             </Carousel>
           </div>
+
+          {/* side card x 2 */}
           <div className="grid grid-rows-2 gap-4">
-            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-green-700 to-emerald-600">
+            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-gray-950 to-gray-700">
               <div
-                className="absolute inset-0 bg-pattern opacity-10"
+                className="absolute inset-0 w-full h-full object-cover z-0"
                 style={{
                   backgroundImage:
-                    "url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')",
+                    "url('https://img.freepik.com/free-photo/view-man-handling-money-funds-wealth-prosperity_23-2151660785.jpg?semt=ais_hybrid')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
               />
-              <div className="p-6 text-white">
+
+              <div className="absolute inset-0  bg-black/40 z-0" />
+
+              <div className="relative p-6 text-white z-10">
                 <div className="flex items-center mb-2">
-                  <BarChart3 className="mr-2 h-5 w-5" />
-                  <span className="text-green-200 uppercase tracking-wider text-xs font-semibold">
+                  <BarChart3 className="mr-2 h-5 w-5  text-amber-100" />
+                  <span className=" text-amber-300 uppercase tracking-wider text-xs font-semibold ">
                     Business Growth
                   </span>
                 </div>
                 <h3 className="text-xl font-bold mb-2">Boost Your Sales</h3>
-                <p className="text-sm mb-3 text-green-100">
+                <p className="text-sm mb-3  text-amber-100">
                   Connect with pre-qualified buyers actively seeking your
                   products
                 </p>
@@ -182,38 +143,45 @@ export default function Home() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+                    className="bg-white text-black border-white/20 hover:bg-white/20"
                   >
                     Get Started
                   </Button>
                 </Link>
               </div>
             </div>
-            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-amber-700 to-orange-600">
+            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-gray-950 to-gray-700">
               <div
-                className="absolute inset-0 bg-pattern opacity-10"
+                className="absolute inset-0 w-full h-full object-cover z-0"
                 style={{
                   backgroundImage:
-                    "url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')",
+                    "url('https://www.shutterstock.com/shutterstock/photos/2221707711/display_1500/stock-photo-indian-small-business-owner-showing-mobile-and-pointing-towards-it-2221707711.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
               />
-              <div className="p-6 text-white">
+
+              {/* Darker Overlay for better contrast */}
+              <div className="absolute inset-0 bg-black/50 z-0" />
+
+              {/* Content Wrapper with proper z-index */}
+              <div className="relative p-6 text-white z-10">
                 <div className="flex items-center mb-2">
-                  <ShieldCheck className="mr-2 h-5 w-5" />
-                  <span className="text-amber-200 uppercase tracking-wider text-xs font-semibold">
+                  <ShieldCheck className="mr-2 h-5 w-5 text-amber-100" />
+                  <span className="text-amber-300 uppercase tracking-wider text-xs font-semibold">
                     Verified Suppliers
                   </span>
                 </div>
                 <h3 className="text-xl font-bold mb-2">Secure Trading</h3>
                 <p className="text-sm mb-3 text-amber-100">
                   Work with verified partners and protect your business with our
-                  escrow service
+                  escrow service.
                 </p>
                 <Link to="/seller/login">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+                    className="border border-white text-black hover:bg-white/20"
                   >
                     Trade Now
                   </Button>
@@ -311,31 +279,33 @@ export default function Home() {
           className="w-full"
         >
           <CarouselContent>
-            {categories.map((category) => (
+            {industries.map((category) => (
               <CarouselItem
                 key={category.id}
                 className="md:basis-1/4 lg:basis-1/6"
               >
+
+
                 <div className="group cursor-pointer">
                   <div className="aspect-square rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden mb-3 flex items-center justify-center">
                     <div className="opacity-40 group-hover:opacity-60 transition-opacity text-white">
-                      {category.name === "Electronics" && (
-                        <Factory className="h-12 w-12" />
+                      {category.name === "Equipments" && (
+                        <img src={category.image} alt={category.name} />
                       )}
-                      {category.name === "Manufacturing" && (
-                        <Factory className="h-12 w-12" />
+                      {category.name === "Services" && (
+                         <img src={category.image} alt={category.name} />
                       )}
                       {category.name === "Healthcare" && (
-                        <Building2 className="h-12 w-12" />
+                        <img src={category.image} alt={category.name} />
                       )}
-                      {category.name === "Construction" && (
-                        <Building2 className="h-12 w-12" />
+                      {category.name === "Organic" && (
+                         <img src={category.image} alt={category.name} />
                       )}
                       {category.name === "Automotive" && (
-                        <Truck className="h-12 w-12" />
+                         <img src={category.image} alt={category.name} />
                       )}
                       {category.name === "Logistics" && (
-                        <Truck className="h-12 w-12" />
+                         <img src={category.image} alt={category.name} />
                       )}
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
@@ -399,7 +369,6 @@ export default function Home() {
                   Access international markets and connect with businesses
                   worldwide
                 </p>
-                
               </div>
 
               <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -411,7 +380,6 @@ export default function Home() {
                   Data-driven insights to help you make informed business
                   decisions
                 </p>
-                
               </div>
 
               <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -423,7 +391,6 @@ export default function Home() {
                   Work with pre-screened, legitimate business partners you can
                   trust
                 </p>
-               
               </div>
             </div>
           </div>

@@ -10,7 +10,7 @@ import { useToast } from "../hooks/use-toast";
 const MainNav = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.user);
+  const {user} = useSelector((state) => state.user);
   const { toast } = useToast();
 
   //pop up logic
@@ -54,7 +54,12 @@ const MainNav = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const searchQuery = formData.get("search");
-    navigate(`/shop?search=${searchQuery}`);
+    
+    // Preserve existing query parameters
+    const currentParams = new URLSearchParams(window.location.search);
+    currentParams.set('search', searchQuery);
+    
+    navigate(`/shop?${currentParams.toString()}`);
   };
 
   const handleSignout = () => {
