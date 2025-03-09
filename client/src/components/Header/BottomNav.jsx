@@ -25,10 +25,15 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const { categories } = useSelector((store) => store.categories);
 
+  const handleCategorySelect = (categoryId, categoryName) => {
+    navigate(`/shop?category=${categoryId}&categoryName=${categoryName}`);
+  };
+
   return (
     <div className="w-full bg-white shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14">
+
           {/* Categories Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -41,38 +46,27 @@ const BottomNav = () => {
             <DropdownMenuContent align="start" className="w-56">
               {categories.map((category) => (
                 <DropdownMenuSub key={category._id}>
-                  <DropdownMenuSubTrigger
-                    onClick={() =>
-                      navigate(`/shop?category=${category.name}`)
-                    }
-                  >
-                    {category.name}
-                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger>{category.name}</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
                     {category.subCategories.map((subCategory) => (
                       <DropdownMenuSub key={subCategory._id}>
-                        <DropdownMenuSubTrigger
-                          onClick={() =>
-                            navigate(`/shop?sub-category=${subCategory.name}`)
-                          }
-                        >
+                        <DropdownMenuSubTrigger>
                           {subCategory.name}
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
-                          {subCategory.subSubCategories.map(
-                            (subSubCategory) => (
-                              <DropdownMenuItem
-                                key={subSubCategory._id}
-                                onClick={() =>
-                                  navigate(
-                                    `/shop?sub-sub-category=${subSubCategory.name}`
-                                  )
-                                }
-                              >
-                                {subSubCategory.name}
-                              </DropdownMenuItem>
-                            )
-                          )}
+                          {subCategory.subSubCategories.map((subSubCategory) => (
+                            <DropdownMenuItem
+                              key={subSubCategory._id}
+                              onClick={() =>
+                                handleCategorySelect(
+                                  subSubCategory._id,
+                                  subSubCategory.name
+                                )
+                              }
+                            >
+                              {subSubCategory.name}
+                            </DropdownMenuItem>
+                          ))}
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
                     ))}
@@ -88,7 +82,6 @@ const BottomNav = () => {
               <PackageSearch size={20} />
               Track Order
             </a>
-
             <a href="#" className="nav-item">
               <Headphones size={20} />
               Support

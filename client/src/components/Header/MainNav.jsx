@@ -56,7 +56,7 @@ const MainNav = () => {
     const searchQuery = formData.get("search");
     
     // Preserve existing query parameters
-    const currentParams = new URLSearchParams(window.location.search);
+    const currentParams = new URLSearchParams();
     currentParams.set('search', searchQuery);
     
     navigate(`/shop?${currentParams.toString()}`);
