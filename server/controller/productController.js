@@ -5,6 +5,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { json } from "express";
 import { validateProductData } from "../utils/validateData.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
+import Category from "../models/categoryModel.js";
 
 export const getSellerProducts = asyncHandler(async (req, res) => {
   const sellerId = req.user._id;
@@ -16,13 +17,11 @@ export const getSellerProducts = asyncHandler(async (req, res) => {
     isBlocked: false,
   }).select("-createdAt -updatedAt -isBlocked");
 
-
   res.status(HTTP_CODES.OK).json({
     success: true,
     count: products.length,
     products: products,
   });
-
 });
 
 export const addProduct = asyncHandler(async (req, res) => {
@@ -53,7 +52,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     description,
     category,
     images,
-    isActive : true,
+    isActive: true,
     basePrice: parseFloat(basePrice),
     stock: parseFloat(stock),
   };
@@ -138,9 +137,9 @@ export const editProduct = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Check if product exists and belongs to seller
-  const existingProduct = await Product.findOne({ 
+  const existingProduct = await Product.findOne({
     _id: productId,
-    seller: req.user._id 
+    seller: req.user._id,
   });
 
   if (!existingProduct) {
@@ -163,9 +162,9 @@ export const editProduct = asyncHandler(async (req, res) => {
     productData.images = req.files.map((file) => file.path);
   }
 
-  let valid = validateProductData({ 
-    ...req.body, 
-    images: productData.images || existingProduct.images 
+  let valid = validateProductData({
+    ...req.body,
+    images: productData.images || existingProduct.images,
   });
   if (valid !== true) {
     res.status(HTTP_CODES.BAD_REQUEST);
@@ -213,46 +212,178 @@ export const editProduct = asyncHandler(async (req, res) => {
   }
 });
 
-
 //the function is being used to set the field to active as well
 export const deleteProduct = asyncHandler(async (req, res) => {
   const productId = req.params.id;
 
   // Check if product exists and belongs to seller
-  const existingProduct = await Product.findOne({ 
+  const existingProduct = await Product.findOne({
     _id: productId,
-    seller: req.user._id 
+    seller: req.user._id,
   });
 
-  if(!existingProduct) {
-    res.status(HTTP_CODES.NOT_FOUND)
-    throw new Error("Product not Found!!")
+  if (!existingProduct) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("Product not Found!!");
   }
 
-
   try {
+    const updatedProduct = await Product.findByIdAndUpdate({ _id: productId }, [
+      {
+        $set: {
+          isActive: !existingProduct.isActive,
+        },
+      },
+    ]);
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-      {_id : productId},
-      [
-        {
-          $set: {
-            isActive: !existingProduct.isActive
-          }
-        }
-      ]
-    )
-    
-    if(updatedProduct){
-      res.status(HTTP_CODES.OK)
-        .json({
-          success : true,
-          message : "Product Deactivated Successfully"
-        })
+    if (updatedProduct) {
+      res.status(HTTP_CODES.OK).json({
+        success: true,
+        message: "Product Deactivated Successfully",
+      });
     }
   } catch (error) {
-    res.status(HTTP_CODES.NOT_FOUND)
-    throw new Error(error)
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error(error);
   }
 });
 
+//controller to send product data to shop page
+export const getShopProducts = asyncHandler(async (req, res) => {
+  console.log(req.query);
+  const { 
+    category,
+    priceRange,
+    rating,
+    sort,
+    page = 1,
+    limit = 12,
+   } = req.query;
+
+  
+
+   //we will create an object to use in mongoose find
+   const baseQuery = {
+    isActive : true,
+    isBlocked : false,
+   };
+
+    //if the breadcrumbs is used to go to parent category the products is not showing. so we add this code
+    if (category) {
+      // First, find the category and its level
+      const selectedCategory = await Category.findById(category);
+      
+      if (selectedCategory) {
+        if (selectedCategory.level === 3) {
+          // if level three no change
+          baseQuery.category = category;
+        } 
+  
+        // if level 2. check for subsub and loop
+        else if (selectedCategory.level === 2) {
+          const subCategories = await Category.find({ 
+            'parentCategory': selectedCategory._id,
+            'level': 3 
+          });
+          baseQuery.category = { 
+            $in: subCategories.map(cat => cat._id) 
+          };
+        } 
+        
+        // if level 1, check for sub and loop then sub sub and loop
+        else if (selectedCategory.level === 1) {
+          const subCategories = await Category.find({ 
+            'parentCategory': selectedCategory._id,
+            'level': 2 
+          });
+          
+          const subSubCategories = await Category.find({
+            'parentCategory': { $in: subCategories.map(cat => cat._id) },
+            'level': 3
+          });
+          
+          baseQuery.category = { 
+            $in: subSubCategories.map(cat => cat._id) 
+          };
+        }
+      }
+    }
+
+   if(priceRange){
+    const [minPrice, maxPrice] = priceRange.split(",").map(Number);
+    baseQuery.basePrice = {
+      $gte : minPrice,
+      $lte : maxPrice,
+    }
+   }
+
+   if(rating){
+    baseQuery.avgRating = {
+      $gte : Number(rating),
+    }
+  }
+
+
+  //like the object to querry db. make on to sort data
+  let sortOptions = {};
+
+  switch(sort){
+    case 'price_asc' :
+      sortOptions.basePrice = 1;
+      break;
+    case 'price_desc':
+      sortOptions.basePrice = -1;
+      break;
+    case 'popoular' : 
+      sortOptions.reviewCount = -1;
+      break;
+    case 'latest' :
+    default:
+      sortOptions.createdAt = -1;
+  }
+
+  
+  try {
+    const skip = (Number(page)-1)*Number(limit);
+    const totalProducts = await Product.countDocuments(baseQuery)
+
+    const products = await Product.find(baseQuery)
+    .select('-isBlocked -__v')
+    .populate('category', 'name')
+    .populate('seller', 'sellerName')
+    .sort(sortOptions)
+    .skip(skip)
+    .limit(Number(limit));
+
+    const totalPages = Math.ceil(totalProducts / Number(limit));
+
+    res.status(HTTP_CODES.OK).json({
+      success: true,
+      currentPage: Number(page),
+      totalPages,
+      totalProducts,
+      productsPerPage: Number(limit),
+      products: products.map(product => ({
+        _id: product._id,
+        productName: product.productName,
+        slug: product.slug,
+        description: product.description,
+        category: product.category,
+        images: product.images,
+        avgRating: product.avgRating,
+        reviewCount: product.reviewCount,
+        basePrice: product.basePrice,
+        stock: product.stock,
+        inStock: product.inStock,
+        seller: product.seller,
+        variants: product.variants,
+        bulkDiscount: product.bulkDiscount
+      }))
+    });
+
+  } catch (error) {
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
+    throw new Error('Error fetching products: ' + error.message);
+  }
+
+});

@@ -5,10 +5,14 @@ import {
   authorizeAdmin,
   authorizeSeller,
 } from "../middlewares/authMiddleware.js";
-import { addProduct, deleteProduct, editProduct, getSellerProducts } from "../controller/productController.js";
+import { addProduct, deleteProduct, editProduct, getSellerProducts, getShopProducts } from "../controller/productController.js";
 import { upload } from "../middlewares/multer.js";
 
 const productRoute = express.Router();
+
+productRoute
+  .route("/shop")
+  .get(getShopProducts)
 
 productRoute
   .route("/get")

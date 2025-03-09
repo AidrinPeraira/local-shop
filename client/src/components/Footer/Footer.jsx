@@ -19,15 +19,15 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Phone size={16} className="text-primary" />
-                <span className="font-medium text-white">+1 234 567 890</span>
+                <span className="font-medium text-white">+91 9400 40 9843</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin size={16} className="text-primary" />
-                <span>123 Commerce St, NY, USA</span>
+                <span>Kochi, Kerala</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-primary" />
-                <span>support@localshop.com</span>
+                <span>aidrin.peraira@gmail.com</span>
               </div>
             </div>
           </div>
@@ -97,14 +97,14 @@ const Footer = () => {
             <div className="space-y-3">
               <Button
                 variant="outline"
-                className="w-full justify-start text-white hover:text-primary border-gray-700"
+                className="w-full justify-start text-black hover:text-primary border-gray-700"
               >
                 <Store className="mr-2 h-4 w-4" />
                 Google Play Store
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start text-white hover:text-primary border-gray-700"
+                className="w-full justify-start text-black hover:text-primary border-gray-700"
               >
                 <Store className="mr-2 h-4 w-4" />
                 Apple App Store

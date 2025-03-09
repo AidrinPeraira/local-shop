@@ -4,7 +4,7 @@ import { Button } from "../../components/ui/button.jsx";
 import { Slider } from "../../components/ui/slider.jsx";
 import { Checkbox } from "../../components/ui/checkbox.jsx";
 import { useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Collapsible,
   CollapsibleContent,
@@ -19,674 +19,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../../components/ui/pagination.jsx";
-import { PageLoading } from "../ui/PageLoading.jsx";
-
-const products = [
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    description: "Apple M2 Pro, 16GB RAM, 512GB SSD",
-    price: 2499.99,
-    rating: 5,
-    reviews: 128,
-    image: "/placeholder.svg",
-    discount: 15,
-    badge: "HOT",
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    description: "A17 Pro, 256GB, Titanium",
-    price: 999.99,
-    rating: 5,
-    reviews: 89,
-    image: "/placeholder.svg",
-    discount: 10,
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM4",
-    description: "Wireless Noise Cancelling Headphones",
-    price: 349.99,
-    rating: 4,
-    reviews: 256,
-    image: "/placeholder.svg",
-    discount: 20,
-    badge: "SALE",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy S24",
-    description: "8GB RAM, 256GB Storage",
-    price: 899.99,
-    rating: 5,
-    reviews: 64,
-    image: "/placeholder.svg",
-    discount: 12,
-    badge: "BEST DEAL",
-  },
-];
+import { getShopProductsApi } from "../../api/productApi.js";
+import { useToast } from "../hooks/use-toast.js";
 
 const ShopContent = () => {
+  const [products, setProducts] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [priceRange, setPriceRange] = useState([0, 3000]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [initialParams, setInitialParams] = useState(null);
   const [currentParams, setCurrentParams] = useState(null);
   const [selectedRating, setSelectedRating] = useState(null);
@@ -695,13 +34,16 @@ const ShopContent = () => {
   const categories = useSelector((state) => state.categories.categories);
   const [sortOption, setSortOption] = useState("latest");
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   //SETTING THE pagination values
-  const totalProducts = products.length;
-  const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentProducts = products.slice(startIndex, endIndex);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [startIndex, setStartIndex] = useState(0);
+
+  //temp????
+  const [endIndex, setEndIndex] = useState(12);
+  const [currentProducts, setCurrentProducts] = useState([]);
 
   //setting the expanded state
   const [expanded, setExpanded] = useState({
@@ -734,6 +76,35 @@ const ShopContent = () => {
     setIsLoading(false);
   }, [searchParams]);
 
+  //getting products
+  async function fetchProducts() {
+    try {
+      setIsLoading(true);
+      const response = await getShopProductsApi(searchParams);
+      const { products, totalProducts, totalPages, currentPage } =
+        response.data;
+
+      setProducts(products);
+      setTotalProducts(totalProducts);
+      setStartIndex((currentPage - 1) * ITEMS_PER_PAGE);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error fetching products",
+        description: error.response.data.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  // useEffect to fetch products on page load
+  useEffect(() => {
+    fetchProducts();
+  }, [searchParams]);
+
   //handle sort selections
   const handleSortChange = (e) => {
     const newSortValue = e.target.value;
@@ -743,6 +114,7 @@ const ShopContent = () => {
     newParams.set("sort", newSortValue);
     setSearchParams(newParams);
   };
+
   //handle rating selection
   const handleRatingChange = (checked, rating) => {
     setSelectedRating(checked ? rating.toString() : null);
@@ -758,8 +130,32 @@ const ShopContent = () => {
   const findCategoryPath = (categoryId) => {
     const path = [];
 
+    // Add null checks
+    if (!categories || !categoryId) return path;
+
     for (const category of categories) {
+      // Check if subCategories exists
+      if (!category.subCategories) continue;
+
       for (const subCategory of category.subCategories) {
+        // First check if this is the subCategory we're looking for
+        if (subCategory._id === categoryId) {
+          path.unshift({
+            id: subCategory._id,
+            name: subCategory.name,
+            level: subCategory.level,
+          });
+          path.unshift({
+            id: category._id,
+            name: category.name,
+            level: category.level,
+          });
+          return path;
+        }
+
+        // Check if subSubCategories exists
+        if (!subCategory.subSubCategories) continue;
+
         for (const subSubCategory of subCategory.subSubCategories) {
           if (subSubCategory._id === categoryId) {
             path.unshift({
@@ -782,6 +178,8 @@ const ShopContent = () => {
         }
       }
     }
+
+    return path;
   };
   // Get category ID from URL
   const selectedCategoryId = searchParams.get("category");
@@ -827,7 +225,6 @@ const ShopContent = () => {
     }
   };
 
-
   return (
     <main className="container mx-auto px-4 py-8">
       {/* breadcrumbs */}
@@ -861,12 +258,12 @@ const ShopContent = () => {
                       {category.name}
                     </span>
                   ) : (
-                    <a
-                      href={`/shop?category=${category.id}`}
+                    <Link
+                      to={`/shop?category=${category.id}`}
                       className="text-gray-500 hover:text-gray-700 text-sm"
                     >
                       {category.name}
-                    </a>
+                    </Link>
                   )}
                 </li>
               </React.Fragment>
@@ -1007,51 +404,123 @@ const ShopContent = () => {
           {/* Products Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {isLoading ? (
-              <div className="m-auto w-48 h-48 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              currentProducts.map((product) => (
-                <div key={product.id} className="group">
-                  <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
-                    />
-                    <Button
-                      className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      size="sm"
-                    >
-                      Add to Cart
-                    </Button>
-                  </div>
-                  <h3 className="font-medium mb-1">{product.name}</h3>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex text-yellow-400">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className="h-4 w-4"
-                          fill={i < product.rating ? "currentColor" : "none"}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600">
-                      ({product.reviews})
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold">${product.price}</span>
-                    <span className="text-sm text-gray-500 line-through">
-                      $
-                      {(product.price * (1 + product.discount / 100)).toFixed(
-                        2
-                      )}
-                    </span>
-                  </div>
+              // Loading state
+              Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="aspect-square bg-gray-200 rounded-xl mb-4" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
                 </div>
+              ))
+            ) : products.length === 0 ? (
+              // Empty state
+              <div className="col-span-full text-center py-10">
+                <h3 className="text-lg font-medium text-gray-900">
+                  No products found
+                </h3>
+                <p className="mt-1 text-gray-500">
+                  Try adjusting your filters or search term
+                </p>
+              </div>
+            ) : (
+              // Products display
+              products.map((product) => (
+                <Link to={`/product?id=${product._id}`} key={product._id}>
+                  <div key={product._id} className="group">
+                    <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
+                      {/* Image carousel or first image */}
+                      <img
+                        src={product.images[0]}
+                        alt={product.productName}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
+                      />
+                      <Button
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        size="sm"
+                      >
+                        View Details
+                      </Button>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="space-y-2">
+                      {/* Product Name */}
+                      <h3 className="font-medium text-sm line-clamp-2">
+                        {product.productName}
+                      </h3>
+
+                      {/* Category & Seller */}
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span>{product.category.name}</span>
+                        <span>{product.seller.sellerName}</span>
+                      </div>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex text-yellow-400">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className="h-4 w-4"
+                              fill={
+                                i < product.avgRating ? "currentColor" : "none"
+                              }
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          ({product.reviewCount} reviews)
+                        </span>
+                      </div>
+
+                      {/* Price & Stock */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-bold">
+                            ₹{product.basePrice.toLocaleString()}
+                          </span>
+                          {product.bulkDiscount.length > 1 && (
+                            <span className="text-xs text-green-600 font-medium">
+                              Bulk discounts available
+                            </span>
+                          )}
+                        </div>
+                        {product.inStock ? (
+                          <span className="text-xs text-green-600">
+                            In Stock
+                          </span>
+                        ) : (
+                          <span className="text-xs text-red-600">
+                            Out of Stock
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Variants Summary */}
+                      {product.variants && product.variants.length > 0 && (
+                        <div className="text-xs text-gray-500">
+                          Available in{" "}
+                          {
+                            new Set(
+                              product.variants.map(
+                                (v) => Object.values(v.attributes[0])[0]
+                              )
+                            ).size
+                          }{" "}
+                          colors,{" "}
+                          {
+                            new Set(
+                              product.variants.map(
+                                (v) => Object.values(v.attributes[0])[1]
+                              )
+                            ).size
+                          }{" "}
+                          sizes
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Link>
               ))
             )}
           </div>
