@@ -1,77 +1,119 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { AspectRatio } from "../../components/ui/aspect-ratio";
+import { cn } from '../../lib/utils';
 
-const ProductGallery = ({ images }) => {
-  const [activeImage, setActiveImage] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
 
-  const nextImage = () => {
-    setActiveImage((prev) => (prev + 1) % images.length);
+const ProductGallery = ({ images, video }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showVideo, setShowVideo] = useState(false);
+
+  const mediaItems = video ? [...images, 'video'] : images;
+  
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? mediaItems.length - 1 : prev - 1));
+    setShowVideo(video ? mediaItems[currentIndex === 0 ? mediaItems.length - 1 : currentIndex - 1] === 'video' : false);
   };
 
-  const previousImage = () => {
-    setActiveImage((prev) => (prev - 1 + images.length) % images.length);
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === mediaItems.length - 1 ? 0 : prev + 1));
+    setShowVideo(video ? mediaItems[currentIndex === mediaItems.length - 1 ? 0 : currentIndex + 1] === 'video' : false);
   };
+
+  const handleThumbnailClick = (index) => {
+    setCurrentIndex(index);
+    setShowVideo(video ? mediaItems[index] === 'video' : false);
+  };
+
+  if (images.length === 0) {
+    return (
+      <div className="relative border rounded overflow-hidden bg-gray-100">
+        <AspectRatio ratio={1 / 1}>
+          <div className="flex items-center justify-center w-full h-full text-gray-400">
+            No image available
+          </div>
+        </AspectRatio>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative w-full">
-      {/* Main Image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-        <img
-          src={images[activeImage].url}
-          alt={images[activeImage].alt}
-          className={`w-full h-full object-cover transition-transform duration-300 ${
-            isZoomed ? "scale-150" : "scale-100"
-          }`}
-          onMouseEnter={() => setIsZoomed(true)}
-          onMouseLeave={() => setIsZoomed(false)}
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 right-4 bg-white/80 hover:bg-white"
-          onClick={() => setIsZoomed(!isZoomed)}
-        >
-          <ZoomIn className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Navigation Arrows */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white"
-        onClick={previousImage}
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white"
-        onClick={nextImage}
-      >
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-
+    <div className="grid grid-cols-4 gap-4">
       {/* Thumbnails */}
-      <div className="flex gap-2 mt-4">
+      <div className="col-span-1 flex flex-col space-y-3 max-h-[500px] overflow-y-auto">
         {images.map((image, index) => (
           <button
-            key={image.id}
-            onClick={() => setActiveImage(index)}
-            className={`relative aspect-square w-20 rounded-md overflow-hidden ${
-              activeImage === index ? "ring-2 ring-accent" : ""
-            }`}
+            key={`image-${index}`}
+            onClick={() => handleThumbnailClick(index)}
+            className={cn(
+              "relative border rounded overflow-hidden h-20",
+              currentIndex === index && !showVideo ? "ring-2 ring-primary" : "opacity-70 hover:opacity-100"
+            )}
           >
-            <img
-              src={image.url}
-              alt={image.alt}
-              className="w-full h-full object-cover"
-            />
+            <AspectRatio ratio={1 / 1}>
+              <img
+                src={image}
+                alt={`Product thumbnail ${index + 1}`}
+                className="object-cover w-full h-full"
+              />
+            </AspectRatio>
           </button>
         ))}
+        {video && (
+          <button
+            onClick={() => {
+              setCurrentIndex(images.length);
+              setShowVideo(true);
+            }}
+            className={cn(
+              "relative border rounded overflow-hidden h-20",
+              showVideo ? "ring-2 ring-primary" : "opacity-70 hover:opacity-100"
+            )}
+          >
+            <AspectRatio ratio={1 / 1}>
+              <div className="bg-gray-100 w-full h-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-primary">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </div>
+            </AspectRatio>
+          </button>
+        )}
+      </div>
+
+      {/* Main Display */}
+      <div className="col-span-3 relative">
+        <div className="relative overflow-hidden rounded-lg bg-gray-100 border">
+          <AspectRatio ratio={1 / 1}>
+            {showVideo && video ? (
+              <video 
+                src={video} 
+                controls
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src={images[currentIndex]}
+                alt={`Product ${currentIndex + 1}`}
+                className="w-full h-full object-cover"
+              />
+            )}
+          </AspectRatio>
+
+          {/* Navigation Buttons */}
+          <button
+            onClick={handlePrevious}
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 shadow-sm hover:bg-white"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleNext}
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 shadow-sm hover:bg-white"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
