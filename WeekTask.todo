@@ -1,11 +1,11 @@
 Admin side :
 ✔ Admin sign in @done (3/10/2025, 4:02:41 PM)
-☐ User management.
-    ☐ Implement block and unblock user (should ask for confirmation before the action)
-    ☐ Implement search along with cancel or clear button to reset the results (should be done from backend)
-    ☐ Implement Pagination (should be done from backend)
-    ☐ Table should be in sorted in descending order (latest data should be at first)
-☐ Category management
+✔ User management. @done (3/10/2025, 10:54:39 PM)
+    ✔ Implement block and unblock user (should ask for confirmation before the action) @done (3/10/2025, 10:54:19 PM)
+    ✔ Implement search along with cancel or clear button to reset the results (should be done from backend) @done (3/10/2025, 10:54:26 PM)
+    ✔ Implement Pagination (should be done from backend) @done (3/10/2025, 10:54:30 PM)
+    ✔ Table should be in sorted in descending order (latest data should be at first) @done (3/10/2025, 10:54:33 PM)
+✔ Category management @done (3/10/2025, 10:54:47 PM)
     ✔ Implement Add,Edit and Delete (soft delete) @done (3/2/2025, 4:03:00 PM)
     ✔ Implement search along with cancel or clear button to reset the results (should be done from backend). @done (3/2/2025, 4:03:05 PM)
     ✔ Pagination  (should be done from backend). @done (3/10/2025, 12:52:28 PM) 
@@ -13,7 +13,7 @@ Admin side :
     ✔ Table should be in sorted in descending order (latest data should be at first) @done (3/2/2025, 4:03:13 PM)
 ✔ Product management @done (3/6/2025, 3:14:27 PM)
     ✔ Implement Add,Edit and Delete(Soft Delete) products. @done (3/6/2025, 3:13:34 PM)
-        //Delte is done by setting status as inactive. admin can set isblocked status
+        //Delte is done by setting status as inactive. admin need to set isblocked status
     ✔ Product must have multiple images and should be uploaded using a single file field (Minimum 3 Images) @done (3/6/2025, 3:13:38 PM)
         //set min lenght of array as 3
     ✔ Images should be cropped and resized properly before upload. @done (3/6/2025, 3:13:43 PM)
@@ -39,7 +39,7 @@ User side :
         ✔ New arrivals (Optional) @done (3/10/2025, 4:04:15 PM)
             //latest first
         ☐ Featured (Optional)
-    ☐ Filter based on 
+        ☐ Filter based on 
         ✔ Category @done (3/10/2025, 12:54:54 PM)
         ✔ Price Range @done (3/10/2025, 12:55:00 PM)
         ☐ Brand (Optional).

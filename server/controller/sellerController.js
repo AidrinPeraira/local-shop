@@ -143,3 +143,130 @@ export const logOutSeller = asyncHandler(
     }
 )
 
+
+//admin actions to manipulate sellers
+export const getAllSellers = asyncHandler(
+    async (req, res) => {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const status = req.query.status;
+        const search = req.query.search;
+        const sort = req.query.sort || 'latest';
+
+        const filter = {};
+        
+        // Status filter
+        if (status && status !== 'All') {
+            filter.isActive = status === 'Active';
+        }
+
+        // Search filter
+        if (search) {
+            filter.$or = [
+                { sellerName: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                { phone: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        // sort conditions
+        let sortCondition = {};
+        switch (sort) {
+            case 'az':
+                sortCondition = { sellerName: 1 };
+                break;
+            case 'za':
+                sortCondition = { sellerName: -1 };
+                break;
+            default: // 'latest'
+                sortCondition = { createdAt: -1 };
+        }
+
+        try {
+            const result = await Seller.aggregate([
+                {
+                    $facet: {
+                        total: [{ $match: filter }, { $count: 'count' }],
+                        sellers: [
+                            { $match: filter },
+                            { $sort: sortCondition },
+                            { $skip: (page - 1) * limit },
+                            { $limit: limit },
+                            {
+                                $project: {
+                                    password: 0,
+                                    __v: 0
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]);
+
+            const total = result[0].total[0]?.count || 0;
+            const sellers = result[0].sellers;
+
+            res.status(HTTP_CODES.OK).json({
+                sellers,
+                total,
+                page,
+                pages: Math.ceil(total / limit)
+            });
+        } catch (error) {
+            res.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
+            throw new Error('Error fetching sellers: ' + error.message);
+        }
+    }
+);
+
+export const activateSeller = asyncHandler(
+    async (req, res) => {
+        const { sellerId } = req.params;
+
+        const seller = await Seller.findById(sellerId);
+        
+        if (!seller) {
+            res.status(HTTP_CODES.NOT_FOUND);
+            throw new Error('Seller not found');
+        }
+
+        seller.isActive = true;
+        await seller.save();
+
+        res.status(HTTP_CODES.OK).json({
+            message: 'Seller activated successfully',
+            seller: {
+                _id: seller._id,
+                sellerName: seller.sellerName,
+                email: seller.email,
+                isActive: seller.isActive
+            }
+        });
+    }
+);
+
+export const deactivateSeller = asyncHandler(
+    async (req, res) => {
+        const { sellerId } = req.params;
+
+        const seller = await Seller.findById(sellerId);
+        
+        if (!seller) {
+            res.status(HTTP_CODES.NOT_FOUND);
+            throw new Error('Seller not found');
+        }
+
+        seller.isActive = false;
+        await seller.save();
+
+        res.status(HTTP_CODES.OK).json({
+            message: 'Seller deactivated successfully',
+            seller: {
+                _id: seller._id,
+                sellerName: seller.sellerName,
+                email: seller.email,
+                isActive: seller.isActive
+            }
+        });
+    }
+);
