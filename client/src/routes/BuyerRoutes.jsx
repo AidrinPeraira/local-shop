@@ -9,6 +9,7 @@ const Register = lazy(() => import("../pages/BuyerPages/Register"));
 const Shop = lazy(() => import("../pages/BuyerPages/Shop"));
 const NotFound = lazy(() => import("../pages/BuyerPages/NotFound"));
 const Product = lazy(() => import("../pages/BuyerPages/Product"));
+const ForgotPassword = lazy(() => import("../pages/BuyerPages/ForgotPassword"));
 
 const MainRoutes = () => {
   return (
@@ -50,6 +51,14 @@ const MainRoutes = () => {
         element={
           <Suspense fallback={<PageLoading />}>
             <Product />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/forgot-password"
+        element={
+          <Suspense fallback={<PageLoading />}>
+            <ForgotPassword />
           </Suspense>
         }
       />

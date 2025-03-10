@@ -7,7 +7,11 @@ import otpSchema from "../models/otpModel.js";
 export const sendOTP = asyncHandler(async (req, res) => {
   try {
     const email = req.body.email;
-    await otpSchema.deleteOne({ email });
+
+    await otpSchema.deleteMany({
+      $or: [{ email: email }, { otpExpiresAt: { $lt: Date.now() } }],
+    });
+
     const otp = generateOTP();
 
     const salt = await bcrypt.genSalt(10);
@@ -29,7 +33,7 @@ export const sendOTP = asyncHandler(async (req, res) => {
       if (delOtp && !delOtp.verifyStatus) {
         await otpSchema.deleteOne({ _id: delOtp._id });
       }
-    }, 120000); //1 min extra
+    }, 120000);
 
     await sendOTPEmail(email, otp);
 
@@ -46,26 +50,53 @@ export const sendOTP = asyncHandler(async (req, res) => {
 
 export const verifyOTP = asyncHandler(async (req, res) => {
   const { email, otpRecieved } = req.body;
-
+  
+  //delete any expired otp before searching
+  await otpSchema.deleteMany({ otpExpiresAt: { $lt: Date.now() } });
+  
   const otpServed = await otpSchema.findOne({ email });
-
+  
   if (!otpServed) {
-    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
-    throw new Error("OTP Fetch Failed. Please try agian later");
-  } else {
-    const isOtpValid = await bcrypt.compare(otpRecieved, otpServed.otp);
-
-    if (isOtpValid) {
-      await otpSchema.deleteOne({ email });
-      res.json({
-        success: true,
-        message: "OTP Verified Succesfully",
-      });
-    } else {
-      res.status(HTTP_CODES.BAD_REQUEST);
-      throw new Error("Invalid OTP");
-    }
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "OTP expired or not found"
+    });
+    return;
   }
+
+  const isOtpValid = await bcrypt.compare(otpRecieved, otpServed.otp);
+  
+  if (isOtpValid) {
+    await otpSchema.deleteOne({ email });
+    res.status(HTTP_CODES.OK).json({
+      success: true,
+      message: "OTP Verified Successfully",
+    });
+    return;
+  }
+
+  // If OTP is invalid, handle attempts
+  const newAttemptCount = Number(otpServed.otpAttempt) + 1;
+  
+  if (newAttemptCount >= 3) {
+    // If attempts exceed limit, delete OTP and ask user to request new one
+    await otpSchema.deleteOne({ email });
+    res.status(HTTP_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Maximum attempts reached. Please request a new OTP"
+    });
+    return;
+  }
+  
+  // Update attempt counter and inform user of remaining attempts
+  await otpSchema.findOneAndUpdate(
+    { email },
+    { otpAttempt: newAttemptCount },
+    { new: true }
+  );
+
+  res.status(HTTP_CODES.BAD_REQUEST).json({
+    success: false,
+    message: `Invalid OTP. ${3 - newAttemptCount} attempts remaining`
+  });
 });
-
-

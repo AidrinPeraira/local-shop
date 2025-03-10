@@ -3,6 +3,7 @@ import {
   createUser,
   loginUser,
   logoutController,
+  googleAuthController
 } from "../controller/userController.js";
 import rateLimit from "express-rate-limit";
 
@@ -23,9 +24,15 @@ userRouter.route("/login", apiLimiter).post(loginUser);
 
 userRouter.route("/logout", apiLimiter).post(logoutController);
 
+userRouter.route("/google").post(googleAuthController);
+
 //------------------------
 
-//add user actions to get put and delete account / details
-//what about cart and wishlist? do we need a seperate controller for tha? that would be better
+//admin actions to manipulate user data
+
+//get all users
+//block or unblock one user
+//edit one user
+//add new user
 
 export default userRouter;

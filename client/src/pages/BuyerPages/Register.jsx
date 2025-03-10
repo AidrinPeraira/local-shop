@@ -3,12 +3,17 @@ import { Button } from "../../components/ui/button.jsx";
 import { Input } from "../../components/ui/input.jsx";
 import { Label } from "../../components/ui/label.jsx";
 import { Mail, User, Key, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useToast } from "../../components/hooks/use-toast.js";
 import { validateUserData } from "../../utils/validateData.js";
 import { sendOTP, verifyOTP } from "../../api/emailOtpApi.js";
-import { registerUser } from "../../redux/features/userSlice.js";
+import {
+  registerUser,
+  googleAuthUser,
+} from "../../redux/features/userSlice.js";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useRedirectIfAuthenticated } from "../../components/hooks/useRedirectIfAuthenticated.js";
 
 export default () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +25,9 @@ export default () => {
   });
   const [showPopup, setShowPopup] = useState(false); //pop up for email otp
   const [userOTP, setUserOTP] = useState(null);
+  const [countdown, setCountdown] = useState(120); // 2 minutes in seconds
+  const [canResend, setCanResend] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { toast } = useToast();
   const dispatch = useDispatch();
@@ -27,6 +35,7 @@ export default () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const dataValid = validateUserData(
       formData.username,
@@ -50,6 +59,7 @@ export default () => {
         description: mailOTP.data.message,
         variant: "default",
       });
+      setIsLoading(false);
       setShowPopup(true); // Show the popup for email verification
     } else {
       toast({
@@ -57,47 +67,52 @@ export default () => {
         description: mailOTP.data.message,
         variant: "destructive",
       });
+      setIsLoading(false);
     }
   };
 
+  useRedirectIfAuthenticated()
+
   const handleEmailConfirm = async () => {
-    const response = await verifyOTP({
-      email: formData.email,
-      otpRecieved: userOTP,
-    });
-
-    if (response.data.success) {
-      toast({
-        title: "OTP verified succesfully!",
-        description: response.data.message,
-        variant: "default",
+    try {
+      const response = await verifyOTP({
+        email: formData.email,
+        otpRecieved: userOTP,
       });
-      setShowPopup(false);
-
-      //add user to the databse
-      dispatch(registerUser(formData))
-        .unwrap() //breaks open the promise to give value if success and throw rejectWithVakue error if rejected
-        .then(() => {
+  
+      // If verification successful
+      if (response.data.success) {
+        toast({
+          title: "OTP verified successfully!",
+          description: response.data.message,
+          variant: "default",
+        });
+        setShowPopup(false);
+  
+        // Add user to the database
+        try {
+          await dispatch(registerUser(formData)).unwrap();
           toast({
             title: "Registered and Logged In",
             description: "Happy Shopping",
             variant: "default",
           });
-          navigate('/');
-        })
-        .catch((error) => {
-          console.error("Reg Dispatch Error: ", error || "Some error occured. Please try again");
+          navigate("/");
+        } catch (error) {
+          console.error("Reg Dispatch Error:", error);
           toast({
             title: "Registration Error!",
-            description: error,
+            description: error.message || "Failed to register user",
             variant: "destructive",
           });
-        });
-
-    } else {
+        }
+      }
+    } catch (error) {
+      // Handle OTP verification errors
+      console.error("OTP Error:", error.response?.data);
       toast({
-        title: "Invalid OTP",
-        description: response.message,
+        title: "OTP Error",
+        description: error.response?.data?.message || "Failed to verify OTP",
         variant: "destructive",
       });
     }
@@ -105,6 +120,84 @@ export default () => {
 
   const handleEmailCancel = () => {
     setShowPopup(false); // Close the popup without submitting
+    setCountdown(120);
+    setCanResend(false);
+  };
+
+  const responseGoogle = async (authResult) => {
+    try {
+      if (authResult.code) {
+        dispatch(googleAuthUser(authResult.code))
+          .unwrap()
+          .then(() => {
+            toast({
+              title: "Logged In",
+              description: "Successfully logged in with Google!",
+              variant: "default",
+            });
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error("Google Auth Error: ", error);
+            toast({
+              title: "Google Auth Error!",
+              description: error,
+              variant: "destructive",
+            });
+          });
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Google Auth Error!",
+        description: error.response?.data?.message || "Authentication failed",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: responseGoogle,
+    onError: responseGoogle,
+    flow: "auth-code",
+  });
+
+  //useEffect to start countdown
+  useEffect(() => {
+    let timer;
+    if (showPopup && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      toast({
+        title: "OTP Expired",
+        description: "OTP Time limit exceeded. Please resend OTP",
+        variant: "destructive",
+      });
+      setCanResend(true);
+    }
+    return () => clearInterval(timer);
+  }, [showPopup, countdown]);
+
+  //resend otp
+  const handleResendOtp = async (e) => {
+    const mailOTP = await sendOTP({ email: formData.email });
+    if (mailOTP.data.success) {
+      toast({
+        title: "Send OTP Resend Success",
+        description: mailOTP.data.message,
+        variant: "default",
+      });
+      setCountdown(120); // Reset timer
+      setCanResend(false); // Show the popup for email verification
+    } else {
+      toast({
+        title: "Resend OTP Error",
+        description: mailOTP.data.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -142,8 +235,11 @@ export default () => {
                     id="username"
                     placeholder="Enter your full name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="pl-10" />
+                    onChange={(e) =>
+                      setFormData({ ...formData, username: e.target.value })
+                    }
+                    className="pl-10"
+                  />
                 </div>
               </div>
 
@@ -156,8 +252,11 @@ export default () => {
                     type="email"
                     placeholder="Enter your email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="pl-10" />
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    className="pl-10"
+                  />
                 </div>
               </div>
 
@@ -170,8 +269,11 @@ export default () => {
                     type="number"
                     placeholder="Enter your phone"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="pl-10" />
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
+                    className="pl-10"
+                  />
                 </div>
               </div>
 
@@ -184,8 +286,11 @@ export default () => {
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a password"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="pl-10" />
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    className="pl-10"
+                  />
                   <Button
                     type="button"
                     variant="ghost"
@@ -202,8 +307,19 @@ export default () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg hover:bg/90">
-                Create Account
+              <Button
+                type="submit"
+                className="w-full bg hover:bg/90"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></div>
+                    Sending OTP...
+                  </div>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
 
               <div className="flex items-center space-x-2">
@@ -215,17 +331,9 @@ export default () => {
               <Button
                 type="button"
                 className="w-full bg-red-500 text-white hover:bg-red-600"
-                onClick={() => handleSocialLogin("Google")}
+                onClick={googleLogin}
               >
                 Sign in with Google
-              </Button>
-
-              <Button
-                type="button"
-                className="w-full bg-blue-600 text-white hover:bg-blue-700"
-                onClick={() => handleSocialLogin("Facebook")}
-              >
-                Sign in with Facebook
               </Button>
 
               <p className="text-center text-sm text-gray-600">
@@ -252,6 +360,10 @@ export default () => {
             <p className="text-sm text-gray-700 mb-4">
               Please enter the OTP sent to your email: {formData.email}
             </p>
+            <p className="text-sm text-gray-500 mb-2">
+              Time remaining: {Math.floor(countdown / 60)}:
+              {String(countdown % 60).padStart(2, "0")}
+            </p>
 
             <Input
               id="email"
@@ -260,7 +372,9 @@ export default () => {
               value={userOTP}
               onChange={(e) => setUserOTP(e.target.value)}
               className="pl-10"
-              required />
+              required
+            />
+
             <div className="flex justify-between mt-5">
               <Button
                 onClick={handleEmailCancel}
@@ -275,6 +389,16 @@ export default () => {
                 Confirm
               </Button>
             </div>
+
+            <Button
+              onClick={handleResendOtp}
+              disabled={!canResend}
+              className={`w-full mt-4 ${
+                !canResend ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              Resend OTP
+            </Button>
           </div>
         </div>
       )}

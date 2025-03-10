@@ -18,8 +18,8 @@ const userSchema = mongoose.Schema({
     },
     phone : {
         type : Number,
-        required : true,
         unique : true,
+        sparse : true,
         message: 'Phone number already registered!', 
     },
     emailVerified : {

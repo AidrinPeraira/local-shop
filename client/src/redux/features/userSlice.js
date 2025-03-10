@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { adminLoginApi, adminLogoutApi, sellerLoginApi, sellerLogoutApi, sellerRegApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
+import { adminLoginApi, adminLogoutApi, googleAuthApi, sellerLoginApi, sellerLogoutApi, sellerRegApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
 import Cookies from 'js-cookie'
+
 
 //first we will create an async thunk midelware
 //user 
@@ -42,6 +43,20 @@ export const logoutUser = createAsyncThunk(
       return true; 
     } catch (error) {
       return rejectWithValue(error.message);
+    }
+  }
+);
+
+//google auth login 
+export const googleAuthUser = createAsyncThunk(
+  "user/googleAuthUser",
+  async (code, { rejectWithValue }) => {
+    try {
+      const response = await googleAuthApi(code);
+      localStorage.setItem("user", JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -160,13 +175,31 @@ const userSlice = createSlice({
         state.error = action.payload.data;
       })
 
+      //user google login
+      .addCase(googleAuthUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleAuthUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(googleAuthUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       //logout user
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(logoutUser.fulfilled, (state, action) => {
-        return {...initialState} // this will remove the old user form the redux store
+        return {
+          user: null, 
+          loading: false,
+          error: null,
+        } 
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
@@ -193,7 +226,11 @@ const userSlice = createSlice({
         state.error = null
       })
       .addCase(logoutAdmin.fulfilled, (state)=>{
-        return {...initialState}
+        return {
+          user: null, 
+          loading: false,
+          error: null,
+        } 
       })
       .addCase(logoutAdmin.rejected, (state, action)=>{
         state.loading = false;
@@ -234,7 +271,11 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(logoutSeller.fulfilled, (state, action) => {
-        return {...initialState} // this will remove the old user form the redux store
+        return {
+          user: null, 
+          loading: false,
+          error: null,
+        } 
       })
       .addCase(logoutSeller.rejected, (state, action) => {
         state.loading = false;

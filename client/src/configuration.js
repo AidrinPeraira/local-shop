@@ -1,4 +1,5 @@
 const apiURL = import.meta.env.VITE_API_BASE_URL
+const googleClientId = import.meta.env.VITE_GOGGLE_OAUTH_CLIENT_ID
 
 const configuration = {
     baseURL: apiURL, // API Base URL
@@ -7,6 +8,13 @@ const configuration = {
     },
   };
   
+  const googleConfig = {
+    web: {
+        client_id: googleClientId
+
+    }
+  }
+
   
-  export {configuration};
+  export {configuration, googleConfig};
   

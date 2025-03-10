@@ -5,8 +5,10 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { loginUser } from "../redux/features/userSlice";
+import { googleAuthUser, loginUser } from "../redux/features/userSlice";
 import { useToast } from "./hooks/use-toast";
+import { useGoogleLogin } from "@react-oauth/google";
+import { googleAuthApi } from "../api/userAuthApi";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -43,11 +45,48 @@ const LoginForm = () => {
       });
   };
 
-  const handleSocialLogin = (provider) => {
-    console.log(`Login with ${provider}`);
-    // Add actual OAuth login logic here
+  //google login
+
+  const responseGoogle = async (authResult) => {
+    try {
+      if(authResult.code){
+        dispatch(googleAuthUser(authResult.code))
+          .unwrap()
+          .then(() => {
+            toast({
+              title: "Logged In",
+              description: "Successfully logged in with Google!",
+              variant: "default",
+            });
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error("Google Auth Error: ", error);
+            toast({
+              title: "Google Auth Error!",
+              description: error,
+              variant: "destructive",
+            });
+          });
+      }
+    } catch (error) {
+      console.log(error)
+      toast({
+        title: "Google Auth Error!",
+        description: error.response?.data?.message || "Authentication failed",
+        variant: "destructive",
+      });
+    }
   };
 
+
+  const googleLogin = useGoogleLogin({
+    onSuccess : responseGoogle,
+    onError : responseGoogle,
+    flow : 'auth-code',
+  })
+
+  
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-sm">
       <div className="space-y-2">
@@ -117,18 +156,10 @@ const LoginForm = () => {
       <Button
         type="button"
         className="w-full bg-red-500 text-white hover:bg-red-600"
-        onClick={() => handleSocialLogin("Google")}
+        onClick={googleLogin}
       >
         Sign in with Google
       </Button>
-
-      {/* <Button
-        type="button"
-        className="w-full bg-blue-600 text-white hover:bg-blue-700"
-        onClick={() => handleSocialLogin("Facebook")}
-      >
-        Sign in with Facebook
-      </Button> */}
 
       <p className="text-center text-sm text-gray-600">
         Don't have an account?{" "}

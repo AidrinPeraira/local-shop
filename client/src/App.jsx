@@ -5,6 +5,9 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PageLoading } from "./components/ui/PageLoading";
 import { useDispatch } from "react-redux";
 import { fetchCategories } from "./redux/features/categoriesSlice";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { googleConfig } from "./configuration";
+
 
 // Lazy load route components
 const BuyerRoutes = lazy(() => import('./routes/BuyerRoutes'));
@@ -21,6 +24,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <GoogleOAuthProvider clientId={googleConfig.web.client_id}>
       <Toaster />
       <Router>
         <Routes>
@@ -41,6 +45,7 @@ function App() {
           } />
         </Routes>
       </Router>
+    </GoogleOAuthProvider>
     </ErrorBoundary>
   );
 }

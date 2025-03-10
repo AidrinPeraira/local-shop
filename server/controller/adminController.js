@@ -119,11 +119,12 @@ export const logOutAdmin = asyncHandler(
     }
 )
 
-//----------------
+//admin dash user page actions
 
+//get all users
 
-//get current user profile
+//get current user profile using id
 
-//update current user profile
+//update current user profile using id
 
-//delete current user account
+//delete current user account using id

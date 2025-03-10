@@ -1,5 +1,5 @@
 Admin side :
-☐ Admin sign in
+✔ Admin sign in @done (3/10/2025, 4:02:41 PM)
 ☐ User management.
     ☐ Implement block and unblock user (should ask for confirmation before the action)
     ☐ Implement search along with cancel or clear button to reset the results (should be done from backend)
@@ -8,7 +8,8 @@ Admin side :
 ☐ Category management
     ✔ Implement Add,Edit and Delete (soft delete) @done (3/2/2025, 4:03:00 PM)
     ✔ Implement search along with cancel or clear button to reset the results (should be done from backend). @done (3/2/2025, 4:03:05 PM)
-    ☐ Pagination  (should be done from backend).
+    ✔ Pagination  (should be done from backend). @done (3/10/2025, 12:52:28 PM) 
+        //too little categories since main categories are few others are nested
     ✔ Table should be in sorted in descending order (latest data should be at first) @done (3/2/2025, 4:03:13 PM)
 ✔ Product management @done (3/6/2025, 3:14:27 PM)
     ✔ Implement Add,Edit and Delete(Soft Delete) products. @done (3/6/2025, 3:13:34 PM)
@@ -21,29 +22,32 @@ Admin side :
 User side :
 ☐ Home page
     ✔ Users sign up & login with validation. @done (3/2/2025, 4:03:37 PM)
-    ☐ Sign up using OTP with OTP timer and Resend Otp
-    ☐ Login or signup with single sign on (google , facebook …)
+    ✔ Sign up using OTP with OTP timer and Resend Otp @done (3/10/2025, 4:02:57 PM)
+    ✔ Login or signup with single sign on (google , facebook …) @done (3/10/2025, 4:02:53 PM)
     ☐ Implement forgot password.
-    ☐ List products on the user side.
-    ☐ Implement Product Listing
-    ☐ Implement search along with cancel or clear button to reset the results (should be done from backend)
+    ✔ List products on the user side. @done (3/10/2025, 12:54:16 PM)
+    ✔ Implement Product Listing @done (3/10/2025, 12:54:20 PM)
+    ✔ Implement search along with cancel or clear button to reset the results (should be done from backend) @done (3/10/2025, 12:54:25 PM)
 
 ☐ Shop Page
     ☐ Sort based on    
-        ☐ Price: low to high anf high to low
-        ☐ Name : aA - zZ and zZ - aA 
-        ☐ Popularity  (Optional)
-        ☐ Average ratings (Optional)
-        ☐ New arrivals (Optional)
+        ✔ Price: low to high anf high to low @done (3/10/2025, 12:54:39 PM)
+        ✔ Name : aA - zZ and zZ - aA @done (3/10/2025, 12:54:46 PM)
+        ✔ Popularity  (Optional) @done (3/10/2025, 4:03:44 PM) 
+            //by the number of ratings
+        ✔ Average ratings (Optional) @done (3/10/2025, 4:04:10 PM)
+        ✔ New arrivals (Optional) @done (3/10/2025, 4:04:15 PM)
+            //latest first
         ☐ Featured (Optional)
     ☐ Filter based on 
-        ☐ Category
-        ☐ Price Range
+        ✔ Category @done (3/10/2025, 12:54:54 PM)
+        ✔ Price Range @done (3/10/2025, 12:55:00 PM)
         ☐ Brand (Optional).
 
 Additional Note: 
     ✔ Search, sort, and filter should work together in combination. @done (3/6/2025, 3:15:40 PM)
         //done by making the mapped item the result of multiple filter stages
+        //also set the url params before fetching the data
     ✔ Ensure blocked/unlisted  products are hidden. @done (3/6/2025, 3:15:05 PM)
         //user cannot see the products blocked by the admin. The data is not being sent
 

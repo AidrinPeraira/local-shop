@@ -4,7 +4,8 @@ import generateToken from "../utils/createToken.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import bcrypt from 'bcryptjs'
 import { validateUserData } from "../utils/validateData.js";
-
+import { oauth2Client } from "../utils/googleConfig.js";
+import axios from 'axios'
 
 export const createUser = asyncHandler(
     async (req, res) => {
@@ -120,11 +121,45 @@ export const logoutController = asyncHandler(
     }
 )
 
+export const googleAuthController = asyncHandler(
+    async (req, res) => {
+        const {code} = req.query;
+        const googleRes = await oauth2Client.getToken(code)
+        oauth2Client.setCredentials(googleRes.tokens)
+
+        const userRes = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`)
+
+        const {email, name} = userRes.data;
+        console.log(email, name)
+        let user = await User.findOne({email})
+        const randomPassword = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+        if(!user){
+            user = await User.create({
+                username : name, 
+                email,
+                password : randomPassword,
+            })
+        }
+
+        generateToken(res, user._id);
+
+        res.status(HTTP_CODES.CREATED).json({
+            _id : user._id,
+            username : user.username,
+            email : user.email,
+            phone : user.phone || null,
+            role : "buyer"
+        })       
+        
+    }
+)
+
 //----------------
 
 
-//get current user profile
+//admin actions to manipulate user data
 
-//update current user profile
-
-//delete current user account
+//get all users
+//block or unblock one user
+//edit one user
+//add new user

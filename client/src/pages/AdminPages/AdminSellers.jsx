@@ -9,7 +9,7 @@ const users = [
   { id: 5, name: "Tom Brown", email: "tom@example.com", role: "Seller", status: "Inactive" },
 ];
 
-export default function AdminUsers() {
+export default function AdminSellers() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">

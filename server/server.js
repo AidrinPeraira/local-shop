@@ -40,6 +40,13 @@ app.use(helmet()); // To protect against the xss seAllow sending cookiescurity t
 app.use(morgan("dev")); // Logs requests in 'dev' format
 
 
+//google auth crooss-origin error fix
+app.use((req, res, next) => {
+  res.removeHeader("Cross-Origin-Opener-Policy"); // Remove COOP
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups"); // Allow popups
+  next();
+});
+
 
 //add necessary routing
 app.use('/api/users', userRouter)

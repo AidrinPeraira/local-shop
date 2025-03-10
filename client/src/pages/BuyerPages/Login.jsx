@@ -1,8 +1,12 @@
 
+import { useRedirectIfAuthenticated } from "../../components/hooks/useRedirectIfAuthenticated";
 import LoginForm from "../../components/LoginForm";
 import { Link } from "react-router-dom";
 
 export default () => {
+
+  useRedirectIfAuthenticated()
+  
   return (
     <div className="min-h-screen bg-secondary flex flex-col">
       {/* Header */}
