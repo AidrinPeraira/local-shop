@@ -50,7 +50,7 @@ export function AdminLayout() {
     { name: "Categories", icon: Box, href: "/admin/categories" },
     { name: "Users", icon: Users, href: "/admin/users" },
     { name: "Sellers", icon: Store, href: "/admin/sellers" },
-    // { name: "Products", icon: ShoppingBag, href: "/admin/products" },
+    { name: "Products", icon: ShoppingBag, href: "/admin/products" },
   ];
 
   return (

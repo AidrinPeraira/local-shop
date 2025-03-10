@@ -3,9 +3,13 @@ import {
   createUser,
   loginUser,
   logoutController,
-  googleAuthController
+  googleAuthController,
+  getAllUsers,
+  activateUser,
+  deactivateUser
 } from "../controller/userController.js";
 import rateLimit from "express-rate-limit";
+import { authenticateAdmin, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
 const userRouter = express.Router();
 
@@ -31,8 +35,8 @@ userRouter.route("/google").post(googleAuthController);
 //admin actions to manipulate user data
 
 //get all users
-//block or unblock one user
-//edit one user
-//add new user
+userRouter.route("/all").get(authenticateAdmin, authorizeAdmin, getAllUsers);
+userRouter.route("/:userId/activate").patch(authenticateAdmin, authorizeAdmin, activateUser);
+userRouter.route("/:userId/deactivate").patch(authenticateAdmin, authorizeAdmin, deactivateUser);
 
 export default userRouter;

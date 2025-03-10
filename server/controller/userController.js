@@ -160,6 +160,139 @@ export const googleAuthController = asyncHandler(
 //admin actions to manipulate user data
 
 //get all users
-//block or unblock one user
-//edit one user
-//add new user
+export const getAllUsers = asyncHandler(
+    async (req, res) => {
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const status = req.query.status;
+        const search = req.query.search;
+        const sort = req.query.sort || 'latest';
+
+         // Build filter to make querrying easier
+         const filter = {};
+        
+         // Status filter
+         if (status && status !== 'All') {
+             filter.isActive = status === 'Active';
+         }
+ 
+         // apply filters
+         if (search) {
+             filter.$or = [
+                 { username: { $regex: search, $options: 'i' } },
+                 { email: { $regex: search, $options: 'i' } }
+             ];
+         }
+ 
+         // apply sorts
+         let sortCondition = {};
+         switch (sort) {
+             case 'az':
+                 sortCondition = { username: 1 };
+                 break;
+             case 'za':
+                 sortCondition = { username: -1 };
+                 break;
+             case 'latest':
+             default:
+                 sortCondition = { createdAt: -1 };
+                 break;
+         }
+         try {
+            // Execute query with aggregation pipeline
+            const [result] = await User.aggregate([
+                { $match: filter },
+                {
+                    $facet: {
+                        total: [{ $count: 'count' }],
+                        users: [
+                            { $sort: sortCondition },
+                            { $skip: (page - 1) * limit },
+                            { $limit: limit },
+                            {
+                                $project: {
+                                    password: 0,
+                                    __v: 0,
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]);
+
+            const total = result.total[0]?.count || 0;
+            const users = result.users;
+
+            if (!users.length && total > 0) {
+                res.status(HTTP_CODES.NOT_FOUND);
+                throw new Error('No users found on this page');
+            }
+
+            res.status(HTTP_CODES.OK).json({
+                users,
+                total,
+                page,
+                pages: Math.ceil(total / limit)
+            });
+
+        } catch (error) {
+            res.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
+            throw new Error('Error fetching users: ' + error.message);
+        }
+    }
+)
+
+//activate user
+export const activateUser = asyncHandler(
+    async (req, res) => {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            res.status(HTTP_CODES.NOT_FOUND);
+            throw new Error('User not found');
+        }
+
+        user.isActive = true;
+        await user.save();
+
+        res.status(HTTP_CODES.OK).json({
+            message: 'User activated successfully',
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                isActive: user.isActive
+            }
+        });
+    }
+);
+
+// Deactivate user
+export const deactivateUser = asyncHandler(
+    async (req, res) => {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            res.status(HTTP_CODES.NOT_FOUND);
+            throw new Error('User not found');
+        }
+
+        user.isActive = false;
+        await user.save();
+
+        res.status(HTTP_CODES.OK).json({
+            message: 'User deactivated successfully',
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                isActive: user.isActive
+            }
+        });
+    }
+);
