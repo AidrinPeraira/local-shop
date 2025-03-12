@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import helmet from "helmet";
 import morgan from 'morgan'
+import csrf from 'csrf';
 
 
 
@@ -39,6 +40,49 @@ app.use(cors({
 app.use(helmet()); // To protect against the xss seAllow sending cookiescurity threarts
 app.use(morgan("dev")); // Logs requests in 'dev' format
 
+//csrf protection
+
+const tokens = new csrf();
+app.use((req, res, next) => {
+  // Skip CSRF for GET requests
+  if (req.method === 'GET') {
+      return next()
+  }
+
+  // Get the token from the request header
+  const token = req.headers['x-csrf-token']
+  
+  // Get the secret from the cookie or create a new one
+  let secret = req.cookies['csrf-secret']
+  if (!secret) {
+      secret = tokens.secretSync()
+      res.cookie('csrf-secret', secret, {
+          httpOnly: true,
+          sameSite: 'strict',
+          secure: process.env.NODE_ENV === 'production'
+      })
+  }
+
+  // Validate the token
+  if (!token || !tokens.verify(secret, token)) {
+      return res.status(403).json({ message: 'Invalid CSRF token' })
+  }
+
+  next()
+})
+
+app.get('/api/csrf-token', (req, res) => {
+  const secret = tokens.secretSync()
+  const token = tokens.create(secret)
+  
+  res.cookie('csrf-secret', secret, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production'
+  })
+  
+  res.json({ csrfToken: token })
+})
 
 //google auth crooss-origin error fix
 app.use((req, res, next) => {

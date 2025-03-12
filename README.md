@@ -1,20 +1,3 @@
-The pages i have
- - Home 
- - Shop 
- - Not Found
- - Product
- - Cart
- - Saved List
- - Login
- - Register
- - email verification
- - Seller
-    - seller registration
-    - seller login
-    
-
-
-The pages I need
 
 
 - phone verification
@@ -34,21 +17,16 @@ The pages I need
     - cancellation and return
 
 - Admin
-    - add edit category
     - add edit product
-    - add edit user
-    - add edit seller
     - see sales
     - customer contact
     - grievance tickets
-    - add edit remove review\
-    
-    - approve sellers?
+    - add edit remove review
     - admin login
     - order status
 
 - Seller
-    - add edit product
+    
     - see sales
     - sell cash in
     - see respond review
@@ -61,23 +39,20 @@ Additional Features to add
     - Language
     - Chat
     - choice of delivery option
-    - send a mail to customer on order and cancel and chat\
-    - Keep count of category visits in local storage. show recomendations
+    - send a mail to customer on order and cancel and chat
+    - Keep count of category visits in local storage. show recomendations??
     - keep last 10 search in local storage. Show recent searchs
     - Security Features TO Added
         - Input Sanitization
         - transaction Secure
-        - helmet
-        - morgan 
-        - CSRF
-        - 
-
+     
 
 
 
 Features Added
 
 - used async thunk to handle async api calls
+- all other api calls are done using axios from seperated api files
 - added lazy loading for all pages (working??)
 - added slug to make url seo friendly
 - used .env in both backend and frontend.
@@ -85,6 +60,7 @@ Features Added
 - used morgan logger middleware to log requests. Need to change it for production mode.
 - used express-validator form data validation
 - Security Features Added
+    - CSRF Protection
     - Authentication & Authorisation using JWT and HTTP Onlcy cookies
     - used express-rate-limit to handle bruteforce attcaks. used in login and register routes
     - Password Encryption 

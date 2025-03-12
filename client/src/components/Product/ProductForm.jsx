@@ -46,10 +46,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
 
   // State for complex fields that need special handling
   const [images, setImages] = useState(initialData.images || []);
-  const [variantTypes, setVariantTypes] = useState([
-    { id: "1", name: "Color", values: ["Red", "Blue", "Green"] },
-    { id: "2", name: "Size", values: ["Small", "Medium", "Large"] },
-  ]);
+  const [variantTypes, setVariantTypes] = useState([]);
   const [variants, setVariants] = useState(initialData.variants || []);
   const [tierPrices, setTierPrices] = useState(
     initialData.tierPrices || [
