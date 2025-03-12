@@ -13,3 +13,4 @@ export const sellerEditProductApi = (data, id) => API.patch(`/products/edit/${id
 export const sellerDeleteProductApi = (id) => API.delete(`/products/edit/${id}`)
 export const getSellerProductsApi = () => API.get("/products/get")
 export const getShopProductsApi = (querry) => API.get(`/products/shop?${querry}`)
+export const getProductDetailsApi = (id) => API.get(`/products/${id}`)

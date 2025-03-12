@@ -5,7 +5,7 @@ import {
   authorizeAdmin,
   authorizeSeller,
 } from "../middlewares/authMiddleware.js";
-import { addProduct, deleteProduct, editProduct, getSellerProducts, getShopProducts } from "../controller/productController.js";
+import { addProduct, deleteProduct, editProduct, getProductDetails, getSellerProducts, getShopProducts } from "../controller/productController.js";
 import { upload } from "../middlewares/multer.js";
 
 const productRoute = express.Router();
@@ -31,5 +31,9 @@ productRoute
   productRoute
   .route("/block/:id")
   .post(authenticateAdmin, authorizeAdmin, deleteProduct)
+
+productRoute
+  .route("/:id")
+  .get(getProductDetails)
 
 export default productRoute;

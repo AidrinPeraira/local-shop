@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 
 
-const ProductBreadcrumbs = ({ category, subcategory, productName }) => {
+const ProductBreadcrumbs = ({ category, subcategory, categoryId, productName }) => {
   return (
     <nav className="flex" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-2 flex-wrap">
@@ -24,12 +24,12 @@ const ProductBreadcrumbs = ({ category, subcategory, productName }) => {
           <div className="flex items-center">
             <ChevronRight className="w-4 h-4 text-gray-400" />
             <Link 
-              to={`/shop?category=${category}`} 
+              to={`/shop?category=${categoryId}`} 
               className="ml-1 text-gray-500 hover:text-primary text-sm font-medium md:ml-2"
             >
               {category}
             </Link>
-          </div>
+          </div>  
         </li>
         {subcategory && (
           <li>

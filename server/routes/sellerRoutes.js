@@ -7,7 +7,7 @@ import { authenticateAdmin, authorizeAdmin } from "../middlewares/authMiddleware
 
 const sellerRouter = express.Router();
 
-//this is how we initialise the rate limiiterwith ther necessaryu settings settings
+//this is how we initialise the rate limiiterwith ther necessary settings 
 const apiLimiter = rateLimit({
   // the following limit is set as 100 requests per 15 mins per route
   //we will first add this to the authentication routes only.
@@ -21,7 +21,7 @@ sellerRouter.route("/login", apiLimiter).post(loginSeller);
 sellerRouter.route("/logout", apiLimiter).post(logOutSeller);
 
 // Admin routes for seller management
-sellerRouter.get("/all", getAllSellers);
+sellerRouter.get("/all", authenticateAdmin, authorizeAdmin, getAllSellers);
 sellerRouter.patch("/:sellerId/activate", authenticateAdmin, authorizeAdmin, activateSeller);
 sellerRouter.patch("/:sellerId/deactivate", authenticateAdmin, authorizeAdmin, deactivateSeller);
 

@@ -5,12 +5,12 @@ import ProductDetailContent from '../../components/Product/ProductDetailContent'
 import { useParams } from 'react-router-dom';
 
 const ProductDetail = () => {
-  const { id } = useParams();
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <ProductDetailContent productId={id} />
+      <ProductDetailContent />
       <Footer />
     </div>
   );

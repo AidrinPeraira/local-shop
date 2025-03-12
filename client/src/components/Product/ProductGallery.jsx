@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AspectRatio } from "../../components/ui/aspect-ratio";
 import { cn } from '../../lib/utils';
@@ -7,6 +7,8 @@ import { cn } from '../../lib/utils';
 const ProductGallery = ({ images, video }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const imageContainerRef = useRef(null);
 
   const mediaItems = video ? [...images, 'video'] : images;
   
@@ -23,6 +25,19 @@ const ProductGallery = ({ images, video }) => {
   const handleThumbnailClick = (index) => {
     setCurrentIndex(index);
     setShowVideo(video ? mediaItems[index] === 'video' : false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!imageContainerRef.current || showVideo) return;
+
+    const { left, top, width, height } = imageContainerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+
+    if (imageContainerRef.current) {
+      imageContainerRef.current.style.setProperty('--mouse-x', `${x}%`);
+      imageContainerRef.current.style.setProperty('--mouse-y', `${y}%`);
+    }
   };
 
   if (images.length === 0) {
@@ -83,7 +98,16 @@ const ProductGallery = ({ images, video }) => {
 
       {/* Main Display */}
       <div className="col-span-3 relative">
-        <div className="relative overflow-hidden rounded-lg bg-gray-100 border">
+        <div 
+          ref={imageContainerRef}
+          className={cn(
+            "relative overflow-hidden rounded-lg bg-gray-100 border",
+            !showVideo && "cursor-zoom-in"
+          )}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => !showVideo && setIsZoomed(true)}
+          onMouseLeave={() => setIsZoomed(false)}
+        >
           <AspectRatio ratio={1 / 1}>
             {showVideo && video ? (
               <video 
@@ -92,24 +116,32 @@ const ProductGallery = ({ images, video }) => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <img
-                src={images[currentIndex]}
-                alt={`Product ${currentIndex + 1}`}
-                className="w-full h-full object-cover"
-              />
+              <div className="w-full h-full relative">
+                <img
+                  src={images[currentIndex]}
+                  alt={`Product ${currentIndex + 1}`}
+                  className={cn(
+                    "w-full h-full object-cover transition-transform duration-200",
+                    isZoomed && "scale-150"
+                  )}
+                  style={isZoomed ? {
+                    transformOrigin: 'var(--mouse-x) var(--mouse-y)'
+                  } : undefined}
+                />
+              </div>
             )}
           </AspectRatio>
 
           {/* Navigation Buttons */}
           <button
             onClick={handlePrevious}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 shadow-sm hover:bg-white"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 shadow-sm hover:bg-white z-10"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 shadow-sm hover:bg-white"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 shadow-sm hover:bg-white z-10"
           >
             <ChevronRight className="w-5 h-5" />
           </button>

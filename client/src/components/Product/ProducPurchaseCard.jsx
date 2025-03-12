@@ -11,7 +11,6 @@ const ProductPurchaseCard = ({ product }) => {
   const [selectedColor, setSelectedColor] = useState(product.colors[0] || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '');
   const [quantity, setQuantity] = useState(1);
-  const [expressDelivery, setExpressDelivery] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const cardRef = useRef(null);
@@ -72,7 +71,7 @@ const ProductPurchaseCard = ({ product }) => {
   };
 
   const discountedPrice = getDiscountedPrice();
-  const totalPrice = discountedPrice * quantity + (expressDelivery ? 200 : 0);
+  const totalPrice = discountedPrice * quantity;
   const hasDiscount = getApplicableBulkDiscount() > 0;
   const discount = getApplicableBulkDiscount();
   const savePercentage = ((discount / product.price) * 100).toFixed(0);
@@ -218,26 +217,7 @@ const ProductPurchaseCard = ({ product }) => {
             </div>
           )}
           
-          {/* Express Delivery Option */}
-          <div className="mb-6">
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="express"
-                checked={expressDelivery}
-                onCheckedChange={(checked) => 
-                  setExpressDelivery(checked)
-                }
-              />
-              <div>
-                <label htmlFor="express" className="text-sm font-medium cursor-pointer">
-                  Express Delivery (+₹200)
-                </label>
-                <p className="text-xs text-gray-500 mt-1">
-                  Get your order delivered within 24 hours
-                </p>
-              </div>
-            </div>
-          </div>
+         
           
           {/* Trust Badges */}
           <div className="mb-6 p-3 bg-gray-50 rounded-lg">

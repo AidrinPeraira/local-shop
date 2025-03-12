@@ -252,6 +252,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 export const getShopProducts = asyncHandler(async (req, res) => {
   console.log(req.query);
   const { 
+    search,
     category,
     priceRange,
     rating,
@@ -267,6 +268,17 @@ export const getShopProducts = asyncHandler(async (req, res) => {
     isActive : true,
     isBlocked : false,
    };
+
+   
+  //query based on search
+  if(search){
+    const searchRegex = new RegExp(search, 'i'); //this is simple search need to add something to show related prosucts
+    baseQuery.$or = [
+      { productName: searchRegex },
+      { description: searchRegex },
+      { slug: searchRegex }
+    ];
+  }
 
     //if the breadcrumbs is used to go to parent category the products is not showing. so we add this code
     if (category) {
@@ -386,4 +398,64 @@ export const getShopProducts = asyncHandler(async (req, res) => {
     throw new Error('Error fetching products: ' + error.message);
   }
 
+});
+
+//get details of one product
+export const getProductDetails = asyncHandler(async (req, res) => {
+  console.log(req.params)
+  const { id } = req.params;
+
+  const product = await Product.findOne({ 
+    _id: id,
+    isActive: true,
+    isBlocked: false 
+  })
+  .populate('category', 'name')
+  .populate('seller', 'sellerName')
+  .select('-isBlocked -__v');
+
+  if (!product) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error('Product not found');
+  }
+
+  // Transform the data to match the frontend format
+  const transformedProduct = {
+    _id: product._id,
+    productName: product.productName,
+    slug: product.slug,
+    description: product.description,
+    category: {
+      _id: product.category._id,
+      name: product.category.name
+    },
+    images: product.images,
+    avgRating: product.avgRating,
+    reviewCount: product.reviewCount,
+    basePrice: product.basePrice,
+    stock: product.stock,
+    inStock: product.inStock,
+    seller: {
+      _id: product.seller._id,
+      sellerName: product.seller.sellerName
+    },
+    variants: product.variants.map(variant => ({
+      variantId: variant.variantId,
+      attributes: variant.attributes,
+      stock: variant.stock,
+      inStock: variant.inStock,
+      basePrice: variant.basePrice,
+      _id: variant._id
+    })),
+    bulkDiscount: product.bulkDiscount.map(discount => ({
+      minQty: discount.minQty,
+      priceDiscountPerUnit: discount.priceDiscountPerUnit,
+      _id: discount._id
+    }))
+  };
+
+  res.status(HTTP_CODES.OK).json({
+    success: true,
+    product: transformedProduct
+  });
 });
