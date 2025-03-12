@@ -33,7 +33,7 @@ productRoute
   .post(authenticateAdmin, authorizeAdmin, deleteProduct)
 
 productRoute
-  .route("/:id")
+  .route("/:slug/:id")
   .get(getProductDetails)
 
 export default productRoute;

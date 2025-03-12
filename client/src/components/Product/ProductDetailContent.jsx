@@ -6,7 +6,7 @@ import ProductInfo from './ProductInfo';
 import ProductPurchaseCard from './ProducPurchaseCard';
 import ProductRecommendations from './ProductRecomendations';
 import { getProductDetailsApi } from '../../api/productApi';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 const ProductDetailContent = () => {
   const [product, setProduct] = useState(null);
@@ -15,12 +15,13 @@ const ProductDetailContent = () => {
   const [searchParams] = useSearchParams();
 
   const id = searchParams.get('id');
+  const { slug } = useParams();
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
         setLoading(true);
-        const response = await getProductDetailsApi(id);
+        const response = await getProductDetailsApi(slug, id);
         setProduct(response.data.product);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch product details');

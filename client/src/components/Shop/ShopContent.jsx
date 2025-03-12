@@ -425,7 +425,7 @@ const ShopContent = () => {
             ) : (
               // Products display
               products.map((product) => (
-                <Link to={`/product?id=${product._id}`} key={product._id}>
+                <Link to={`/product/${product.slug}?id=${product._id}`} key={product._id}>
                   <div key={product._id} className="group">
                     <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
                       {/* Image carousel or first image */}

@@ -45,8 +45,7 @@ Additional Features to add
     - Security Features TO Added
         - Input Sanitization
         - transaction Secure
-     
-
+    
 
 
 Features Added
@@ -59,7 +58,9 @@ Features Added
 - also added seperate config file for env varriables in vite
 - used morgan logger middleware to log requests. Need to change it for production mode.
 - used express-validator form data validation
+
 - Security Features Added
+
     - CSRF Protection
     - Authentication & Authorisation using JWT and HTTP Onlcy cookies
     - used express-rate-limit to handle bruteforce attcaks. used in login and register routes

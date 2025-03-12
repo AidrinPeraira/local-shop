@@ -47,7 +47,7 @@ const MainRoutes = () => {
         }
       />
       <Route
-        path="/product"
+        path="/product/*"
         element={
           <Suspense fallback={<PageLoading />}>
             <Product />
