@@ -8,50 +8,57 @@ import { toast } from "../../components/ui/use-toast";
 const ProductPurchaseCard = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState({});
-  const [matchingVariant, setMatchingVariant] = useState(null)
+  const [matchingVariant, setMatchingVariant] = useState(null);
   const cardRef = useRef(null);
 
-
-  //fins matching variant for price and stock count
+  // Find matching variant for price and stock count
   const findMatchingVariant = () => {
-    if(!selectedVariant) return null
-    const matchingVariant = product.variants.find((value, index, arr) => {
-      let variations = Object.entries(value.attributes[0])
-      let selected = Object.entries(selectedVariant)
+    if (!selectedVariant) return null;
+    const matchingVariant = product.variants.find((value) => {
+      let variations = Object.entries(value.attributes[0]);
+      let selected = Object.entries(selectedVariant);
       
-      return JSON.stringify(variations) === JSON.stringify(selected)
-    })
-    return matchingVariant
-  }
-  // Update selected variant  details
+      return JSON.stringify(variations) === JSON.stringify(selected);
+    });
+    return matchingVariant;
+  };
+
+  // Update selected variant details
   useEffect(() => {
-    console.log(product)
-    setSelectedVariant(product.variants[0].attributes[0]);
-    setMatchingVariant(findMatchingVariant())
-  }, []);
+    if (product.variants && product.variants.length > 0) {
+      setSelectedVariant(product.variants[0].attributes[0]);
+      setMatchingVariant(findMatchingVariant());
+    }
+  }, [product.variants]);
 
   const handleVariantChange = (variationName, value) => {
-    const newVariantSelected = selectedVariant
-    newVariantSelected[variationName] = value
     setSelectedVariant(prev => ({
       ...prev,
       [variationName]: value
     }));
-    setMatchingVariant(findMatchingVariant())
+    // Find matching variant after state update using callback
+    setTimeout(() => {
+      setMatchingVariant(findMatchingVariant());
+    }, 0);
   };
 
-
   const handleAddToCart = () => {
+    // Construct variant description string
+    const variantDesc = Object.values(selectedVariant).join(', ');
+    
     toast({
       title: "Added to cart",
-      description: `${quantity} × ${product.name} (${selectedColor}, ${selectedSize})`,
+      description: `${quantity} × ${product.name} (${variantDesc})`,
     });
   };
 
   const handleBuyNow = () => {
+    // Construct variant description string
+    const variantDesc = Object.values(selectedVariant).join(', ');
+    
     toast({
       title: "Proceeding to checkout",
-      description: `${quantity} × ${product.name} (${selectedColor}, ${selectedSize})`,
+      description: `${quantity} × ${product.name} (${variantDesc})`,
     });
   };
 
@@ -74,7 +81,7 @@ const ProductPurchaseCard = ({ product }) => {
 
   // Calculate price with discount
   const getDiscountedPrice = () => {
-    const basePrice = selectedVariant?.basePrice || product.price;
+    const basePrice = matchingVariant?.basePrice || product.price;
     const discountPerUnit = getApplicableBulkDiscount();
     const discountAmount = (discountPerUnit / 100) * basePrice; // Convert percentage to amount
     return basePrice - discountAmount;
@@ -84,28 +91,31 @@ const ProductPurchaseCard = ({ product }) => {
   const totalPrice = discountedPrice * quantity;
   const hasDiscount = getApplicableBulkDiscount() > 0;
   const discount = getApplicableBulkDiscount();
-  const savePercentage = ((discount / product.price) * 100).toFixed(0);
-
-  // Simplified card classes
-  const cardClasses = "bg-white rounded-lg shadow-md p-6 h-full";
+  const savePercentage = matchingVariant ? 
+    ((discount / matchingVariant.basePrice) * 100).toFixed(0) : 
+    ((discount / product.price) * 100).toFixed(0);
 
   // Check if current variant is in stock
-  const isVariantInStock = selectedVariant
-    ? selectedVariant.inStock && selectedVariant.stock > 0
-    : product.inStock;
+  const isVariantInStock = matchingVariant ? 
+    matchingVariant.stock > 0 : 
+    product.inStock;
 
   return (
-    <div ref={cardRef} className={cardClasses}>
+    <div 
+      ref={cardRef} 
+      className="bg-white rounded-lg shadow-md p-6 flex flex-col h-full"
+    >
       <div className="flex flex-col h-full">
-        <div className="flex-grow">
+        {/* Header and main content section */}
+        <div className="flex-grow space-y-4">
           <h1 className="text-2xl font-bold">{product.name}</h1>
 
           {/* Pricing Section */}
-          <div className="mt-4 flex items-center">
+          <div className="flex items-center">
             <span className="text-3xl font-bold text-gray-900">
               ₹{discountedPrice.toFixed(2)}
             </span>
-            {hasDiscount && (
+            {hasDiscount && matchingVariant && (
               <>
                 <span className="ml-3 text-lg text-gray-500 line-through">
                   ₹{matchingVariant.basePrice.toFixed(2)}
@@ -121,7 +131,7 @@ const ProductPurchaseCard = ({ product }) => {
           </div>
 
           {/* Rating */}
-          <div className="mt-3 flex items-center">
+          <div className="flex items-center">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
                 <Star
@@ -140,22 +150,22 @@ const ProductPurchaseCard = ({ product }) => {
           </div>
 
           {/* Divider */}
-          <div className="my-6 border-t border-gray-200"></div>
+          <div className="border-t border-gray-200 my-4"></div>
 
-          {/* Variants Data */}
+          {/* Variants Data - Compact layout */}
           {product.variantTypes?.map((variantType) => (
-            <div key={variantType._id} className="mb-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">
+            <div key={variantType._id} className="mb-4">
+              <h3 className="text-sm font-medium text-gray-900 mb-2">
                 {variantType.variationName}
               </h3>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2">
                 {variantType.variationValues?.map((value) => (
                   <button
                     key={value}
                     onClick={() =>
                       handleVariantChange(variantType.variationName, value)
                     }
-                    className={`px-4 py-2 border rounded ${
+                    className={`px-3 py-1.5 border rounded-md text-sm ${
                       selectedVariant[variantType.variationName] === value
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-gray-300 hover:border-gray-400"
@@ -169,7 +179,7 @@ const ProductPurchaseCard = ({ product }) => {
           ))}
 
           {/* Stock Status */}
-          <div className="mb-6 flex items-center">
+          <div className="flex items-center">
             <Package className="w-4 h-4 mr-2 text-gray-500" />
             {matchingVariant ? (
               <span
@@ -188,16 +198,14 @@ const ProductPurchaseCard = ({ product }) => {
             )}
           </div>
 
-         
-
-          {/* Bulk Discount Information */}
+          {/* Bulk Discount Information - More compact */}
           {product.bulkDiscount && product.bulkDiscount.length > 0 && (
-            <div className="mb-6 p-3 bg-gray-50 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                <Tag className="w-4 h-4 mr-2 text-primary" />
+            <div className="p-3 bg-gray-50 rounded-lg text-sm">
+              <h3 className="font-medium text-gray-900 mb-1.5 flex items-center">
+                <Tag className="w-4 h-4 mr-1.5 text-primary" />
                 Bulk Discounts
               </h3>
-              <ul className="space-y-1 text-sm text-gray-600">
+              <ul className="space-y-0.5 text-gray-600">
                 {product.bulkDiscount
                   .filter((d) => d.priceDiscountPerUnit > 0)
                   .sort((a, b) => a.minQty - b.minQty)
@@ -213,9 +221,9 @@ const ProductPurchaseCard = ({ product }) => {
             </div>
           )}
 
-           {/* Quantity and Units */}
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">
+          {/* Quantity and Units */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">
               Quantity ({product.stockUnit})
             </h3>
             <div className="flex items-center space-x-3">
@@ -230,19 +238,17 @@ const ProductPurchaseCard = ({ product }) => {
               <button
                 onClick={() => setQuantity(quantity + 1)}
                 className="px-3 py-1 border rounded-md"
-                disabled={selectedVariant && quantity >= selectedVariant.stock}
+                disabled={matchingVariant && quantity >= matchingVariant.stock}
               >
                 +
               </button>
             </div>
           </div>
-
-          
         </div>
 
-        {/* Bottom buttons section - now part of flex layout */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <div className="flex items-center justify-between mb-4">
+        {/* Bottom buttons section - clear separation */}
+        <div className="mt-auto pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-gray-600">Total:</span>
             <span className="text-xl font-bold">₹{totalPrice.toFixed(2)}</span>
           </div>

@@ -128,22 +128,24 @@ const ProductDetailContent = () => {
           
           {/* Product Purchase Card - 5 columns */}
           <div className="mt-8 lg:mt-0 lg:col-span-5">
-            <ProductPurchaseCard 
-              product={{
-                id: product._id,
-                name: product.productName,
-                price: product.basePrice,
-                rating: product.avgRating,
-                reviewCount: product.reviewCount,
-                colors: colors,
-                sizes: sizes,
-                inStock: product.inStock,
-                variantTypes: product.variantTypes,
-                variants: product.variants,
-                bulkDiscount: product.bulkDiscount,
-                stockUnit : product.stockUnit
-              }} 
-            />
+            <div className="lg:sticky lg:top-6">
+              <ProductPurchaseCard 
+                product={{
+                  id: product._id,
+                  name: product.productName,
+                  price: product.basePrice,
+                  rating: product.avgRating,
+                  reviewCount: product.reviewCount,
+                  colors: colors,
+                  sizes: sizes,
+                  inStock: product.inStock,
+                  variantTypes: product.variantTypes,
+                  variants: product.variants,
+                  bulkDiscount: product.bulkDiscount,
+                  stockUnit : product.stockUnit
+                }} 
+              />
+            </div>
           </div>
         </div>
       </Container>
