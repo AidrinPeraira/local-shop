@@ -47,10 +47,8 @@ const ProductRecommendations = ({ productId, categoryId }) => {
           .map((id) => getProductDetailsApi("slug",id));
 
         const responses = await Promise.all(promises);
-        console.log(responses)
         const products = responses
           .map((response) => response.data.product)
-console.log(products)
         setRecentlyViewed(products);
       } catch (error) {
         console.error("Error fetching recently viewed products:", error);
@@ -81,7 +79,7 @@ console.log(products)
           {product.productName}
         </h3>
         <p className="mt-1 text-sm font-medium text-gray-900">
-          ${product.basePrice}
+        ₹{product.basePrice}
         </p>
       </div>
     </Link>

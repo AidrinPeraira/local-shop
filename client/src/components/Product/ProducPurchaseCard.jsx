@@ -6,51 +6,40 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { toast } from "../../components/ui/use-toast";
 
 const ProductPurchaseCard = ({ product }) => {
-  const [selectedVariants, setSelectedVariants] = useState({});
   const [quantity, setQuantity] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
-  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState({});
+  const [matchingVariant, setMatchingVariant] = useState(null)
   const cardRef = useRef(null);
 
 
-  // Check if we're on mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  // we will set the first of variaint Types as default
-  useEffect(() => {
-    const initialVariants = {};
-    product.variantTypes?.forEach((type) => {
-      initialVariants[type.variationName] = type.variationValues[0];
-    });
-    setSelectedVariants(initialVariants);
-  }, [product.variantTypes]);
-
+  //fins matching variant for price and stock count
+  const findMatchingVariant = () => {
+    if(!selectedVariant) return null
+    const matchingVariant = product.variants.find((value, index, arr) => {
+      let variations = Object.entries(value.attributes[0])
+      let selected = Object.entries(selectedVariant)
+      
+      return JSON.stringify(variations) === JSON.stringify(selected)
+    })
+    return matchingVariant
+  }
   // Update selected variant  details
   useEffect(() => {
-    const variant = product.variants.find((v) =>
-      product.variantTypes?.every(
-        (type) =>
-          v.attributes[0]?.[type.variationName] ===
-          selectedVariants[type.variationName]
-      )
-    );
-    setSelectedVariant(variant || null);
-  }, [selectedVariants, product.variants, product.variantTypes]);
+    console.log(product)
+    setSelectedVariant(product.variants[0].attributes[0]);
+    setMatchingVariant(findMatchingVariant())
+  }, []);
 
   const handleVariantChange = (variationName, value) => {
-    setSelectedVariants((prev) => ({
+    const newVariantSelected = selectedVariant
+    newVariantSelected[variationName] = value
+    setSelectedVariant(prev => ({
       ...prev,
-      [variationName]: value,
+      [variationName]: value
     }));
+    setMatchingVariant(findMatchingVariant())
   };
+
 
   const handleAddToCart = () => {
     toast({
@@ -119,7 +108,7 @@ const ProductPurchaseCard = ({ product }) => {
             {hasDiscount && (
               <>
                 <span className="ml-3 text-lg text-gray-500 line-through">
-                  ₹{product.price.toFixed(2)}
+                  ₹{matchingVariant.basePrice.toFixed(2)}
                 </span>
                 <Badge
                   variant="outline"
@@ -167,7 +156,7 @@ const ProductPurchaseCard = ({ product }) => {
                       handleVariantChange(variantType.variationName, value)
                     }
                     className={`px-4 py-2 border rounded ${
-                      selectedVariants[variantType.variationName] === value
+                      selectedVariant[variantType.variationName] === value
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-gray-300 hover:border-gray-400"
                     }`}
@@ -182,14 +171,14 @@ const ProductPurchaseCard = ({ product }) => {
           {/* Stock Status */}
           <div className="mb-6 flex items-center">
             <Package className="w-4 h-4 mr-2 text-gray-500" />
-            {selectedVariant ? (
+            {matchingVariant ? (
               <span
                 className={`text-sm ${
-                  selectedVariant.stock > 0 ? "text-green-600" : "text-red-600"
+                  matchingVariant.stock > 0 ? "text-green-600" : "text-red-600"
                 }`}
               >
-                {selectedVariant.stock > 0
-                  ? `In Stock (${selectedVariant.stock} ${product.stockUnit} available)`
+                {matchingVariant.stock > 0
+                  ? `In Stock (${matchingVariant.stock} ${product.stockUnit} available)`
                   : "Out of Stock"}
               </span>
             ) : (
@@ -199,29 +188,7 @@ const ProductPurchaseCard = ({ product }) => {
             )}
           </div>
 
-          {/* Quantity and Units */}
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">
-              Quantity ({product.stockUnit})
-            </h3>
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="px-3 py-1 border rounded-md"
-                disabled={quantity <= 1}
-              >
-                -
-              </button>
-              <span className="w-12 text-center">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="px-3 py-1 border rounded-md"
-                disabled={selectedVariant && quantity >= selectedVariant.stock}
-              >
-                +
-              </button>
-            </div>
-          </div>
+         
 
           {/* Bulk Discount Information */}
           {product.bulkDiscount && product.bulkDiscount.length > 0 && (
@@ -246,15 +213,31 @@ const ProductPurchaseCard = ({ product }) => {
             </div>
           )}
 
-          {/* Trust Badges */}
-          <div className="mb-6 p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-green-600 mr-2" />
-              <span className="text-sm font-medium text-gray-800">
-                Money Back Guarantee • Free Returns
-              </span>
+           {/* Quantity and Units */}
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-gray-900 mb-3">
+              Quantity ({product.stockUnit})
+            </h3>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="px-3 py-1 border rounded-md"
+                disabled={quantity <= 1}
+              >
+                -
+              </button>
+              <span className="w-12 text-center">{quantity}</span>
+              <button
+                onClick={() => setQuantity(quantity + 1)}
+                className="px-3 py-1 border rounded-md"
+                disabled={selectedVariant && quantity >= selectedVariant.stock}
+              >
+                +
+              </button>
             </div>
           </div>
+
+          
         </div>
 
         {/* Bottom buttons section - now part of flex layout */}
