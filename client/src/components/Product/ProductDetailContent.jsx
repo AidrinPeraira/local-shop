@@ -17,6 +17,19 @@ const ProductDetailContent = () => {
   const id = searchParams.get('id');
   const { slug } = useParams();
 
+  const updateRecentProducts = () => {
+    if(!id) return;
+
+    const recenntProducts = JSON.parse(localStorage.getItem('recentProducts')) || [];
+    const filteredProducts = recenntProducts.filter(productId => productId !== id);
+    filteredProducts.unshift(id);
+    const updatedProducts = filteredProducts.slice(0, 10);
+    localStorage.setItem('recentProducts', JSON.stringify(updatedProducts));
+
+  }
+
+  updateRecentProducts();
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -109,7 +122,7 @@ const ProductDetailContent = () => {
             </div>
             
             <div className="mt-16">
-              <ProductRecommendations productId={product._id} />
+              <ProductRecommendations productId={product._id} categoryId={product.category._id} />
             </div>
           </div>
           
@@ -125,8 +138,10 @@ const ProductDetailContent = () => {
                 colors: colors,
                 sizes: sizes,
                 inStock: product.inStock,
+                variantTypes: product.variantTypes,
                 variants: product.variants,
-                bulkDiscount: product.bulkDiscount
+                bulkDiscount: product.bulkDiscount,
+                stockUnit : product.stockUnit
               }} 
             />
           </div>

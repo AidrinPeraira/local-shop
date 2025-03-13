@@ -24,20 +24,27 @@ const ProductDialogs = ({ selectedProduct, isOpen, onOpenChange, onSubmit, categ
       order: index,
       isExisting: true 
     })),
+    variantTypes: selectedProduct.variantTypes.map(vType => ({
+      id: `vtype-${Date.now()}-${Math.random()}`,
+      name: vType.name || vType.variationName,
+      values: vType.values || vType.variationValues
+    })),
     variants: selectedProduct.variants.map(variant => ({
-      id: variant.variantId,
-      attributes: variant.attributes[0], 
-      price: variant.basePrice , 
+      id: variant._id || variant.variantId,
+      attributes: typeof variant.attributes === 'object' ? 
+        variant.attributes : 
+        variant.attributes[0],
+      price: variant.price || variant.basePrice,
       stock: variant.stock
     })),
+    useVariants: selectedProduct.variants && selectedProduct.variants.length > 0,
     tierPrices: selectedProduct.bulkDiscount.map(tier => ({
-      id: tier._id, 
-      minQuantity: tier.minQty,
-      price: tier.priceDiscountPerUnit
+      id: tier._id || `tier-${Date.now()}-${Math.random()}`,
+      minQuantity: tier.minQuantity || tier.minQty,
+      price: tier.price || tier.priceDiscountPerUnit
     }))
   } : null;
 
-  console
 
   return (
     <Dialog 

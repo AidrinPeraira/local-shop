@@ -32,6 +32,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
       description: initialData.description || "",
       category: initialData.category || "",
       basePrice: initialData.basePrice || 0,
+      stockUnit: initialData.stockUnit || "Nos",
       stock: initialData.stock || 0,
       useVariants: initialData.variants
         ? initialData.variants.length > 0
@@ -46,7 +47,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
 
   // State for complex fields that need special handling
   const [images, setImages] = useState(initialData.images || []);
-  const [variantTypes, setVariantTypes] = useState([]);
+  const [variantTypes, setVariantTypes] = useState(initialData.variantTypes || []);
   const [variants, setVariants] = useState(initialData.variants || []);
   const [tierPrices, setTierPrices] = useState(
     initialData.tierPrices || [
@@ -451,6 +452,33 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
             )}
           </div>
 
+          <div className="space-y-2 flex-1">
+            <Label htmlFor="stockUnit">Stock Unit</Label>
+            <Controller
+              name="stockUnit"
+              control={control}
+              rules={{
+                required: "Stock unit is required",
+                min: { value: 0.01, message: "Price must be greater than 0" },
+              }}
+              render={({ field }) => (
+                <Input
+                  id="stockUnit"
+                  type="text"
+                  className={errors.stockUnit ? "border-red-500" : ""}
+                  {...field}
+                  onChange={(e) => {
+                    const value = e.target.value || "Nos";
+                    field.onChange(value);
+                  }}
+                />
+              )}
+            />
+            {errors.stockUnit && (
+              <p className="text-red-500 text-sm">{errors.stockUnit.message}</p>
+            )}
+          </div>
+
           {!useVariants && (
             <div className="space-y-2 flex-1">
               <Label htmlFor="stock">Stock</Label>
@@ -732,7 +760,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
                               ([key, value], idx, arr) => (
                                 <span key={key}>
                                   <span className="font-medium">{key}:</span>{" "}
-                                  {value}
+                                  {String(value)}
                                   {idx < arr.length - 1 ? ", " : ""}
                                 </span>
                               )

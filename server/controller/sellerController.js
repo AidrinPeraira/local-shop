@@ -102,9 +102,17 @@ export const loginSeller = asyncHandler(
         const {email, password} = req.body;
         //check for corresponding user
         const registerdSeller = await Seller.findOne({email})
+
+        //blocked sellr
+        
         //login if exist eroor message if not
         if(registerdSeller){
             //let user login
+            if(!registerdSeller.isActive){
+                res.status(HTTP_CODES.BAD_REQUEST).json({message : 'Your Account is blocked. Please contact admin for more information'})
+                return //to exit the function
+            }
+    
 
             //compare password first
             const isPasswordValid = await bcrypt.compare(password, registerdSeller.password)

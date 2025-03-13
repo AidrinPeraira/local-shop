@@ -31,6 +31,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     category,
     basePrice,
     stock,
+    stockUnit,
     variantTypes,
     variants,
     bulkDiscount,
@@ -55,6 +56,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     isActive: true,
     basePrice: parseFloat(basePrice),
     stock: parseFloat(stock),
+    stockUnit : stockUnit || 'Nos'
   };
 
   //IF THERE ARE VARIANTS
@@ -131,6 +133,7 @@ export const editProduct = asyncHandler(async (req, res) => {
     category,
     basePrice,
     stock,
+    stockUnit,
     variantTypes,
     variants,
     bulkDiscount,
@@ -155,6 +158,7 @@ export const editProduct = asyncHandler(async (req, res) => {
     category,
     basePrice: parseFloat(basePrice),
     stock: parseFloat(stock),
+    stockUnit : stockUnit || 'Nos'
   };
 
   // Handle images only if new ones are uploaded
@@ -387,6 +391,7 @@ export const getShopProducts = asyncHandler(async (req, res) => {
         basePrice: product.basePrice,
         stock: product.stock,
         inStock: product.inStock,
+        stockUnit : product.stockUnit,
         seller: product.seller,
         variants: product.variants,
         bulkDiscount: product.bulkDiscount
@@ -434,11 +439,13 @@ export const getProductDetails = asyncHandler(async (req, res) => {
     reviewCount: product.reviewCount,
     basePrice: product.basePrice,
     stock: product.stock,
+    stockUnit : product.stockUnit,
     inStock: product.inStock,
     seller: {
       _id: product.seller._id,
       sellerName: product.seller.sellerName
-    },
+    },    
+    variantTypes: product.variantTypes,
     variants: product.variants.map(variant => ({
       variantId: variant.variantId,
       attributes: variant.attributes,

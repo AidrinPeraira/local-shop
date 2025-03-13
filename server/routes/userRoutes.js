@@ -40,4 +40,3 @@ userRouter.route("/:userId/activate").patch(authenticateAdmin, authorizeAdmin, a
 userRouter.route("/:userId/deactivate").patch(authenticateAdmin, authorizeAdmin, deactivateUser);
 
 export default userRouter;
-  

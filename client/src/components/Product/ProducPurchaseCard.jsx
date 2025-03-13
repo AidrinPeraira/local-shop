@@ -1,39 +1,56 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Check, ShieldCheck, Star, Package, Tag } from 'lucide-react';
-import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { Checkbox } from '../../components/ui/checkbox';
-import { toast } from '../../components/ui/use-toast';
-
-
+import React, { useState, useEffect, useRef } from "react";
+import { Check, ShieldCheck, Star, Package, Tag } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Checkbox } from "../../components/ui/checkbox";
+import { toast } from "../../components/ui/use-toast";
 
 const ProductPurchaseCard = ({ product }) => {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0] || '');
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '');
+  const [selectedVariants, setSelectedVariants] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const cardRef = useRef(null);
+
 
   // Check if we're on mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Update selected variant when color or size changes
+  // we will set the first of variaint Types as default
   useEffect(() => {
-    const variant = product.variants.find(v => 
-      v.attributes[0]?.Color === selectedColor && 
-      v.attributes[0]?.Size === selectedSize
+    const initialVariants = {};
+    product.variantTypes?.forEach((type) => {
+      initialVariants[type.variationName] = type.variationValues[0];
+    });
+    setSelectedVariants(initialVariants);
+  }, [product.variantTypes]);
+
+  // Update selected variant  details
+  useEffect(() => {
+    const variant = product.variants.find((v) =>
+      product.variantTypes?.every(
+        (type) =>
+          v.attributes[0]?.[type.variationName] ===
+          selectedVariants[type.variationName]
+      )
     );
     setSelectedVariant(variant || null);
-  }, [selectedColor, selectedSize, product.variants]);
+  }, [selectedVariants, product.variants, product.variantTypes]);
+
+  const handleVariantChange = (variationName, value) => {
+    setSelectedVariants((prev) => ({
+      ...prev,
+      [variationName]: value,
+    }));
+  };
 
   const handleAddToCart = () => {
     toast({
@@ -52,13 +69,17 @@ const ProductPurchaseCard = ({ product }) => {
   // Find applicable bulk discount
   const getApplicableBulkDiscount = () => {
     if (!product.bulkDiscount || product.bulkDiscount.length === 0) return 0;
-    
+
     // Sort discounts by minQty in descending order
-    const sortedDiscounts = [...product.bulkDiscount].sort((a, b) => b.minQty - a.minQty);
-    
+    const sortedDiscounts = [...product.bulkDiscount].sort(
+      (a, b) => b.minQty - a.minQty
+    );
+
     // Find the first discount that applies to the current quantity
-    const applicableDiscount = sortedDiscounts.find(discount => quantity >= discount.minQty);
-    
+    const applicableDiscount = sortedDiscounts.find(
+      (discount) => quantity >= discount.minQty
+    );
+
     return applicableDiscount ? applicableDiscount.priceDiscountPerUnit : 0;
   };
 
@@ -80,121 +101,128 @@ const ProductPurchaseCard = ({ product }) => {
   const cardClasses = "bg-white rounded-lg shadow-md p-6 h-full";
 
   // Check if current variant is in stock
-  const isVariantInStock = selectedVariant ? selectedVariant.inStock && selectedVariant.stock > 0 : product.inStock;
+  const isVariantInStock = selectedVariant
+    ? selectedVariant.inStock && selectedVariant.stock > 0
+    : product.inStock;
 
   return (
     <div ref={cardRef} className={cardClasses}>
       <div className="flex flex-col h-full">
         <div className="flex-grow">
           <h1 className="text-2xl font-bold">{product.name}</h1>
-          
+
           {/* Pricing Section */}
           <div className="mt-4 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">₹{discountedPrice.toFixed(2)}</span>
+            <span className="text-3xl font-bold text-gray-900">
+              ₹{discountedPrice.toFixed(2)}
+            </span>
             {hasDiscount && (
               <>
-                <span className="ml-3 text-lg text-gray-500 line-through">₹{product.price.toFixed(2)}</span>
-                <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-200">
+                <span className="ml-3 text-lg text-gray-500 line-through">
+                  ₹{product.price.toFixed(2)}
+                </span>
+                <Badge
+                  variant="outline"
+                  className="ml-2 bg-green-50 text-green-700 border-green-200"
+                >
                   {savePercentage}% OFF
                 </Badge>
               </>
             )}
           </div>
-          
+
           {/* Rating */}
           <div className="mt-3 flex items-center">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                  className={`w-4 h-4 ${
+                    i < Math.floor(product.rating)
+                      ? "text-yellow-400 fill-yellow-400"
+                      : "text-gray-300"
+                  }`}
                 />
               ))}
             </div>
-            <span className="ml-2 text-sm text-gray-600">{product.rating} ({product.reviewCount} reviews)</span>
+            <span className="ml-2 text-sm text-gray-600">
+              {product.rating} ({product.reviewCount} reviews)
+            </span>
           </div>
 
           {/* Divider */}
           <div className="my-6 border-t border-gray-200"></div>
-          
-          {/* Color Selection */}
-          {product.colors.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Color</h3>
+
+          {/* Variants Data */}
+          {product.variantTypes?.map((variantType) => (
+            <div key={variantType._id} className="mb-6">
+              <h3 className="text-sm font-medium text-gray-900 mb-3">
+                {variantType.variationName}
+              </h3>
               <div className="flex flex-wrap gap-3">
-                {product.colors.map((color) => (
+                {variantType.variationValues?.map((value) => (
                   <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-3 py-1 rounded-full ${
-                      color === selectedColor
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                    }`}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Size Selection */}
-          {product.sizes.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Size</h3>
-              <div className="flex flex-wrap gap-3">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
+                    key={value}
+                    onClick={() =>
+                      handleVariantChange(variantType.variationName, value)
+                    }
                     className={`px-4 py-2 border rounded ${
-                      size === selectedSize
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-gray-300 hover:border-gray-400'
+                      selectedVariants[variantType.variationName] === value
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-gray-300 hover:border-gray-400"
                     }`}
                   >
-                    {size}
+                    {value}
                   </button>
                 ))}
               </div>
             </div>
-          )}
-          
-          {/* Stock Information */}
+          ))}
+
+          {/* Stock Status */}
           <div className="mb-6 flex items-center">
             <Package className="w-4 h-4 mr-2 text-gray-500" />
-            <span className={`text-sm ${isVariantInStock ? 'text-green-600' : 'text-red-600'}`}>
-              {isVariantInStock 
-                ? `In Stock (${selectedVariant?.stock || product.stock} available)` 
-                : 'Out of Stock'}
-            </span>
+            {selectedVariant ? (
+              <span
+                className={`text-sm ${
+                  selectedVariant.stock > 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {selectedVariant.stock > 0
+                  ? `In Stock (${selectedVariant.stock} ${product.stockUnit} available)`
+                  : "Out of Stock"}
+              </span>
+            ) : (
+              <span className="text-sm text-yellow-600">
+                Please select all variants
+              </span>
+            )}
           </div>
-          
-          {/* Quantity */}
+
+          {/* Quantity and Units */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">Quantity</h3>
-            <div className="flex items-center">
+            <h3 className="text-sm font-medium text-gray-900 mb-3">
+              Quantity ({product.stockUnit})
+            </h3>
+            <div className="flex items-center space-x-3">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="px-3 py-1 border rounded-md"
                 disabled={quantity <= 1}
-                className="w-10 h-10 border rounded-l flex items-center justify-center bg-gray-50 text-gray-600 disabled:opacity-50"
               >
                 -
               </button>
-              <div className="w-14 h-10 border-t border-b flex items-center justify-center text-gray-800">
-                {quantity}
-              </div>
+              <span className="w-12 text-center">{quantity}</span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                disabled={!isVariantInStock || (selectedVariant && quantity >= selectedVariant.stock)}
-                className="w-10 h-10 border rounded-r flex items-center justify-center bg-gray-50 text-gray-600 disabled:opacity-50"
+                className="px-3 py-1 border rounded-md"
+                disabled={selectedVariant && quantity >= selectedVariant.stock}
               >
                 +
               </button>
             </div>
           </div>
-          
+
           {/* Bulk Discount Information */}
           {product.bulkDiscount && product.bulkDiscount.length > 0 && (
             <div className="mb-6 p-3 bg-gray-50 rounded-lg">
@@ -204,21 +232,20 @@ const ProductPurchaseCard = ({ product }) => {
               </h3>
               <ul className="space-y-1 text-sm text-gray-600">
                 {product.bulkDiscount
-                  .filter(d => d.priceDiscountPerUnit > 0)
+                  .filter((d) => d.priceDiscountPerUnit > 0)
                   .sort((a, b) => a.minQty - b.minQty)
                   .map((discount) => (
                     <li key={discount._id} className="flex justify-between">
                       <span>{discount.minQty}+ units:</span>
-                      <span className="font-medium">{discount.priceDiscountPerUnit}% off per unit</span>
+                      <span className="font-medium">
+                        {discount.priceDiscountPerUnit}% off per unit
+                      </span>
                     </li>
-                  ))
-                }
+                  ))}
               </ul>
             </div>
           )}
-          
-         
-          
+
           {/* Trust Badges */}
           <div className="mb-6 p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-center">
@@ -229,7 +256,7 @@ const ProductPurchaseCard = ({ product }) => {
             </div>
           </div>
         </div>
-        
+
         {/* Bottom buttons section - now part of flex layout */}
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="flex items-center justify-between mb-4">

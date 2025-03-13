@@ -1,39 +1,40 @@
-☐ Add querry params when navigating to the shop and product page 
+✔ Add querry params when navigating to the shop and product page @done (3/13/2025, 10:34:07 AM)
 ☐ make the dashboard side nav autoclose for responsiveness
 ✘ after verifying email. set the verification status to global state in redux @cancelled (2/21/2025, 4:05:22 PM)
-☐ add a count for the number of invalid otp attempts
+✔ add a count for the number of invalid otp attempts @done (3/13/2025, 10:34:23 AM)
 ✔ check if otp doc is being deleted form mongodb collection @done (2/21/2025, 4:05:07 PM)
-☐ check if timer is clearing otp 
+☐ check if timer is clearing otp
 ☐ add cart and wishlist to global state on signup or login
-☐ when buyer registers there is a small delay before showing the model for email verification
-☐ need to re arrange seller registration to give it a proper structure
-☐ how do we use the remember me function?
+✔ when buyer registers there is a small delay before showing the model for email verification @done (3/13/2025, 10:34:35 AM)
+✔ need to re arrange seller registration to give it a proper structure @done (3/13/2025, 10:34:43 AM)
+✔ how do we use the remember me function? @done (3/13/2025, 10:36:10 AM)
 ✔ lazy loading not working @done (3/2/2025, 7:12:43 PM)
 ☐ make a profile page for user
 ☐ small bug on nav bar pop ups - pop ups not closing on outside click
 ✔ need to add small preview for wishlist and cart @done (2/27/2025, 6:57:32 PM)
-✘ should we add phone number login or phone/email login @cancelled (2/27/2025, 6:57:21 PM)
-☐ should we make the profile and other dropdowns a seperate component? do this for normal user homwpage
-☐ should we add a field to record the details of the user who updated the category ot other fields?
-☐ make some components reusab
-☐ block access to blocked users
+✔ should we add phone number login or phone/email login @done (3/13/2025, 10:35:06 AM)
+✔ should we make the profile and other dropdowns a seperate component? do this for normal user homwpage @done (3/13/2025, 10:36:43 AM)
+✔ should we add a field to record the details of the user who updated the category ot other fields? @done (3/13/2025, 10:36:47 AM)
+✔ make some components reusab @done (3/13/2025, 10:36:49 AM)
+✔ block access to blocked users @done (3/13/2025, 10:42:18 AM)
 ☐ make blocking parent category block all child category??
 ☐ category page edit and delte button not responsive
-
 ☐ how do we cache pages to optimise loding times and reduce the number of requests?
 ☐ do we cache it in the browser or where?
 ☐ should we do pagination form backend or front end when using react
 ☐ how do i verify the varients submitted by the user
-
-☐ back to ligin restriction
+✔ back to ligin restriction @done (3/13/2025, 10:33:56 AM)
 ☐ add use memo for pages
 ☐ check for bugs in delete / deactivate category by admin
-☐ add rensend otp function and email
+✔ add rensend otp function and email @done (3/13/2025, 10:42:42 AM)
 ☐ add pagination from backend for categories
-☐ the logout is causing a rendering bug when logging out from admin and seller dash. Check for other pages also
+✔ the logout is causing a rendering bug when logging out from admin and seller dash. Check for other pages also @done (3/13/2025, 10:42:51 AM)
 ☐ the prevent accessing page causees a bug, after loggin in as seller try changing the path to try and acess the login page and then logging out
 ☐ PRON??
-☐ can we use querryClient from tanstack query or something else to reduce api calls
+✘ can we use querryClient from tanstack query or something else to reduce api calls @cancelled (3/13/2025, 10:43:22 AM)
 
 
 ☐ blocled category???
+☐ varaints are not showing when trying to edit product
+☐ need to add unit for existing products
+☐ the otp keeps being sent when the user enters incorrecct data. button is deactivated
