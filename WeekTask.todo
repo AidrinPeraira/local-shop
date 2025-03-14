@@ -1,15 +1,12 @@
 Assigned Pendings:
     ☐ Proper homepage for regular customers
-    ☐ Product search bug 
+    ✔ Product search bug @done (3/14/2025, 12:27:12 PM)
     ☐ Variant management - user side
     ☐ Image crop
     ☐ Seller - product pagination
     ☐ Admin - product management
-    ☐ add to cart buy now on homepage
+    ✔ add to cart buy now on homepage @done (3/14/2025, 12:46:07 PM)
     ☐ add image crop
-    ☐ add to cart buy now on homepage
-    ☐ add image crop
-
 
 Admin side :
 ✔ Admin sign in @done (3/10/2025, 4:02:41 PM)
@@ -37,13 +34,13 @@ User side :
     ✔ Users sign up & login with validation. @done (3/2/2025, 4:03:37 PM)
     ✔ Sign up using OTP with OTP timer and Resend Otp @done (3/10/2025, 4:02:57 PM)
     ✔ Login or signup with single sign on (google , facebook …) @done (3/10/2025, 4:02:53 PM)
-    ☐ Implement forgot password.
+    ✔ Implement forgot password. @done (3/14/2025, 12:24:13 PM)
     ✔ List products on the user side. @done (3/10/2025, 12:54:16 PM)
     ✔ Implement Product Listing @done (3/10/2025, 12:54:20 PM)
     ✔ Implement search along with cancel or clear button to reset the results (should be done from backend) @done (3/10/2025, 12:54:25 PM)
 
-☐ Shop Page
-    ☐ Sort based on    
+✔ Shop Page @done (3/14/2025, 12:24:31 PM)
+    ✔ Sort based on @done (3/14/2025, 12:24:29 PM)
         ✔ Price: low to high anf high to low @done (3/10/2025, 12:54:39 PM)
         ✔ Name : aA - zZ and zZ - aA @done (3/10/2025, 12:54:46 PM)
         ✔ Popularity  (Optional) @done (3/10/2025, 4:03:44 PM) 
@@ -51,11 +48,11 @@ User side :
         ✔ Average ratings (Optional) @done (3/10/2025, 4:04:10 PM)
         ✔ New arrivals (Optional) @done (3/10/2025, 4:04:15 PM)
             //latest first
-        ☐ Featured (Optional)
-        ☐ Filter based on 
-        ✔ Category @done (3/10/2025, 12:54:54 PM)
-        ✔ Price Range @done (3/10/2025, 12:55:00 PM)
-        ☐ Brand (Optional).
+        ✘ Featured (Optional) @cancelled (3/14/2025, 12:24:26 PM)
+        ✔ Filter based on @done (3/14/2025, 12:24:35 PM)
+            ✔ Category @done (3/10/2025, 12:54:54 PM)
+            ✔ Price Range @done (3/10/2025, 12:55:00 PM)
+            ✘ Brand (Optional). @cancelled (3/14/2025, 12:24:24 PM)
 
 Additional Note: 
     ✔ Search, sort, and filter should work together in combination. @done (3/6/2025, 3:15:40 PM)

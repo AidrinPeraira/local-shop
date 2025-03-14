@@ -21,6 +21,14 @@ import {
 } from "../../components/ui/pagination.jsx";
 import { getShopProductsApi } from "../../api/productApi.js";
 import { useToast } from "../hooks/use-toast.js";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../../components/ui/sheet";
+import ProductPurchaseCard from "../Product/ProducPurchaseCard";
 
 const ShopContent = () => {
   const [products, setProducts] = useState([]);
@@ -425,21 +433,51 @@ const ShopContent = () => {
             ) : (
               // Products display
               products.map((product) => (
-                <Link to={`/product/${product.slug}?id=${product._id}`} key={product._id}>
-                  <div key={product._id} className="group">
+                <div key={product._id} className="group">
+                  <Link 
+                    to={`/product/${product.slug}?id=${product._id}`} 
+                    className="block"
+                  >
                     <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
-                      {/* Image carousel or first image */}
                       <img
                         src={product.images[0]}
                         alt={product.productName}
                         className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
                       />
-                      <Button
-                        className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                        size="sm"
+                      <div 
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2"
+                        onClick={(e) => e.preventDefault()} // Prevent Link navigation when clicking buttons
                       >
-                        View Details
-                      </Button>
+                        <Sheet>
+                          <SheetTrigger>
+                            <Button size="sm" variant="secondary">
+                              Add to Cart
+                            </Button>
+                          </SheetTrigger>
+                          <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
+                            <SheetHeader className="flex-none">
+                              <SheetTitle>Add to Cart</SheetTitle>
+                            </SheetHeader>
+                            <div className="mt-4 flex-1 overflow-y-auto">
+                              <ProductPurchaseCard product={product} mode="cart" />
+                            </div>
+                          </SheetContent>
+                        </Sheet>
+
+                        <Sheet>
+                          <SheetTrigger>
+                            <Button size="sm">Buy Now</Button>
+                          </SheetTrigger>
+                          <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
+                            <SheetHeader className="flex-none">
+                              <SheetTitle>Buy Now</SheetTitle>
+                            </SheetHeader>
+                            <div className="mt-4 flex-1 overflow-y-auto">
+                              <ProductPurchaseCard product={product} mode="buy" />
+                            </div>
+                          </SheetContent>
+                        </Sheet>
+                      </div>
                     </div>
 
                     {/* Product Info */}
@@ -519,8 +557,8 @@ const ShopContent = () => {
                         </div>
                       )}
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               ))
             )}
           </div>

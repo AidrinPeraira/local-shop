@@ -26,6 +26,9 @@ import {
 } from "../../components/ui/tooltip";
 
 const ProductPurchaseCard = ({ product }) => {
+
+  console.log(product)
+
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState({});
   const [matchingVariant, setMatchingVariant] = useState(null);
@@ -210,7 +213,7 @@ const ProductPurchaseCard = ({ product }) => {
       <div className="flex flex-col h-full">
         {/* Header and main content section */}
         <div className="flex-grow space-y-4">
-          <h1 className="text-2xl font-bold">{product.name}</h1>
+          <h1 className="text-2xl font-bold">{product.name || product.productName}</h1>
           <div className="mt-4 flex items-center">
             <span className="text-3xl font-bold text-gray-900">
               ₹{matchingVariant?.basePrice.toFixed(2)}
