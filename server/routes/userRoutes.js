@@ -6,7 +6,9 @@ import {
   googleAuthController,
   getAllUsers,
   activateUser,
-  deactivateUser
+  deactivateUser,
+  checkUserExists,
+  resetUserPassword
 } from "../controller/userController.js";
 import rateLimit from "express-rate-limit";
 import { authenticateAdmin, authorizeAdmin } from "../middlewares/authMiddleware.js";
@@ -29,6 +31,10 @@ userRouter.route("/login", apiLimiter).post(loginUser);
 userRouter.route("/logout", apiLimiter).post(logoutController);
 
 userRouter.route("/google").post(googleAuthController);
+
+//forgot password routes
+userRouter.route("/forgot-password/check-user").post(checkUserExists)
+userRouter.route("/forgot-password/reset").post(resetUserPassword)
 
 //------------------------
 

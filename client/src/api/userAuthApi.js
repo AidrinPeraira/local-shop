@@ -5,6 +5,11 @@ export const userRegApi = (data) => API.post("/users/register", data)
 export const userLoginApi = (data) => API.post("/users/login", data)
 export const userLogoutApi = () => API.post("/users/logout")
 
+export const checkUserApi = (data) => API.post("/users/forgot-password/check-user", data)
+export const resetUserPasswordApi = (data) => API.post("/users/forgot-password/reset", data)
+
+
+
 //admin apis
 export const adminLoginApi = (data) => API.post("/admin/login", data)
 export const adminLogoutApi = (data) => API.post("/admin/logout", data) 
