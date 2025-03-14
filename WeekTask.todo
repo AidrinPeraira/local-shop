@@ -5,6 +5,8 @@ Assigned Pendings:
     ☐ Image crop
     ☐ Seller - product pagination
     ☐ Admin - product management
+    ☐ add to cart buy now on homepage
+    ☐ add image crop
 
 
 Admin side :
@@ -61,18 +63,18 @@ Additional Note:
         //user cannot see the products blocked by the admin. The data is not being sent
 
 Product Details Page:
-    ☐ Product details view on the user side with image zoom.
+    ✔ Product details view on the user side with image zoom. @done (3/14/2025, 9:35:21 AM)
     ☐ Product detailed page should contain following
-        ☐ Breadcrumbs
+        ✔ Breadcrumbs @done (3/14/2025, 9:35:04 AM)
         ☐ Ratings
-        ☐ Price
+        ✔ Price @done (3/14/2025, 9:35:11 AM)
         ✔ Discounts or coupons applied @done (3/6/2025, 3:17:57 PM)
             //no discount coupons. discounted price is shown based on the quantity of itmes
         ☐ Reviews
-        ☐ Stock
+        ✔ Stock @done (3/14/2025, 9:35:13 AM)
     ☐ Proper error handles Sold out / unavailable  and  out of stock EXAMPLE
     ☐ Highlights / specs of product
-    ☐ Related product recommendations
+    ✔ Related product recommendations @done (3/14/2025, 9:35:24 AM)
     ☐ Redirect users to product listing page,  if 
         ☐ the product is blocked or 
         ☐ unavailable on 
@@ -112,13 +114,13 @@ Show user details including profile image and address:
             ☐ Final price summary (including taxes, discounts, and shipping)
             ☐ Place order with Cash on Delivery
             ☐ Order successful page with thanking statement and illustration and should contain buttons to redirect user to order detail page and continue shopping page.
-            ☐ Order Management
-        Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS).
-        Show basic details in the listing, such as status, order date, etc.
-        Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
-        when canceling an order should ask for reason(optional) .
-        Provide an option to return order when the order is delivered,should ask for reason for return (mandatory).
-        Include a detail page for each respective order.
-        Provide the option to download the invoice for each order.(pdf)
-        Implement search to find specific order
+        ☐ Order Management
+            ☐ Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS).
+            ☐ Show basic details in the listing, such as status, order date, etc.
+            ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.  
+            ☐ when canceling an order should ask for reason(optional) .
+            ☐ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory).
+            ☐ Include a detail page for each respective order.
+            ☐ Provide the option to download the invoice for each order.(pdf)
+            ☐ Implement search to find specific order
         
