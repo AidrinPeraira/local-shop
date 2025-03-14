@@ -4,7 +4,7 @@ import { Button } from "../../components/ui/button.jsx";
 import { Slider } from "../../components/ui/slider.jsx";
 import { Checkbox } from "../../components/ui/checkbox.jsx";
 import { useSelector } from "react-redux";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Collapsible,
   CollapsibleContent,
@@ -48,6 +48,7 @@ const ShopContent = () => {
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
+  const navigate = useNavigate()
 
   //temp????
   const [endIndex, setEndIndex] = useState(12);
@@ -104,6 +105,7 @@ const ShopContent = () => {
         description: error.response.data.message,
         variant: "destructive",
       });
+      navigate(-1)
     } finally {
       setIsLoading(false);
     }
@@ -466,127 +468,131 @@ const ShopContent = () => {
             ) : (
               // Products display
               products.map((product) => (
-                
                 <div key={product._id} className="group">
-                  <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
-                    <img
-                      src={product.images[0]}
-                      alt={product.productName}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
-                    />
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                      <Sheet>
-                        <SheetTrigger>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                          >
-                            Add to Cart
-                          </Button>
-                        </SheetTrigger>
-                        <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
-                          <SheetHeader className="flex-none">
-                            <SheetTitle>Add to Cart</SheetTitle>
-                          </SheetHeader>
-                          <div className="mt-4 flex-1 overflow-y-auto">
-                            <ProductPurchaseCard product={product} mode="cart" />
-                          </div>
-                        </SheetContent>
-                      </Sheet>
+                  <Link 
+                    to={`/product/${product.slug}?id=${product._id}`} 
+                    className="block"
+                  >
+                    <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
+                      <img
+                        src={product.images[0]}
+                        alt={product.productName}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
+                      />
+                      <div 
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2"
+                        onClick={(e) => e.preventDefault()} // Prevent Link navigation when clicking buttons
+                      >
+                        <Sheet>
+                          <SheetTrigger>
+                            <Button size="sm" variant="secondary">
+                              Add to Cart
+                            </Button>
+                          </SheetTrigger>
+                          <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
+                            <SheetHeader className="flex-none">
+                              <SheetTitle>Add to Cart</SheetTitle>
+                            </SheetHeader>
+                            <div className="mt-4 flex-1 overflow-y-auto">
+                              <ProductPurchaseCard product={product} mode="cart" />
+                            </div>
+                          </SheetContent>
+                        </Sheet>
 
-                      <Sheet>
-                        <SheetTrigger>
-                          <Button size="sm">Buy Now</Button>
-                        </SheetTrigger>
-                        <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
-                          <SheetHeader className="flex-none">
-                            <SheetTitle>Buy Now</SheetTitle>
-                          </SheetHeader>
-                          <div className="mt-4 flex-1 overflow-y-auto">
-                            <ProductPurchaseCard product={product} mode="buy" />
-                          </div>
-                        </SheetContent>
-                      </Sheet>
-                    </div>
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="space-y-2">
-                    {/* Product Name */}
-                    <h3 className="font-medium text-sm line-clamp-2">
-                      {product.productName}
-                    </h3>
-
-                    {/* Category & Seller */}
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>{product.category.name}</span>
-                      <span>{product.seller.sellerName}</span>
-                    </div>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-2">
-                      <div className="flex text-yellow-400">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className="h-4 w-4"
-                            fill={
-                              i < product.avgRating ? "currentColor" : "none"
-                            }
-                          />
-                        ))}
+                        <Sheet>
+                          <SheetTrigger>
+                            <Button size="sm">Buy Now</Button>
+                          </SheetTrigger>
+                          <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
+                            <SheetHeader className="flex-none">
+                              <SheetTitle>Buy Now</SheetTitle>
+                            </SheetHeader>
+                            <div className="mt-4 flex-1 overflow-y-auto">
+                              <ProductPurchaseCard product={product} mode="buy" />
+                            </div>
+                          </SheetContent>
+                        </Sheet>
                       </div>
-                      <span className="text-sm text-gray-600">
-                        ({product.reviewCount} reviews)
-                      </span>
                     </div>
 
-                    {/* Price & Stock */}
-                    <div className="flex items-center justify-between">
+                    {/* Product Info */}
+                    <div className="space-y-2">
+                      {/* Product Name */}
+                      <h3 className="font-medium text-sm line-clamp-2">
+                        {product.productName}
+                      </h3>
+
+                      {/* Category & Seller */}
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span>{product.category.name}</span>
+                        <span>{product.seller.sellerName}</span>
+                      </div>
+
+                      {/* Rating */}
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold">
-                          ₹{product.basePrice.toLocaleString()}
+                        <div className="flex text-yellow-400">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className="h-4 w-4"
+                              fill={
+                                i < product.avgRating ? "currentColor" : "none"
+                              }
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          ({product.reviewCount} reviews)
                         </span>
-                        {product.bulkDiscount.length > 1 && (
-                          <span className="text-xs text-green-600 font-medium">
-                            Bulk discounts available
+                      </div>
+
+                      {/* Price & Stock */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-bold">
+                            ₹{product.basePrice.toLocaleString()}
+                          </span>
+                          {product.bulkDiscount.length > 1 && (
+                            <span className="text-xs text-green-600 font-medium">
+                              Bulk discounts available
+                            </span>
+                          )}
+                        </div>
+                        {product.inStock ? (
+                          <span className="text-xs text-green-600">
+                            In Stock
+                          </span>
+                        ) : (
+                          <span className="text-xs text-red-600">
+                            Out of Stock
                           </span>
                         )}
                       </div>
-                      {product.inStock ? (
-                        <span className="text-xs text-green-600">
-                          In Stock
-                        </span>
-                      ) : (
-                        <span className="text-xs text-red-600">
-                          Out of Stock
-                        </span>
+
+                      {/* Variants Summary */}
+                      {product.variants && product.variants.length > 0 && (
+                        <div className="text-xs text-gray-500">
+                          Available in{" "}
+                          {
+                            new Set(
+                              product.variants.map(
+                                (v) => Object.values(v.attributes[0])[0]
+                              )
+                            ).size
+                          }{" "}
+                          colors,{" "}
+                          {
+                            new Set(
+                              product.variants.map(
+                                (v) => Object.values(v.attributes[0])[1]
+                              )
+                            ).size
+                          }{" "}
+                          sizes
+                        </div>
                       )}
                     </div>
-
-                    {/* Variants Summary */}
-                    {product.variants && product.variants.length > 0 && (
-                      <div className="text-xs text-gray-500">
-                        Available in{" "}
-                        {
-                          new Set(
-                            product.variants.map(
-                              (v) => Object.values(v.attributes[0])[0]
-                            )
-                          ).size
-                        }{" "}
-                        colors,{" "}
-                        {
-                          new Set(
-                            product.variants.map(
-                              (v) => Object.values(v.attributes[0])[1]
-                            )
-                          ).size
-                        }{" "}
-                        sizes
-                      </div>
-                    )}
-                  </div>
+                  </Link>
                 </div>
               ))
             )}

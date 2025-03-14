@@ -10,6 +10,9 @@ const Shop = lazy(() => import("../pages/BuyerPages/Shop"));
 const NotFound = lazy(() => import("../pages/BuyerPages/NotFound"));
 const Product = lazy(() => import("../pages/BuyerPages/Product"));
 const ForgotPassword = lazy(() => import("../pages/BuyerPages/ForgotPassword"));
+const Profile = lazy(() => import("../pages/BuyerPages/Profile"));
+const Cart = lazy(() => import("../pages/BuyerPages/Cart"));
+const Checkout = lazy(() => import("../pages/BuyerPages/Checkout"));
 
 const MainRoutes = () => {
   return (
@@ -66,11 +69,11 @@ const MainRoutes = () => {
       {/* Protected Routes */}
       <Route element={<ProtectedRoute allowedRoles={["buyer"]} />}>
       
-        {/* <Route
-          path="/saved"
+        <Route
+          path="/profile"
           element={
             <Suspense fallback={<PageLoading />}>
-              <SavedList />
+              <Profile />
             </Suspense>
           }
         />
@@ -81,7 +84,15 @@ const MainRoutes = () => {
               <Cart />
             </Suspense>
           }
-        /> */}
+        />
+        <Route
+          path="/checkout"
+          element={
+            <Suspense fallback={<PageLoading />}>
+              <Checkout />
+            </Suspense>
+          }
+        />
       </Route>
 
       <Route path="*" element={<NotFound />} />

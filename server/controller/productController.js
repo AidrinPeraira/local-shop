@@ -421,7 +421,7 @@ export const getProductDetails = asyncHandler(async (req, res) => {
 
   if (!product) {
     res.status(HTTP_CODES.NOT_FOUND);
-    throw new Error('Product not found');
+    throw new Error('This product is currently unavailable. Please try later');
   }
 
   // Transform the data to match the frontend format
