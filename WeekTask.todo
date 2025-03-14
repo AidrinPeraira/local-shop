@@ -7,6 +7,8 @@ Assigned Pendings:
     ☐ Admin - product management
     ☐ add to cart buy now on homepage
     ☐ add image crop
+    ☐ add to cart buy now on homepage
+    ☐ add image crop
 
 
 Admin side :
@@ -74,8 +76,8 @@ Product Details Page:
         ☐ Reviews
         ✔ Stock @done (3/14/2025, 9:35:13 AM)
     ☐ Proper error handles Sold out / unavailable  and  out of stock EXAMPLE
-    ✔ Highlights / specs of product @done (3/14/2025, 10:08:58 AM)
-    ✔ Related product recommendations @done (3/14/2025, 9:35:24 AM)
+    ☐ Highlights / specs of product
+    ☐ Related product recommendations
     ☐ Redirect users to product listing page,  if 
         ☐ the product is blocked or 
         ☐ unavailable on 
