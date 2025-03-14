@@ -305,17 +305,50 @@ const ShopContent = () => {
             </div>
             <CollapsibleContent>
               <div className="px-2 pt-4">
+                <div className="flex items-center gap-4 mb-2">
+                  <input
+                    type="number"
+                    value={priceRange[0]}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      if (value <= priceRange[1]) {
+                        setPriceRange([value, priceRange[1]]);
+                      }
+                    }}
+                    className="w-24 px-2 py-1 border rounded-md"
+                    min={0}
+                    max={priceRange[1]}
+                  />
+                  <span>to</span>
+                  <input
+                    type="number"
+                    value={priceRange[1]}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      if (value >= priceRange[0]) {
+                        setPriceRange([priceRange[0], value]);
+                      }
+                    }}
+                    className="w-24 px-2 py-1 border rounded-md"
+                    min={priceRange[0]}
+                    max={10000}
+                  />
+                </div>
                 <Slider
                   defaultValue={[0, 3000]}
-                  max={3000}
+                  min={0}
+                  max={10000}
                   step={100}
                   value={priceRange}
-                  onValueChange={setPriceRange}
+                  onValueChange={(value) => {
+                    setPriceRange(value);
+                  }}
                   className="mb-4"
+                  minStepsBetweenThumbs={1}
                 />
                 <div className="flex items-center justify-between text-sm">
-                  <span>₹{priceRange[0]}</span>
-                  <span>₹{priceRange[1]}</span>
+                  <span>₹{priceRange[0].toLocaleString()}</span>
+                  <span>₹{priceRange[1].toLocaleString()}</span>
                 </div>
               </div>
             </CollapsibleContent>
@@ -433,131 +466,127 @@ const ShopContent = () => {
             ) : (
               // Products display
               products.map((product) => (
+                
                 <div key={product._id} className="group">
-                  <Link 
-                    to={`/product/${product.slug}?id=${product._id}`} 
-                    className="block"
-                  >
-                    <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
-                      <img
-                        src={product.images[0]}
-                        alt={product.productName}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
-                      />
-                      <div 
-                        className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2"
-                        onClick={(e) => e.preventDefault()} // Prevent Link navigation when clicking buttons
-                      >
-                        <Sheet>
-                          <SheetTrigger>
-                            <Button size="sm" variant="secondary">
-                              Add to Cart
-                            </Button>
-                          </SheetTrigger>
-                          <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
-                            <SheetHeader className="flex-none">
-                              <SheetTitle>Add to Cart</SheetTitle>
-                            </SheetHeader>
-                            <div className="mt-4 flex-1 overflow-y-auto">
-                              <ProductPurchaseCard product={product} mode="cart" />
-                            </div>
-                          </SheetContent>
-                        </Sheet>
+                  <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
+                    <img
+                      src={product.images[0]}
+                      alt={product.productName}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
+                    />
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <Sheet>
+                        <SheetTrigger>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                          >
+                            Add to Cart
+                          </Button>
+                        </SheetTrigger>
+                        <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
+                          <SheetHeader className="flex-none">
+                            <SheetTitle>Add to Cart</SheetTitle>
+                          </SheetHeader>
+                          <div className="mt-4 flex-1 overflow-y-auto">
+                            <ProductPurchaseCard product={product} mode="cart" />
+                          </div>
+                        </SheetContent>
+                      </Sheet>
 
-                        <Sheet>
-                          <SheetTrigger>
-                            <Button size="sm">Buy Now</Button>
-                          </SheetTrigger>
-                          <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
-                            <SheetHeader className="flex-none">
-                              <SheetTitle>Buy Now</SheetTitle>
-                            </SheetHeader>
-                            <div className="mt-4 flex-1 overflow-y-auto">
-                              <ProductPurchaseCard product={product} mode="buy" />
-                            </div>
-                          </SheetContent>
-                        </Sheet>
-                      </div>
+                      <Sheet>
+                        <SheetTrigger>
+                          <Button size="sm">Buy Now</Button>
+                        </SheetTrigger>
+                        <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
+                          <SheetHeader className="flex-none">
+                            <SheetTitle>Buy Now</SheetTitle>
+                          </SheetHeader>
+                          <div className="mt-4 flex-1 overflow-y-auto">
+                            <ProductPurchaseCard product={product} mode="buy" />
+                          </div>
+                        </SheetContent>
+                      </Sheet>
+                    </div>
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="space-y-2">
+                    {/* Product Name */}
+                    <h3 className="font-medium text-sm line-clamp-2">
+                      {product.productName}
+                    </h3>
+
+                    {/* Category & Seller */}
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <span>{product.category.name}</span>
+                      <span>{product.seller.sellerName}</span>
                     </div>
 
-                    {/* Product Info */}
-                    <div className="space-y-2">
-                      {/* Product Name */}
-                      <h3 className="font-medium text-sm line-clamp-2">
-                        {product.productName}
-                      </h3>
-
-                      {/* Category & Seller */}
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span>{product.category.name}</span>
-                        <span>{product.seller.sellerName}</span>
+                    {/* Rating */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex text-yellow-400">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className="h-4 w-4"
+                            fill={
+                              i < product.avgRating ? "currentColor" : "none"
+                            }
+                          />
+                        ))}
                       </div>
+                      <span className="text-sm text-gray-600">
+                        ({product.reviewCount} reviews)
+                      </span>
+                    </div>
 
-                      {/* Rating */}
+                    {/* Price & Stock */}
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="flex text-yellow-400">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className="h-4 w-4"
-                              fill={
-                                i < product.avgRating ? "currentColor" : "none"
-                              }
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-gray-600">
-                          ({product.reviewCount} reviews)
+                        <span className="text-lg font-bold">
+                          ₹{product.basePrice.toLocaleString()}
                         </span>
-                      </div>
-
-                      {/* Price & Stock */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold">
-                            ₹{product.basePrice.toLocaleString()}
-                          </span>
-                          {product.bulkDiscount.length > 1 && (
-                            <span className="text-xs text-green-600 font-medium">
-                              Bulk discounts available
-                            </span>
-                          )}
-                        </div>
-                        {product.inStock ? (
-                          <span className="text-xs text-green-600">
-                            In Stock
-                          </span>
-                        ) : (
-                          <span className="text-xs text-red-600">
-                            Out of Stock
+                        {product.bulkDiscount.length > 1 && (
+                          <span className="text-xs text-green-600 font-medium">
+                            Bulk discounts available
                           </span>
                         )}
                       </div>
-
-                      {/* Variants Summary */}
-                      {product.variants && product.variants.length > 0 && (
-                        <div className="text-xs text-gray-500">
-                          Available in{" "}
-                          {
-                            new Set(
-                              product.variants.map(
-                                (v) => Object.values(v.attributes[0])[0]
-                              )
-                            ).size
-                          }{" "}
-                          colors,{" "}
-                          {
-                            new Set(
-                              product.variants.map(
-                                (v) => Object.values(v.attributes[0])[1]
-                              )
-                            ).size
-                          }{" "}
-                          sizes
-                        </div>
+                      {product.inStock ? (
+                        <span className="text-xs text-green-600">
+                          In Stock
+                        </span>
+                      ) : (
+                        <span className="text-xs text-red-600">
+                          Out of Stock
+                        </span>
                       )}
                     </div>
-                  </Link>
+
+                    {/* Variants Summary */}
+                    {product.variants && product.variants.length > 0 && (
+                      <div className="text-xs text-gray-500">
+                        Available in{" "}
+                        {
+                          new Set(
+                            product.variants.map(
+                              (v) => Object.values(v.attributes[0])[0]
+                            )
+                          ).size
+                        }{" "}
+                        colors,{" "}
+                        {
+                          new Set(
+                            product.variants.map(
+                              (v) => Object.values(v.attributes[0])[1]
+                            )
+                          ).size
+                        }{" "}
+                        sizes
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))
             )}
