@@ -22,15 +22,48 @@ import {
   CarouselPrevious,
 } from "../../components/ui/carousel";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { getShopProductsApi } from "../../api/productApi";
 
 export default function Home() {
   const industries = [
-    { id: 1, name: "Equipments", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163584.jpg?t=st=1741325045~exp=1741328645~hmac=3e5181756393886d0563bb0d6504f86804cb04ef13c65013486588588b92f205&w=740" },
-    { id: 2, name: "Services", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163577.jpg?ga=GA1.1.1465198438.1741275083" },
-    { id: 3, name: "Healthcare", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163569.jpg?t=st=1741324820~exp=1741328420~hmac=c6e6f2f0e2f7ab14827da271e2d442d4d50fae67d841ee487cef75b461781db9&w=740" },
-    { id: 4, name: "Organic", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163601.jpg?t=st=1741324885~exp=1741328485~hmac=10fd7beb587319b868301910c4fc26ef7194abd1709f0deddc5903ab617e31ff&w=740" },
-    { id: 5, name: "Automotive", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163610.jpg?t=st=1741324845~exp=1741328445~hmac=636a11bffa39a6317573687c62d80df5991ab3aaab199151e500577ee117e0a9&w=740" },
-    { id: 6, name: "Logistics", image: "https://img.freepik.com/free-photo/person-their-job-position_23-2150163596.jpg?t=st=1741324777~exp=1741328377~hmac=0fbc98c236f2e6ba1cec50e724402ef6a89a56561eccf3b38935e7816764c5b0&w=1060" },
+    {
+      id: 1,
+      name: "Equipments",
+      image:
+        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163584.jpg?t=st=1741325045~exp=1741328645~hmac=3e5181756393886d0563bb0d6504f86804cb04ef13c65013486588588b92f205&w=740",
+    },
+    {
+      id: 2,
+      name: "Services",
+      image:
+        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163577.jpg?ga=GA1.1.1465198438.1741275083",
+    },
+    {
+      id: 3,
+      name: "Healthcare",
+      image:
+        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163569.jpg?t=st=1741324820~exp=1741328420~hmac=c6e6f2f0e2f7ab14827da271e2d442d4d50fae67d841ee487cef75b461781db9&w=740",
+    },
+    {
+      id: 4,
+      name: "Organic",
+      image:
+        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163601.jpg?t=st=1741324885~exp=1741328485~hmac=10fd7beb587319b868301910c4fc26ef7194abd1709f0deddc5903ab617e31ff&w=740",
+    },
+    {
+      id: 5,
+      name: "Automotive",
+      image:
+        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163610.jpg?t=st=1741324845~exp=1741328445~hmac=636a11bffa39a6317573687c62d80df5991ab3aaab199151e500577ee117e0a9&w=740",
+    },
+    {
+      id: 6,
+      name: "Logistics",
+      image:
+        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163596.jpg?t=st=1741324777~exp=1741328377~hmac=0fbc98c236f2e6ba1cec50e724402ef6a89a56561eccf3b38935e7816764c5b0&w=1060",
+    },
   ];
 
   const featuredProducts = [
@@ -71,6 +104,57 @@ export default function Home() {
       badge: "BEST DEAL",
     },
   ];
+
+  const { categories } = useSelector((state) => state.categories);
+  const [categoryProducts, setCategoryProducts] = useState({});
+
+  // Get level 3 categories
+  const level3Categories = categories.flatMap((l1) => {
+    return l1.subCategories.flatMap((l2) =>
+      l2.subSubCategories?.map((l3) => {
+        return {
+          id: l3._id,
+          name: l3.name,
+          image: null,
+        };
+      })
+    );
+  }).slice(0, 10);
+
+  // Fetch one product for each category
+  useEffect(() => {
+    const fetchCategoryProducts = async () => {
+      try {
+        const productPromises = level3Categories.map(async (category) => {
+          const query = `category=${category.id}&limit=1`;
+          const response = await getShopProductsApi(query);
+          if (response.data?.products?.[0]?.images?.[0]) {
+            return {
+              categoryId: category.id,
+              image: response.data.products[0].images[0],
+            };
+          }
+          return null;
+        });
+
+        const results = await Promise.all(productPromises);
+        const productImages = {};
+        results.forEach((result) => {
+          if (result) {
+            productImages[result.categoryId] = result.image;
+          }
+        });
+        console.log(productImages);
+        setCategoryProducts(productImages);
+      } catch (error) {
+        console.error("Error fetching category products:", error);
+      }
+    };
+
+    if (level3Categories.length > 0) {
+      fetchCategoryProducts();
+    }
+  }, [categories]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -192,6 +276,46 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Categories */}
+      <section className="container mx-auto px-4 py-12">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold">Product Categories</h2>
+            <p className="text-gray-600">
+              Explore opportunities across specialized business categories
+            </p>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 pb-4">
+            {level3Categories.map((category) => (
+              <div key={category?.id} className="flex-none w-64">
+                <div className="group cursor-pointer">
+                  <div className="aspect-square rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden mb-3">
+                    <div className="opacity-40 group-hover:opacity-60 transition-opacity">
+                      {categoryProducts[category?.id] ? (
+                        <img
+                          src={categoryProducts[category?.id]}
+                          alt={category.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-700" />
+                      )}
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                      <span className="text-white font-medium text-center w-full">
+                        {category?.name}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Key Features */}
       <section className="container mx-auto px-4 py-12">
         <div className="text-center mb-10">
@@ -251,74 +375,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Categories */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl font-bold">Industry Sectors</h2>
-            <p className="text-gray-600">
-              Explore opportunities across diverse business categories
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon">
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full"
-        >
-          <CarouselContent>
-            {industries.map((category) => (
-              <CarouselItem
-                key={category.id}
-                className="md:basis-1/4 lg:basis-1/6"
-              >
-
-
-                <div className="group cursor-pointer">
-                  <div className="aspect-square rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden mb-3 flex items-center justify-center">
-                    <div className="opacity-40 group-hover:opacity-60 transition-opacity text-white">
-                      {category.name === "Equipments" && (
-                        <img src={category.image} alt={category.name} />
-                      )}
-                      {category.name === "Services" && (
-                         <img src={category.image} alt={category.name} />
-                      )}
-                      {category.name === "Healthcare" && (
-                        <img src={category.image} alt={category.name} />
-                      )}
-                      {category.name === "Organic" && (
-                         <img src={category.image} alt={category.name} />
-                      )}
-                      {category.name === "Automotive" && (
-                         <img src={category.image} alt={category.name} />
-                      )}
-                      {category.name === "Logistics" && (
-                         <img src={category.image} alt={category.name} />
-                      )}
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
-                      <span className="text-white font-medium text-center w-full">
-                        {category.name}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
       </section>
 
       <section className="container mx-auto px-4 py-12">

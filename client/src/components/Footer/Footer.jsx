@@ -1,66 +1,21 @@
-
 import React from 'react';
-import { Phone, MapPin, Mail, ArrowRight, Store } from 'lucide-react';
-import { Button } from "../ui/button";
 import { useNavigate } from 'react-router-dom';
+import { Store, Apple } from 'lucide-react';
+import { Button } from "../ui/button";
 
 const Footer = () => {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <footer className="bg-gray-900 text-gray-300">
-      {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          {/* Customer Support */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* About */}
           <div>
-            <h3 className="text-white font-semibold text-lg mb-4">Customer Support</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Phone size={16} className="text-primary" />
-                <span className="font-medium text-white">+91 9400 40 9843</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin size={16} className="text-primary" />
-                <span>Kochi, Kerala</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail size={16} className="text-primary" />
-                <span>aidrin.peraira@gmail.com</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Top Categories */}
-          <div>
-            <h3 className="text-white font-semibold text-lg mb-4">Top Categories</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">Computer & Laptop</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">Smartphone</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">Headphones</a>
-              </li>
-              <li>
-                <a href="#" className="font-medium text-white hover:text-primary transition-colors">Accessories</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">Camera & Photo</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">TV & Homes</a>
-              </li>
-              <li>
-                <a href="#" className="inline-flex items-center gap-1 text-primary hover:gap-2 transition-all">
-                  Browse All Products
-                  <ArrowRight size={16} />
-                </a>
-              </li>
-            </ul>
+            <h3 className="text-white font-semibold text-lg mb-4">About LocalShop</h3>
+            <p className="text-gray-400">
+              Your trusted B2B marketplace connecting businesses worldwide. Find quality products and reliable suppliers.
+            </p>
           </div>
 
           {/* Quick Links */}
@@ -68,25 +23,22 @@ const Footer = () => {
             <h3 className="text-white font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-primary transition-colors">Shop Product</a>
+                <a href="/" className="hover:text-primary transition-colors">Home</a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary transition-colors">Shopping Cart</a>
+                <a href="/shop" className="hover:text-primary transition-colors">Shop</a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary transition-colors">Wishlist</a>
+                <a href="#" className="hover:text-primary transition-colors">Contact</a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary transition-colors">Compare</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">Track Order</a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">Customer Help</a>
-              </li>
-              <li>
-                <a href="#" className="text-primary hover:text-primary/80 transition-colors" onClick={()=>navigate('/seller/login')}>Login as Seller</a>
+                <a 
+                  href="#" 
+                  className="text-primary hover:text-primary/80 transition-colors" 
+                  onClick={() => navigate('/seller/login')}
+                >
+                  Login as Seller
+                </a>
               </li>
             </ul>
           </div>
@@ -97,39 +49,30 @@ const Footer = () => {
             <div className="space-y-3">
               <Button
                 variant="outline"
-                className="w-full justify-start text-black hover:text-primary border-gray-700"
+                className="w-full justify-start text-gray-800 hover:text-white border-gray-700 hover:bg-gray-800"
               >
-                <Store className="mr-2 h-4 w-4" />
+                <Store className="mr-2 h-5 w-5" />
                 Google Play Store
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start text-black hover:text-primary border-gray-700"
+                className="w-full justify-start text-gray-800 hover:text-white border-gray-700 hover:bg-gray-800"
               >
-                <Store className="mr-2 h-4 w-4" />
+                <Apple className="mr-2 h-5 w-5" />
                 Apple App Store
               </Button>
             </div>
           </div>
 
-          {/* Popular Tags */}
+          {/* Contact */}
           <div>
-            <h3 className="text-white font-semibold text-lg mb-4">Popular Tags</h3>
-            <div className="flex flex-wrap gap-2">
-              {[
-                'Game', 'iPhone', 'TV', 'Asus Laptops',
-                'MacBook', 'SSD', 'Graphics Card',
-                'Power Bank', 'Smart TV', 'Speaker',
-                'Tablet', 'Microwave', 'Samsung'
-              ].map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 text-sm bg-gray-800 rounded-full hover:bg-gray-700 transition-colors cursor-pointer"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+            <h3 className="text-white font-semibold text-lg mb-4">Contact</h3>
+            <p className="text-gray-400">
+              Have questions? Get in touch with our support team.
+            </p>
+            <a href="mailto:support@localshop.com" className="text-primary hover:text-primary/80 transition-colors">
+              support@localshop.com
+            </a>
           </div>
         </div>
       </div>
