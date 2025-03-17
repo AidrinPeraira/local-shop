@@ -23,11 +23,11 @@ export const authenticateUser = asyncHandler(
                 next()
             } catch (error) {
                 res.status(HTTP_CODES.UNAUTHORIZED)
-                throw new Error('Not authorised, token failed')
+                throw new Error('Not authorised, plaese login as buyer to continue')
             }
         } else {
             res.status(HTTP_CODES.UNAUTHORIZED)
-            throw new Error('Not authorised. No token.')
+            throw new Error('Not authorised. plaese login as buyer to continue.')
 
         }
     }

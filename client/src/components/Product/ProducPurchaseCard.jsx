@@ -24,10 +24,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../components/ui/tooltip";
+import { addToCartAPI } from "../../api/cartApi";
+import { useNavigate } from "react-router-dom";
 
 const ProductPurchaseCard = ({ product }) => {
-
-  console.log(product)
 
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState({});
@@ -35,6 +35,7 @@ const ProductPurchaseCard = ({ product }) => {
   const [showAllVariants, setShowAllVariants] = useState(false);
   const [variantQuantities, setVariantQuantities] = useState({});
   const cardRef = useRef(null);
+  const navigate = useNavigate()
 
   // Find matching variant for price and stock count
   const findMatchingVariant = () => {
@@ -66,7 +67,6 @@ const ProductPurchaseCard = ({ product }) => {
   // Update selected variant details
   useEffect(() => {
     const match = findMatchingVariant();
-    console.log(findMatchingVariant())
     setMatchingVariant(match);
   }, [selectedVariant]);
 
@@ -81,7 +81,7 @@ const ProductPurchaseCard = ({ product }) => {
     setVariantQuantities((prev) => {
       const variant = product.variants.find((v) => v._id === variantId);
       const currentQty = prev[variantId] || 0;
-      const newQty = Math.max(0, Math.min(variant.stock, currentQty + change));
+      const newQty = Math.max(0, Math.min(variant.stock, currentQty + change)); // to ensure we don't buy anything more than stock available
 
       return {
         ...prev,
@@ -94,15 +94,16 @@ const ProductPurchaseCard = ({ product }) => {
     return Object.values(variantQuantities).reduce((sum, qty) => sum + qty, 0);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     // Get selected variants with quantities
     const selectedVariants = Object.entries(variantQuantities)
       .filter(([_, qty]) => qty > 0)
       .map(([variantId, qty]) => {
         const variant = product.variants.find((v) => v._id === variantId);
-        const variantDesc = Object.values(variant.attributes[0]).join(", ");
-        return { variant, qty, variantDesc };
+        const variantDescription = Object.values(variant.attributes[0]).join(", ");
+        return { variant : variant.variantId , qty, variantDescription };
       });
+
 
     if (selectedVariants.length === 0) {
       toast({
@@ -113,12 +114,28 @@ const ProductPurchaseCard = ({ product }) => {
       return;
     }
 
-    toast({
-      title: "Added to cart",
-      description: `${getTotalQuantity()} × ${product.name} (${
-        selectedVariants.length
-      } variants)`,
-    });
+    try {
+      console.log("product", product)
+      const response = await addToCartAPI({
+        productId : product.id || product._id,
+        variants : selectedVariants
+      })
+
+      toast({
+        title: "Added to cart",
+        description: `${response.data.message}`
+      });
+      
+    } catch (error) {
+      console.log(error, "error")
+      toast({
+        title: "Error",
+        description: `Error adding products to cart`,
+        variant: "destructive"
+      });
+
+    }
+    
   };
 
   const handleBuyNow = () => {
@@ -127,8 +144,8 @@ const ProductPurchaseCard = ({ product }) => {
       .filter(([_, qty]) => qty > 0)
       .map(([variantId, qty]) => {
         const variant = product.variants.find((v) => v._id === variantId);
-        const variantDesc = Object.values(variant.attributes[0]).join(", ");
-        return { variant, qty, variantDesc };
+        const variantDescription = Object.values(variant.attributes[0]).join(", ");
+        return { variant, qty, variantDescription };
       });
 
     if (selectedVariants.length === 0) {
@@ -140,12 +157,16 @@ const ProductPurchaseCard = ({ product }) => {
       return;
     }
 
+    localStorage.setItem("buyNow", JSON.stringify(selectedVariants))
+
     toast({
       title: "Proceeding to checkout",
       description: `${getTotalQuantity()} × ${product.name} (${
         selectedVariants.length
       } variants)`,
     });
+
+    navigate(`/checkout?productId=${product.id || product._id}&variants=${JSON.stringify(selectedVariants)}`)
   };
 
   // Find applicable bulk discount
