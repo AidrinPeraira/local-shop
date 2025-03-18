@@ -63,5 +63,69 @@ export const addCartItem = asyncHandler(
 
 export const getCartItems = asyncHandler(
     async (req, res) => {
+        const userId = req.user._id;
+
+        const cart = await Cart.findOne({ user: userId })
+            .populate({
+                path: 'items.product',
+                select: 'productName images variants bulkDiscount basePrice'
+            });
+
+        if (!cart) {
+            res.status(404)
+            throw new Error("Cart not found")
+        }
+
+        const processedItems = cart.items.map(item => {
+            const product = item.product;
+            
+            const processedVariants = item.variants.map(variant => {
+
+                const productVariant = product.variants.find(
+                    pv => pv.variantId === variant.variantId
+                );
+
+                const bulkDiscount = product.bulkDiscount
+                    .filter(discount => discount.minQty <= variant.quantity)
+                    .sort((a, b) => b.minQty - a.minQty)[0] || { priceDiscountPerUnit: 0 };
+
+                const basePrice = productVariant ? productVariant.basePrice : product.basePrice;
+                const unitPrice = basePrice - bulkDiscount.priceDiscountPerUnit;
+                const subtotal = unitPrice * variant.quantity;
+
+                return {
+                    variantId: variant.variantId,
+                    attributes: variant.attributes,
+                    quantity: variant.quantity,
+                    basePrice,
+                    unitPrice,
+                    discountPerUnit: bulkDiscount.priceDiscountPerUnit,
+                    bulkDiscount: product.bulkDiscount,
+                    subtotal,
+                    stock: productVariant ? productVariant.stock : product.stock,
+                    inStock: productVariant ? productVariant.inStock : product.inStock
+                };
+            });
+
+            const itemTotal = processedVariants.reduce((sum, variant) => sum + variant.subtotal, 0);
+
+            return {
+                productId: product._id,
+                productName: product.productName,
+                image: product.images[0], 
+                variants: processedVariants,
+                itemTotal
+            };
+        });
+
+        const cartTotal = processedItems.reduce((sum, item) => sum + item.itemTotal, 0);
+
+        res.status(200).json({
+            success: true,
+            cart: {
+                items: processedItems,
+                cartTotal
+            }
+        });
     }
-)
+);

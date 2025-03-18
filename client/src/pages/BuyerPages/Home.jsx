@@ -144,7 +144,6 @@ export default function Home() {
             productImages[result.categoryId] = result.image;
           }
         });
-        console.log(productImages);
         setCategoryProducts(productImages);
       } catch (error) {
         console.error("Error fetching category products:", error);
