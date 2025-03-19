@@ -89,21 +89,21 @@ WEEK 2 Project
 
 User side: 
     ☐ User profile
-        ☐ Show user details
-            ☐ Show user details including profile image and address.
-        ☐ show address, 
+        ✔ Show user details @done (3/19/2025, 2:52:17 PM)
+            ✔ Show user details including profile image and address. @done (3/19/2025, 2:52:16 PM)
+        ✔ show address, @done (3/19/2025, 2:52:13 PM)
         ☐ show orders, 
         ☐ edit profile, 
-            ☐ Implement Edit profile (edit profile and profile page should not be the same)
+            ✔ Implement Edit profile (edit profile and profile page should not be the same) @done (3/19/2025, 2:51:35 PM)
             ☐ Note : When editing email need to verify the emails via OTP or Token.
-            ☐ Implement an option to change password followed by its functionality.
+            ✔ Implement an option to change password followed by its functionality. @done (3/19/2025, 2:52:07 PM)
         ☐ cancel orders, 
-        ☐ forgot password  
+        ✔ forgot password @done (3/19/2025, 2:51:32 PM)
 
     ☐ Address Management
-        ☐ Implement Add,
-        ☐ Edit and 
-        ☐ Delete.
+        ✔ Implement Add, @done (3/19/2025, 2:51:28 PM)
+        ✔ Edit and @done (3/19/2025, 2:51:29 PM)
+        ✔ Delete. @done (3/19/2025, 2:51:29 PM)
     
     ☐ Cart management 
         ☐ Add to cart

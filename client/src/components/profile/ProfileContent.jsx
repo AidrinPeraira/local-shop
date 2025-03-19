@@ -27,7 +27,7 @@ const ProfileContent = () => {
     { id: "profile", label: "Profile Information", icon: User },
     { id: "orders", label: "My Orders", icon: ShoppingBag },
     { id: "cart", label: "My Cart", icon: ShoppingCart },
-    { id: "wishlist", label: "Wishlist", icon: Heart },
+    { id: "saved", label: "Saved Items", icon: Heart },
     { id: "addresses", label: "Addresses", icon: MapPin },
     { id: "security", label: "Change Password", icon: Lock },
   ];
@@ -41,8 +41,8 @@ const ProfileContent = () => {
       case "cart":
         navigate("/cart");
         return null;
-      case "wishlist":
-        navigate("/wishlist");
+      case "saved":
+        navigate("/saved-list");
         return null;
       case "addresses":
         return <ProfileAddress/>;

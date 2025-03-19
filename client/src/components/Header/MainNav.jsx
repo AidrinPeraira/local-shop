@@ -10,28 +10,19 @@ import { useToast } from "../hooks/use-toast";
 const MainNav = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {user} = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const { toast } = useToast();
 
   //pop up logic
   const [showCart, setShowCart] = useState(false);
-  const [showWishlist, setShowWishlist] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const cartRef = useRef();
-  const wishlistRef = useRef();
   const profileRef = useRef();
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (cartRef.current && !cartRef.current.contains(event.target)) {
-        setShowCart(false);
-      }
-      if (wishlistRef.current && !wishlistRef.current.contains(event.target)) {
-        setShowWishlist(false);
-      }
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfile(false);
       }
@@ -54,11 +45,11 @@ const MainNav = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const searchQuery = formData.get("search");
-    
+
     // Preserve existing query parameters
     const currentParams = new URLSearchParams();
-    currentParams.set('search', searchQuery);
-    
+    currentParams.set("search", searchQuery);
+
     navigate(`/shop?${currentParams.toString()}`);
   };
 
@@ -118,104 +109,35 @@ const MainNav = () => {
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
-            {/* Wishlist */}
-            <div className="relative" ref={wishlistRef}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowWishlist(!showWishlist);
-                }}
-              >
-                <Heart className="h-6 w-6" />
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
-                  0
-                </span>
-              </Button>
-              {showWishlist && (
-                <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-xl p-4 border border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-800">
-                    Wishlist
-                  </h3>
-                  {isLoggedIn ? (
-                    <>
-                      <p className="text-sm text-gray-500 mt-2">
-                        Your wishlist is empty
-                      </p>
-                      <Link
-                        to="/wishlist"
-                        className="block mt-2 text-sm text-primary hover:bg-gray-100 px-3 py-2 rounded-md transition"
-                      >
-                        View Wishlist
-                      </Link>
-                    </>
-                  ) : (
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        Login to view your wishlist
-                      </p>
-                      <button
-                        onClick={() => navigate("/login")}
-                        className="mt-2 text-sm text-primary font-semibold hover:underline flex items-center justify-center py-2 transition"
-                      >
-                        <LogIn className="w-4 h-4 mr-2" /> Sign In
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+            {/* saved-list */}
+            <div className="relative">
+              <Link to={'/saved-list'}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative"
+                  
+                >
+                  <Heart className="h-6 w-6" />
+                </Button>
+              </Link>
             </div>
 
             {/* Shopping Cart */}
-            <div className="relative" ref={cartRef}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowCart(!showCart);
-                }}
-              >
-                <ShoppingCart className="h-6 w-6" />
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
-                  0
-                </span>
-              </Button>
-              {showCart && (
-                <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-xl p-4 border border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-800">
-                    Shopping Cart
-                  </h3>
-                  {isLoggedIn ? (
-                    <>
-                      <p className="text-sm text-gray-500 mt-2">
-                        Your cart is empty
-                      </p>
-                      <Link
-                        to="/cart"
-                        className="block mt-2 text-sm text-primary hover:bg-gray-100 px-3 py-2 rounded-md transition"
-                      >
-                        View Cart
-                      </Link>
-                    </>
-                  ) : (
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        Login to view your cart
-                      </p>
-                      <button
-                        onClick={() => navigate("/login")}
-                        className="mt-2 text-sm text-primary font-semibold hover:underline flex items-center justify-center py-2 transition"
-                      >
-                        <LogIn className="w-4 h-4 mr-2" /> Sign In
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+            <div className="relative">
+              <Link to={"/cart"}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCart(!showCart);
+                  }}
+                >
+                  <ShoppingCart className="h-6 w-6" />
+                </Button>
+              </Link>
             </div>
 
             {/* Profile */}

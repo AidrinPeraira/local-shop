@@ -344,8 +344,7 @@ const CartContent = () => {
                    
                     <div className="mt-3 space-y-3">
                       {item.variants.map((variant) => {
-                        const variantPricing =
-                          getVariantPricing(variant);
+                        const variantPricing = getVariantPricing(variant);
                         return (
                           <div
                             key={variant.variantId}
@@ -355,12 +354,9 @@ const CartContent = () => {
                               <span className="text-sm text-gray-600 block">
                                 {variant.attributes}
                               </span>
-                              {variantPricing.discountPercentage > 0 && (
+                              {variantPricing?.discountPercentage > 0 && (
                                 <span className="text-xs text-green-600 mt-1 block">
-                                  {variantPricing.discountPercentage.toFixed(
-                                    0
-                                  )}
-                                  % discount applied
+                                  {variantPricing.discountPercentage.toFixed(0)}% discount applied
                                 </span>
                               )}
                             </div>
@@ -421,19 +417,14 @@ const CartContent = () => {
                             <div className="flex items-center gap-3 min-w-[100px] justify-end">
                               <div className="text-right">
                                 <span className="font-semibold block">
-                                  ₹{formatPrice(variantPricing.totalDiscountedPrice)}
+                                  ₹{formatPrice(variantPricing ? variantPricing.totalDiscountedPrice : variant.basePrice * variant.quantity)}
                                 </span>
                               </div>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8"
-                                onClick={() =>
-                                  removeVariant(
-                                    item.productId,
-                                    variant.variantId
-                                  )
-                                }
+                                onClick={() => removeVariant(item.productId, variant.variantId)}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>

@@ -20,7 +20,6 @@ import { updateUserProfile } from '../../redux/features/userSlice';
 
 // In the props
 const ProfileInfo = ({ onManageAddresses }) => {
-  const dispatch = useDispatch();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -62,6 +61,8 @@ const ProfileInfo = ({ onManageAddresses }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const dispatch = useDispatch();
+
       if (!editForm.currentPassword) {
         toast({
           title: 'Validation Error',
@@ -90,7 +91,7 @@ const ProfileInfo = ({ onManageAddresses }) => {
 
       const response = await updateUserProfileApi(user._id, editForm);
       
-      // Using dispatch from the top level
+      // Update global store with new user data
       dispatch(updateUserProfile({
         username: editForm.username,
         email: editForm.email,

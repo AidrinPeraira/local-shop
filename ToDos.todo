@@ -9,15 +9,15 @@
 ✔ need to re arrange seller registration to give it a proper structure @done (3/13/2025, 10:34:43 AM)
 ✔ how do we use the remember me function? @done (3/13/2025, 10:36:10 AM)
 ✔ lazy loading not working @done (3/2/2025, 7:12:43 PM)
-☐ make a profile page for user
-☐ small bug on nav bar pop ups - pop ups not closing on outside click
+✔ make a profile page for user @done (3/19/2025, 2:31:31 PM)
+✔ small bug on nav bar pop ups - pop ups not closing on outside click @done (3/19/2025, 2:31:29 PM)
 ✔ need to add small preview for wishlist and cart @done (2/27/2025, 6:57:32 PM)
 ✔ should we add phone number login or phone/email login @done (3/13/2025, 10:35:06 AM)
 ✔ should we make the profile and other dropdowns a seperate component? do this for normal user homwpage @done (3/13/2025, 10:36:43 AM)
 ✔ should we add a field to record the details of the user who updated the category ot other fields? @done (3/13/2025, 10:36:47 AM)
 ✔ make some components reusab @done (3/13/2025, 10:36:49 AM)
 ✔ block access to blocked users @done (3/13/2025, 10:42:18 AM)
-☐ make blocking parent category block all child category??
+✔ make blocking parent category block all child category?? @done (3/19/2025, 2:31:51 PM)
 ☐ category page edit and delte button not responsive
 ☐ how do we cache pages to optimise loding times and reduce the number of requests?
 ☐ do we cache it in the browser or where?
