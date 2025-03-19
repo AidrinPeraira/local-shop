@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import ProfileInfo from "./ProfileInfo";
 import ProfileOrders from "./ProfileOrders";
 import ProfileAddress from "./ProfileAddress";
+import ProfilePassword from "./ProfilePassword";
 
 const ProfileContent = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -45,7 +46,8 @@ const ProfileContent = () => {
         return null;
       case "addresses":
         return <ProfileAddress/>;
-      
+      case "security":
+        return <ProfilePassword/>;
       default:
         return <ProfileInfo/>;
     }

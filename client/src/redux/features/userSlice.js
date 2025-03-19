@@ -142,7 +142,12 @@ const initialState = {
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {}, //we have no reducers since we are not using the normal dispatch method
+  reducers: {
+    updateUserProfile: (state, action) => {
+      state.user = { ...state.user, ...action.payload };
+      localStorage.setItem("user", JSON.stringify(state.user));
+    }
+  },
   extraReducers: (builder) => {
     //this is where we add the async thunk reducers. we add reducers for each promise state
     builder
@@ -284,5 +289,8 @@ const userSlice = createSlice({
       
   },
 });
+
+// Export the action
+export const { updateUserProfile } = userSlice.actions;
 
 export default userSlice.reducer; //export the reducer to add a slice in the store

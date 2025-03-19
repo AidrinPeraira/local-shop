@@ -8,6 +8,9 @@ import { validateUserData } from "../utils/validateData.js";
 import { oauth2Client } from "../utils/googleConfig.js";
 import axios from "axios";
 
+
+
+//user signup sign in actions
 export const createUser = asyncHandler(async (req, res) => {
   const { username, email, password, phone } = req.body;
 
@@ -92,6 +95,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         username: existingUser.username,
         email: existingUser.email,
         role: existingUser.role,
+        joinedOn: existingUser.createdAt,
       });
 
       return;
@@ -151,7 +155,6 @@ export const googleAuthController = asyncHandler(async (req, res) => {
   });
 });
 
-//----------------
 //forgot passwrod actions
 export const checkUserExists = asyncHandler(async (req, res) => {
   const { email } = req.body;
@@ -217,8 +220,10 @@ export const resetUserPassword = asyncHandler(async (req, res) => {
 });
 
 //admin actions to manipulate user data
-
+// Deactivate user
+//activate user
 //get all users
+
 export const getAllUsers = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -298,7 +303,6 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   }
 });
 
-//activate user
 export const activateUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
@@ -323,7 +327,6 @@ export const activateUser = asyncHandler(async (req, res) => {
   });
 });
 
-// Deactivate user
 export const deactivateUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
@@ -350,8 +353,6 @@ export const deactivateUser = asyncHandler(async (req, res) => {
 
 
 //add edit and delte user address
-
-
 export const getUserAddresses = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
@@ -472,3 +473,136 @@ export const deleteUserAddress = asyncHandler(async (req, res) => {
     message: "Address deleted successfully"
   });
 });
+
+
+//show edit user profile info and change password
+export const getUserProfile = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  
+  const user = await User.findById(userId).select('-password');
+  if (!user) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("User not found");
+  }
+
+  // Get default address if exists
+  const defaultAddress = await Address.findOne({ userId, isDefault: true });
+
+  res.status(HTTP_CODES.OK).json({
+    user: {
+      ...user.toObject(),
+      defaultAddress
+    }
+  });
+});
+
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { username, email, phone, currentPassword } = req.body;
+
+  // Find user
+  const user = await User.findById(userId);
+  if (!user) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("User not found");
+  }
+
+  // Verify password
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    res.status(HTTP_CODES.UNAUTHORIZED);
+    throw new Error("Invalid password");
+  }
+
+  // Check if email is being changed and verify it's not taken
+  if (email !== user.email) {
+    const emailExists = await User.findOne({ email, _id: { $ne: userId } });
+    if (emailExists) {
+      res.status(HTTP_CODES.BAD_REQUEST);
+      throw new Error("Email already registered");
+    }
+  }
+
+  // Check if phone is being changed and verify it's not taken
+  if (phone !== user.phone) {
+    const phoneExists = await User.findOne({ phone, _id: { $ne: userId } });
+    if (phoneExists) {
+      res.status(HTTP_CODES.BAD_REQUEST);
+      throw new Error("Phone number already registered");
+    }
+  }
+
+  // Validate new data
+  const valid = validateUserData(username, email, phone, currentPassword);
+  if (valid !== true) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error(`${valid}`);
+  }
+
+  // Update user
+  user.username = username;
+  user.email = email;
+  user.phone = phone;
+  // Reset verification flags if email/phone changed
+  if (email !== user.email) user.emailVerified = false;
+  if (phone !== user.phone) user.phoneVerified = false;
+
+  await user.save();
+
+  res.status(HTTP_CODES.OK).json({
+    message: "Profile updated successfully",
+    user: {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      phone: user.phone,
+      emailVerified: user.emailVerified,
+      phoneVerified: user.phoneVerified,
+      role: user.role,
+    }
+  });
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { currentPassword, newPassword } = req.body;
+
+  // Find user
+  const user = await User.findById(userId);
+  if (!user) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("User not found");
+  }
+
+  // Verify current password
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    res.status(HTTP_CODES.UNAUTHORIZED);
+    throw new Error("Current password is incorrect");
+  }
+
+  // Validate new password
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+  if (!passwordRegex.test(newPassword)) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("Password must be at least 6 characters long and contain at least one uppercase letter, one number, and one special character");
+  }
+
+  // Check if new password is same as current
+  if (await bcrypt.compare(newPassword, user.password)) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("New password must be different from current password");
+  }
+
+  // Hash and save new password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = bcrypt.hashSync(newPassword, salt);
+  user.password = hashedPassword;
+  await user.save();
+
+  res.status(HTTP_CODES.OK).json({
+    message: "Password changed successfully"
+  });
+});
+
+

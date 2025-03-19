@@ -13,9 +13,14 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { useToast } from '../hooks/use-toast';
 import { PageLoading } from '../ui/PageLoading';
+import { getUserProfileApi, updateUserProfileApi } from '../../api/userDataApi';
+import { validateUserData } from '../../utils/validateData';
+import { useDispatch } from 'react-redux';
+import { updateUserProfile } from '../../redux/features/userSlice';
 
 // In the props
 const ProfileInfo = ({ onManageAddresses }) => {
+  const dispatch = useDispatch();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -33,39 +38,78 @@ const ProfileInfo = ({ onManageAddresses }) => {
 
   const fetchUserData = async () => {
     try {
-      // TODO: Implement API call to fetch user data
-      // For now using dummy data
-      const dummyData = {
-        username: 'John Doe',
-        email: 'john@example.com',
-        phone: '1234567890',
-        emailVerified: true,
-        phoneVerified: false,
-        role: 'buyer',
-        createdAt: '2024-01-15T10:30:00.000Z', // Add this field
-        defaultAddress: {
-          street: '123 Main St',
-          city: 'New York',
-          state: 'NY',
-          pincode: '10001',
-          isDefault: true
-        }
-      };
-      setUser(dummyData);
+      setLoading(true);
+      const response = await getUserProfileApi(user?._id);
+      const userData = response.data.user;
+      setUser(userData);
       setEditForm({
-        username: dummyData.username,
-        email: dummyData.email,
-        phone: dummyData.phone,
+        username: userData.username,
+        email: userData.email,
+        phone: userData.phone,
         currentPassword: '',
       });
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to fetch user data',
+        description: error.response?.data?.message || 'Failed to fetch user data',
         variant: 'destructive',
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (!editForm.currentPassword) {
+        toast({
+          title: 'Validation Error',
+          description: 'Please enter your current password to confirm changes',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Validate form data
+      const validationResult = validateUserData(
+        editForm.username,
+        editForm.email,
+        editForm.phone,
+        'Aa1@aaaa'
+      );
+
+      if (validationResult !== true) {
+        toast({
+          title: 'Validation Error',
+          description: validationResult,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const response = await updateUserProfileApi(user._id, editForm);
+      
+      // Using dispatch from the top level
+      dispatch(updateUserProfile({
+        username: editForm.username,
+        email: editForm.email,
+        phone: editForm.phone,
+      }));
+
+      await fetchUserData();
+      toast({
+        title: 'Success',
+        description: 'Profile updated successfully',
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to update profile',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -76,24 +120,6 @@ const ProfileInfo = ({ onManageAddresses }) => {
       month: 'long',
       day: 'numeric'
     });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // TODO: Implement API call to update user data
-      toast({
-        title: 'Success',
-        description: 'Profile updated successfully',
-      });
-      setIsEditing(false);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update profile',
-        variant: 'destructive',
-      });
-    }
   };
 
   if (loading) {

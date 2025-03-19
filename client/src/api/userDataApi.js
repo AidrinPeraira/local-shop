@@ -11,3 +11,7 @@ export const addUserAddressApi = (data) => API.post(`users/address/add`, data);
 export const editUserAddressApi = (data) => API.patch(`users/address/edit/${data.addressId}`, data);
 export const deleteUserAddressApi = (data) => API.delete(`users/address/delete/${data.addressId}`, data);
 
+//user profile actions
+export const getUserProfileApi = (userId) => API.get(`users/profile/get/${userId}`);
+export const updateUserProfileApi = (userId, data) => API.patch(`users/profile/edit/${userId}`, data);
+export const updateUserPasswordApi = (userId, data) => API.patch(`users/profile/edit-password/${userId}`, data);

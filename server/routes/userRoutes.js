@@ -12,7 +12,10 @@ import {
   getUserAddresses,
   addUserAddress,
   updateUserAddress,
-  deleteUserAddress
+  deleteUserAddress,
+  getUserProfile,
+  updateUserProfile,
+  changePassword
 } from "../controller/userController.js";
 import rateLimit from "express-rate-limit";
 import { authenticateAdmin, authenticateUser, authorizeAdmin } from "../middlewares/authMiddleware.js";
@@ -42,6 +45,11 @@ userRouter.route("/address/get").get( authenticateUser, getUserAddresses)
 userRouter.route("/address/add").post(authenticateUser, addUserAddress)
 userRouter.route("/address/edit/:id").patch(authenticateUser, updateUserAddress)
 userRouter.route("/address/delete/:id").delete(authenticateUser, deleteUserAddress)
+
+//user profile actions
+userRouter.route("/profile/get/:id").get(authenticateUser, getUserProfile)
+userRouter.route("/profile/edit/:id").patch(authenticateUser, updateUserProfile)
+userRouter.route("/profile/edit-password/:id").patch(authenticateUser, changePassword)
 
 
 //admin actions to manipulate user data
