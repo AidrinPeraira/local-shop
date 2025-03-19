@@ -8,10 +8,14 @@ import {
   activateUser,
   deactivateUser,
   checkUserExists,
-  resetUserPassword
+  resetUserPassword,
+  getUserAddresses,
+  addUserAddress,
+  updateUserAddress,
+  deleteUserAddress
 } from "../controller/userController.js";
 import rateLimit from "express-rate-limit";
-import { authenticateAdmin, authorizeAdmin } from "../middlewares/authMiddleware.js";
+import { authenticateAdmin, authenticateUser, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
 const userRouter = express.Router();
 
@@ -25,18 +29,20 @@ const apiLimiter = rateLimit({
 });
 
 userRouter.route("/register", apiLimiter).post(createUser);
-
 userRouter.route("/login", apiLimiter).post(loginUser);
-
 userRouter.route("/logout", apiLimiter).post(logoutController);
-
 userRouter.route("/google").post(googleAuthController);
 
 //forgot password routes
 userRouter.route("/forgot-password/check-user").post(checkUserExists)
 userRouter.route("/forgot-password/reset").post(resetUserPassword)
 
-//------------------------
+//address actions
+userRouter.route("/address/get").get( authenticateUser, getUserAddresses)
+userRouter.route("/address/add").post(authenticateUser, addUserAddress)
+userRouter.route("/address/edit/:id").patch(authenticateUser, updateUserAddress)
+userRouter.route("/address/delete/:id").delete(authenticateUser, deleteUserAddress)
+
 
 //admin actions to manipulate user data
 
@@ -44,5 +50,7 @@ userRouter.route("/forgot-password/reset").post(resetUserPassword)
 userRouter.route("/all").get(authenticateAdmin, authorizeAdmin, getAllUsers);
 userRouter.route("/:userId/activate").patch(authenticateAdmin, authorizeAdmin, activateUser);
 userRouter.route("/:userId/deactivate").patch(authenticateAdmin, authorizeAdmin, deactivateUser);
+
+
 
 export default userRouter;

@@ -1,5 +1,6 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import User from "../models/userModel.js";
+import Address from "../models/userAddresssModel.js";
 import generateToken from "../utils/createToken.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import bcrypt from "bcryptjs";
@@ -344,5 +345,130 @@ export const deactivateUser = asyncHandler(async (req, res) => {
       email: user.email,
       isActive: user.isActive,
     },
+  });
+});
+
+
+//add edit and delte user address
+
+
+export const getUserAddresses = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const addresses = await Address.find({ userId });
+
+  res.status(HTTP_CODES.OK).json({
+    addresses
+  });
+});
+
+export const addUserAddress = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { street, city, state, pincode, isDefault } = req.body;
+
+  // Validate required fields
+  if (!street || !city || !state || !pincode) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("All fields are required");
+  }
+
+  // If this is default address, remove default from other addresses
+  if (isDefault) {
+    await Address.updateMany(
+      { userId },
+      { $set: { isDefault: false } }
+    );
+  }
+
+  // Create new address
+  const newAddress = await Address.create({
+    userId,
+    street,
+    city,
+    state,
+    pincode,
+    isDefault
+  });
+
+  // If this is the first address, make it default
+  const addressCount = await Address.countDocuments({ userId });
+  if (addressCount === 1) {
+    newAddress.isDefault = true;
+    await newAddress.save();
+  }
+
+  res.status(HTTP_CODES.CREATED).json({
+    message: "Address added successfully",
+    address: newAddress
+  });
+});
+
+export const updateUserAddress = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const addressId = req.body.addressId;
+  const { street, city, state, pincode, isDefault } = req.body;
+
+  // Find address and verify ownership
+  const address = await Address.findOne({ _id: addressId, userId });
+  if (!address) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("Address not found");
+  }
+
+  // If setting as default, remove default from other addresses
+  if (isDefault && !address.isDefault) {
+    await Address.updateMany(
+      { userId },
+      { $set: { isDefault: false } }
+    );
+  }
+
+  // Update address
+  address.street = street || address.street;
+  address.city = city || address.city;
+  address.state = state || address.state;
+  address.pincode = pincode || address.pincode;
+  address.isDefault = isDefault || address.isDefault;
+
+  await address.save();
+
+  res.status(HTTP_CODES.OK).json({
+    message: "Address updated successfully",
+    address
+  });
+});
+
+export const deleteUserAddress = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const addressId = req.params.id;
+
+  console.log(addressId)
+  // Find address and verify ownership
+  const address = await Address.findOne({ _id: addressId, userId });
+  if (!address) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("Address not found");
+  }
+
+  // Don't allow deletion of default address
+  if (address.isDefault) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("Cannot delete default address");
+  }
+
+  await address.deleteOne();
+
+  // If this was the last address, no need to check for default
+  const remainingAddresses = await Address.countDocuments({ userId });
+  if (remainingAddresses === 1) {
+    // Make the remaining address default
+    await Address.updateOne(
+      { userId },
+      { $set: { isDefault: true } }
+    );
+  }
+
+  res.status(HTTP_CODES.OK).json({
+    message: "Address deleted successfully"
   });
 });
