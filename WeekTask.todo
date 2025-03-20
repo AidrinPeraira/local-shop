@@ -137,11 +137,11 @@ User side:
         ✔ Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS). @done (3/20/2025, 6:01:40 PM)
         ✔ Show basic details in the listing, such as status, order date, etc. @done (3/20/2025, 6:01:42 PM)
         ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
-        ☐ when canceling an order should ask for reason(optional) .
-        ☐ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory).
-        ☐ Include a detail page for each respective order.
+        ✔ when canceling an order should ask for reason(optional) . @done (3/21/2025, 12:20:20 AM)
+        ✔ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory). @done (3/21/2025, 12:20:23 AM)
+        ✔ Include a detail page for each respective order. @done (3/21/2025, 12:20:31 AM)
         ☐ Provide the option to download the invoice for each order.(pdf)
-        ☐ Implement search to find specific order
+        ✔ Implement search to find specific order @done (3/21/2025, 12:20:36 AM)
     
 Admin side : 
     ☐ Order Management
@@ -151,7 +151,7 @@ Admin side :
             ✔ detail of user , @done (3/20/2025, 10:18:33 PM)
             ✔ view button to show detailed view of order etc.. @done (3/20/2025, 10:18:36 PM)
         ✔ Implement functionality to change order Status(pending,shipped,out for delivery,delivered,cancelled) @done (3/20/2025, 10:18:38 PM)
-        ☐ Implement a functionality to verify the  return request of product
+        ✔ Implement a functionality to verify the  return request of product @done (3/21/2025, 12:20:51 AM)
         ☐ If the verification is accepted ,then return the previously paid amount by the consumer or user to the wallet.
         ✔ Implement search,sort and filter along with clear search functionality. @done (3/20/2025, 10:18:44 PM)
         ✔ Implement Pagination @done (3/20/2025, 10:18:45 PM)

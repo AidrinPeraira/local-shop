@@ -325,6 +325,46 @@ export default function SellerOrders() {
                               Phone: {order.shippingAddress.phone}
                             </p>
                           </div>
+                          
+
+                          {/* retunr reason */}
+                          {[
+                            "RETURN-REQUESTED",
+                            "RETURN-PROCESSING",
+                            "RETURNED",
+                          ].includes(order.orderStatus) && (
+                            <div className="bg-white p-4 rounded-lg shadow-sm">
+                              <h3 className="font-medium text-sm mb-2 flex items-center">
+                                <ArrowDown className="h-4 w-4 mr-2" />
+                                Return Details
+                              </h3>
+                              <div className="text-sm">
+                                {order.trackingDetails
+                                  .filter((detail) =>
+                                    [
+                                      "RETURN-REQUESTED",
+                                      "RETURN-PROCESSING",
+                                      "RETURNED",
+                                    ].includes(detail.status)
+                                  )
+                                  .map((detail, index) => (
+                                    <div key={index} className="mb-2">
+                                      <p className="text-gray-600">
+                                        {new Date(
+                                          detail.timestamp
+                                        ).toLocaleDateString()}{" "}
+                                        - {detail.status}
+                                      </p>
+                                      <p className="mt-1">
+                                        {detail.description}
+                                      </p>
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
+
+                          
 
                           {/* Order Items */}
                           <div>

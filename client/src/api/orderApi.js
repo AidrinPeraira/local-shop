@@ -9,7 +9,7 @@ export const getUserOrdersApi = (page = 1, limit = 5, sort = 'desc', search = ''
 export const cancelOrderApi = (orderId) => 
   API.patch(`/orders/cancel/${orderId}`);
 
-export const returnOrderApi = (orderId, returnReason) => API.patch(`/orders/return/${orderId}`, returnReason);
+export const returnOrderApi = (orderId, returnReason) => API.patch(`/orders/return/${orderId}`, {returnReason});
 
 
 //order apis for sellers

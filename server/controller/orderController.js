@@ -282,7 +282,7 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
 export const returnUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { orderId } = req.params;
-  const { reason } = req.body;
+  const {  returnReason : reason } = req.body;
 
   try {
     const order = await Order.findOne({
