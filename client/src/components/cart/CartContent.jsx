@@ -14,6 +14,8 @@ import { Separator } from "../../components/ui/separator";
 import { useToast } from "../../components/hooks/use-toast";
 import { getCartItemsAPI, updateCartAPI } from "../../api/cartApi";
 import { PageLoading } from "../ui/PageLoading";
+import { useDispatch } from "react-redux";
+import { setCart } from "../../redux/features/cartSlice";
 
 const CartContent = () => {
   const [cartData, setCartData] = useState(null);
@@ -21,6 +23,7 @@ const CartContent = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchCartData();
@@ -36,6 +39,7 @@ const CartContent = () => {
     try {
       const response = await getCartItemsAPI();
       if (response.data.success) {
+        dispatch(setCart(response.data.cart))
         setCartData(response.data.cart);
       } else {
         throw new Error("Failed to fetch cart data");
@@ -153,6 +157,7 @@ const CartContent = () => {
         const freshCartData = await getCartItemsAPI();
         if (freshCartData.data.success) {
           setCartData(freshCartData.data.cart);
+          dispatch(setCart(freshCartData.data.cart))
           setLocalCartData(JSON.parse(JSON.stringify(freshCartData.data.cart))); // Ensure exact copy
         }
         toast({

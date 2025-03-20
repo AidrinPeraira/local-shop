@@ -1,17 +1,23 @@
-
-import React from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
-import { Container } from '../../components/ui/container';
-import CheckoutContent from '../../components/Checkout/CheckoutContent';
+import React from "react";
+import { useLocation, Navigate } from "react-router-dom";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import { Container } from "../../components/ui/container";
+import CheckoutContent from "../../components/Checkout/CheckoutContent";
+import { useSelector } from "react-redux";
+import { useToast } from "../../components/hooks/use-toast";
 
 const Checkout = () => {
-  const location = useLocation();
+  const cart = useSelector((state) => state.cart.cart);
+  const {toast} = useToast()
   
-  // Redirect to cart if no cart data is present
-  if (!location.state?.cartData) {
-    return <Navigate to="/cart" replace />;
+  if(!cart){
+    toast({
+      title: "Cart is empty",
+      description: "Please add some items to your cart",
+      variant : "destructive"
+    })
+    return <Navigate to="/" />
   }
 
   return (
@@ -19,10 +25,7 @@ const Checkout = () => {
       <Header />
       <main className="flex-grow bg-gray-50 py-10">
         <Container>
-          <CheckoutContent 
-            cartData={location.state.cartData}
-            summary={location.state.summary}
-          />
+          <CheckoutContent />
         </Container>
       </main>
       <Footer />
