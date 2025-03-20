@@ -2,17 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
+import { useDispatch } from "react-redux";
+import { clearCart } from "../../redux/features/cartSlice";
 
 const OrderSuccess = ({ orderId }) => {
   const [countdown, setCountdown] = useState(5);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const timer = setInterval(() => {
+      
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
           navigate("/");
+          dispatch(clearCart())
           return 0;
         }
         return prev - 1;

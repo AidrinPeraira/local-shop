@@ -115,7 +115,6 @@ const ProductPurchaseCard = ({ product }) => {
     }
 
     try {
-      console.log("product", product)
       const response = await addToCartAPI({
         productId : product.id || product._id,
         variants : selectedVariants
@@ -157,7 +156,6 @@ const ProductPurchaseCard = ({ product }) => {
       return;
     }
 
-    localStorage.setItem("buyNow", JSON.stringify(selectedVariants))
 
     toast({
       title: "Proceeding to checkout",
@@ -166,7 +164,6 @@ const ProductPurchaseCard = ({ product }) => {
       } variants)`,
     });
 
-    navigate(`/checkout?productId=${product.id || product._id}&variants=${JSON.stringify(selectedVariants)}`)
   };
 
   // Find applicable bulk discount

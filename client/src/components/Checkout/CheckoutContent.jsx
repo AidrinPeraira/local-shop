@@ -110,7 +110,7 @@ const CheckoutContent = () => {
           title: "Order placed successfully!",
           description: response.data.message,
         });
-        dispatch(clearCart())
+        
         setOrderId(response.data.order.orderId);
         setOrderSuccess(true);
       } catch (error) {

@@ -4,7 +4,7 @@ import Product from "../models/productModel.js";
 import Address from "../models/userAddresssModel.js";
 import Cart from "../models/cartModel.js";
 
-export const createOrder = asyncHandler(async (req, res) => {
+export const createUserOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { cart, selectedAddressId, paymentMethod, userProfile } = req.body;
 
@@ -125,6 +125,90 @@ export const createOrder = asyncHandler(async (req, res) => {
       success: false,
       message: "Failed to create order",
       error: error.message,
+    });
+  }
+});
+
+
+export const getUserOrders = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { page = 1, limit = 5, sort = 'desc', search = '' } = req.query;
+
+  try {
+    // Build query
+    const query = {
+      user: userId,
+    };
+
+    // Add search functionality
+    if (search) {
+      query.$or = [
+        { orderId: { $regex: search, $options: 'i' } },
+        { 'items.productName': { $regex: search, $options: 'i' } },
+        { orderStatus: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    // Calculate pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Get total count for pagination
+    const total = await Order.countDocuments(query);
+
+    // Fetch orders with pagination and sorting
+    const orders = await Order.find(query)
+      .sort({ createdAt: sort === 'desc' ? -1 : 1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('items.productId', 'images productName')
+      .populate('items.seller', 'sellerName')
+      .lean();
+
+    // Format orders for frontend
+    const formattedOrders = orders.map(order => ({
+      _id: order._id,
+      orderId: order.orderId,
+      createdAt: order.createdAt,
+      orderStatus: order.orderStatus,
+      items: order.items.map(item => ({
+        _id: item._id,
+        productName: item.productName,
+        image: item.image,
+        variants: item.variants.map(variant => ({
+          variantId: variant.variantId,
+          attributes: variant.attributes,
+          quantity: variant.quantity,
+          basePrice: variant.basePrice,
+          variantTotal: variant.variantTotal
+        })),
+        productTotal: item.variants.reduce((sum, variant) => sum + variant.variantTotal, 0)
+      })),
+      summary: {
+        subtotalBeforeDiscount: order.summary.subtotalBeforeDiscount,
+        totalDiscount: order.summary.totalDiscount,
+        subtotalAfterDiscount: order.summary.subtotalAfterDiscount,
+        shippingCharge: order.summary.shippingCharge,
+        platformFee: order.summary.platformFee,
+        cartTotal: order.summary.cartTotal
+      },
+      shippingAddress: order.shippingAddress,
+      payment: order.payment,
+      trackingDetails: order.trackingDetails
+    }));
+
+    res.status(200).json({
+      success: true,
+      orders: formattedOrders,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit))
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching orders",
+      error: error.message
     });
   }
 });

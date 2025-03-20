@@ -40,7 +40,6 @@ const ProductRecommendations = ({ productId, categoryId }) => {
           ? JSON.parse(localStorage.getItem("recentProducts"))
           : [];
 
-          console.log("recentProductIds", recentProductIds);
 
         //lets use promise.all to fetch each products one by one. later make a separate function to fetch recent products
         const promises = recentProductIds

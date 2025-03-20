@@ -38,3 +38,5 @@
 ☐ varaints are not showing when trying to edit product
 ☐ need to add unit for existing products
 ☐ the otp keeps being sent when the user enters incorrecct data. button is deactivated
+
+☐ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store

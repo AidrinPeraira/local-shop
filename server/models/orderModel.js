@@ -28,7 +28,7 @@ const orderItemVariantSchema = new mongoose.Schema({
   inStock: {
     type: Boolean,
     default: true,
-  }
+  },
 });
 
 const orderItemSchema = new mongoose.Schema({
@@ -46,16 +46,18 @@ const orderItemSchema = new mongoose.Schema({
     required: true,
   },
   variants: [orderItemVariantSchema],
-  bulkDiscount: [{
-    minQty: {
-      type: Number,
-      required: true
+  bulkDiscount: [
+    {
+      minQty: {
+        type: Number,
+        required: true,
+      },
+      priceDiscountPerUnit: {
+        type: Number,
+        required: true,
+      },
     },
-    priceDiscountPerUnit: {
-      type: Number,
-      required: true
-    }
-  }],
+  ],
   productSubtotal: {
     type: Number,
     required: true,
@@ -76,7 +78,7 @@ const orderItemSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Seller",
     required: true,
-  }
+  },
 });
 
 const shippingAddressSchema = new mongoose.Schema({
@@ -99,89 +101,96 @@ const shippingAddressSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true,
-  }
+  },
 });
 
-const orderSchema = new mongoose.Schema({
-  orderId: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  items: [orderItemSchema],
-  shippingAddress: shippingAddressSchema,
-  summary: {
-    subtotalBeforeDiscount: {
-      type: Number,
-      required: true,
-    },
-    totalDiscount: {
-      type: Number,
-      required: true,
-    },
-    subtotalAfterDiscount: {
-      type: Number,
-      required: true,
-    },
-    shippingCharge: {
-      type: Number,
-      required: true,
-    },
-    platformFee: {
-      type: Number,
-      required: true,
-    },
-    cartTotal: {
-      type: Number,
-      required: true,
-    }
-  },
-  payment: {
-    method: {
+const orderSchema = new mongoose.Schema(
+  {
+    orderId: {
       type: String,
-      enum: ["ONLINE", "COD"],
+      required: true,
+      unique: true,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
-    status: {
+    items: [orderItemSchema],
+    shippingAddress: shippingAddressSchema,
+    summary: {
+      subtotalBeforeDiscount: {
+        type: Number,
+        required: true,
+      },
+      totalDiscount: {
+        type: Number,
+        required: true,
+      },
+      subtotalAfterDiscount: {
+        type: Number,
+        required: true,
+      },
+      shippingCharge: {
+        type: Number,
+        required: true,
+      },
+      platformFee: {
+        type: Number,
+        required: true,
+      },
+      cartTotal: {
+        type: Number,
+        required: true,
+      },
+    },
+    payment: {
+      method: {
+        type: String,
+        enum: ["ONLINE", "COD"],
+        required: true,
+      },
+      status: {
+        type: String,
+        enum: ["PENDING", "COMPLETED", "FAILED", "REFUNDED"],
+        default: "PENDING",
+      },
+      transactionId: String,
+      paymentProvider: String,
+      paymentDetails: {
+        orderId: String,
+        signature: String,
+        paymentId: String,
+        paymentMethod: String,
+        bank: String,
+        wallet: String,
+        timestamp: Date,
+      },
+    },
+    orderStatus: {
       type: String,
-      enum: ["PENDING", "COMPLETED", "FAILED", "REFUNDED"],
+      enum: [
+        "PENDING",
+        "PROCESSING",
+        "SHIPPED",
+        "DELIVERED",
+        "CANCELLED",
+        "RETURNED",
+        "RETURN-REQUESTED",
+        "RETURN-COMPLETED",
+      ],
       default: "PENDING",
     },
-    transactionId: String,
-    paymentProvider: String,
-    paymentDetails: {
-      orderId: String,
-      signature: String,
-      paymentId: String,
-      paymentMethod: String,
-      bank: String,
-      wallet: String,
-      timestamp: Date,
-    },
-  },
-  orderStatus: {
-    type: String,
-    enum: [
-      "PENDING",
-      "PROCESSING",
-      "SHIPPED",
-      "DELIVERED",
-      "CANCELLED",
-      "RETURNED",
+    trackingDetails: [
+      {
+        status: String,
+        location: String,
+        timestamp: Date,
+        description: String,
+      },
     ],
-    default: "PENDING",
   },
-  trackingDetails: [{
-    status: String,
-    location: String,
-    timestamp: Date,
-    description: String,
-  }],
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 export default mongoose.model("Order", orderSchema);
