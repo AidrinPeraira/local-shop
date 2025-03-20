@@ -26,7 +26,6 @@ import { getSellerProductsApi, sellerAddProductApi, sellerDeleteProductApi, sell
 import { useSelector } from 'react-redux'
 import { getAllProductsApi, blockProductApi } from "../../api/productApi";
 
-const initialProducts = []
 
 export default function AdminProductsPage() {
 
@@ -310,9 +309,9 @@ const getStockStatusBadge = (product) => {
         </Card>
 
         {/* Search */}
-        <Card className="p-4 md:col-span-2">
+        <Card className="p-4 md:col-span-2 -z-10">
           <h2 className="font-semibold mb-2">Search Products</h2>
-          <div className="relative">
+          <div className="relative ">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Search by product name or seller..."

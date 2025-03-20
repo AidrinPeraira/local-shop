@@ -92,7 +92,7 @@ User side:
         ✔ Show user details @done (3/19/2025, 2:52:17 PM)
             ✔ Show user details including profile image and address. @done (3/19/2025, 2:52:16 PM)
         ✔ show address, @done (3/19/2025, 2:52:13 PM)
-        ☐ show orders, 
+        ✔ show orders, @done (3/20/2025, 6:01:18 PM)
         ☐ edit profile, 
             ✔ Implement Edit profile (edit profile and profile page should not be the same) @done (3/19/2025, 2:51:35 PM)
             ☐ Note : When editing email need to verify the emails via OTP or Token.
@@ -117,11 +117,11 @@ User side:
         ✔ remove products from cart @done (3/18/2025, 6:59:07 PM)
 
     ☐ Checkout page
-        ☐ Display user-added addresses.
-        ☐ Provide an option to add a new address and edit existing addresses.
-        ☐ Ensure one address is selected as the default.
+        ✔ Display user-added addresses. @done (3/20/2025, 5:50:04 PM)
+        ✔ Provide an option to add a new address and edit existing addresses. @done (3/20/2025, 5:50:06 PM)
+        ✔ Ensure one address is selected as the default. @done (3/20/2025, 5:50:08 PM)
         ☐ Display products moved to checkout with:
-        ☐ Product image
+        ✔ Product image @done (3/20/2025, 6:00:53 PM)
         ☐ Quantity
         ☐ Item total (price based on quantity)
         ☐ Taxes (optional)
@@ -134,8 +134,8 @@ User side:
     
     
     ☐ Order Management
-        ☐ Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS).
-        ☐ Show basic details in the listing, such as status, order date, etc.
+        ✔ Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS). @done (3/20/2025, 6:01:40 PM)
+        ✔ Show basic details in the listing, such as status, order date, etc. @done (3/20/2025, 6:01:42 PM)
         ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
         ☐ when canceling an order should ask for reason(optional) .
         ☐ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory).

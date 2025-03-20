@@ -4,6 +4,9 @@ import Product from "../models/productModel.js";
 import Address from "../models/userAddresssModel.js";
 import Cart from "../models/cartModel.js";
 
+
+//buyer side controllers
+
 export const createUserOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { cart, selectedAddressId, paymentMethod, userProfile } = req.body;
@@ -129,7 +132,6 @@ export const createUserOrder = asyncHandler(async (req, res) => {
   }
 });
 
-
 export const getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { page = 1, limit = 5, sort = 'desc', search = '' } = req.query;
@@ -208,6 +210,150 @@ export const getUserOrders = asyncHandler(async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching orders",
+      error: error.message
+    });
+  }
+});
+
+
+//seller side controllers
+export const getSellerOrders = asyncHandler(async (req, res) => {
+  const sellerId = req.user._id;
+  const { page = 1, limit = 6, status = '', sort = 'desc', search = '' } = req.query;
+
+  try {
+    // Build base query for seller's orders
+    const query = {
+      'items.seller': sellerId
+    };
+
+    if (status) {
+      query.orderStatus = status;
+    }
+
+    if (search) {
+      query.$or = [
+        { orderId: { $regex: search, $options: 'i' } },
+        { 'items.productName': { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Calculate pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Get total count for pagination
+    const total = await Order.countDocuments(query);
+
+    // Fetch orders with pagination and sorting
+    const orders = await Order.find(query)
+      .sort({ createdAt: sort === 'desc' ? -1 : 1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('user', 'username email')
+      .lean();
+
+    // Format orders for frontend
+    const formattedOrders = orders.map(order => ({
+      _id: order._id,
+      orderId: order.orderId,
+      user: {
+        name: order.user.username,
+        email: order.user.email
+      },
+      createdAt: order.createdAt,
+      orderStatus: order.orderStatus,
+      items: order.items.filter(item => item.seller.toString() === sellerId.toString()),
+      summary: {
+        subtotalBeforeDiscount: order.summary.subtotalBeforeDiscount,
+        totalDiscount: order.summary.totalDiscount,
+        subtotalAfterDiscount: order.summary.subtotalAfterDiscount,
+        shippingCharge: order.summary.shippingCharge,
+        platformFee: order.summary.platformFee,
+        cartTotal: order.summary.cartTotal
+      },
+      shippingAddress: order.shippingAddress,
+      payment: order.payment,
+      trackingDetails: order.trackingDetails
+    }));
+
+    res.status(200).json({
+      success: true,
+      orders: formattedOrders,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit))
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching orders",
+      error: error.message
+    });
+  }
+});
+
+export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
+  const sellerId = req.user._id;
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  try {
+    // Find the order and verify seller ownership
+    const order = await Order.findOne({
+      _id: orderId,
+      'items.seller': sellerId
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found or unauthorized"
+      });
+    }
+
+    // Validate status transition
+    const validTransitions = {
+      PENDING: ['PROCESSING', 'CANCELLED'],
+      PROCESSING: ['SHIPPED', 'CANCELLED'],
+      SHIPPED: ['DELIVERED'],
+      'RETURN-REQUESTED': ['RETURNED', 'CANCELLED'],
+    };
+
+    if (validTransitions[order.orderStatus] && 
+        !validTransitions[order.orderStatus].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status transition"
+      });
+    }
+
+    // Update order status
+    order.orderStatus = status;
+    
+    // Add tracking detail
+    order.trackingDetails.push({
+      status,
+      timestamp: new Date(),
+      description: `Order ${status.toLowerCase()} by seller`
+    });
+
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Order status updated successfully",
+      order: {
+        orderId: order.orderId,
+        status: order.orderStatus,
+        trackingDetails: order.trackingDetails
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating order status",
       error: error.message
     });
   }
