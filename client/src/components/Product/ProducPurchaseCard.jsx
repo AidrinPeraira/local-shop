@@ -24,8 +24,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../components/ui/tooltip";
-import { addToCartAPI } from "../../api/cartApi";
+import { addToCartAPI, processCartItemsAPI } from "../../api/cartApi";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCart } from "../../redux/features/cartSlice";
 
 const ProductPurchaseCard = ({ product }) => {
 
@@ -36,6 +38,7 @@ const ProductPurchaseCard = ({ product }) => {
   const [variantQuantities, setVariantQuantities] = useState({});
   const cardRef = useRef(null);
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   // Find matching variant for price and stock count
   const findMatchingVariant = () => {
@@ -126,7 +129,6 @@ const ProductPurchaseCard = ({ product }) => {
       });
       
     } catch (error) {
-      console.log(error, "error")
       toast({
         title: "Error",
         description: `Error adding products to cart`,
@@ -137,15 +139,16 @@ const ProductPurchaseCard = ({ product }) => {
     
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow =async () => {
     // Get selected variants with quantities
     const selectedVariants = Object.entries(variantQuantities)
       .filter(([_, qty]) => qty > 0)
       .map(([variantId, qty]) => {
         const variant = product.variants.find((v) => v._id === variantId);
         const variantDescription = Object.values(variant.attributes[0]).join(", ");
-        return { variant, qty, variantDescription };
+        return { variant : variant.variantId , qty, variantDescription };
       });
+
 
     if (selectedVariants.length === 0) {
       toast({
@@ -156,14 +159,27 @@ const ProductPurchaseCard = ({ product }) => {
       return;
     }
 
+    try {
+      const response = await processCartItemsAPI({
+        productId : product.id || product._id,
+        variants : selectedVariants
+      })
 
-    toast({
-      title: "Proceeding to checkout",
-      description: `${getTotalQuantity()} × ${product.name} (${
-        selectedVariants.length
-      } variants)`,
-    });
 
+      dispatch(setCart(response.data.cart))
+      navigate('/checkout')
+
+      
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Error adding products to cart`,
+        variant: "destructive"
+      });
+
+    }
+    
   };
 
   // Find applicable bulk discount

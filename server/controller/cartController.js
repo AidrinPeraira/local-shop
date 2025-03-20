@@ -1,5 +1,6 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js"
 import Cart from "../models/cartModel.js"
+import Product from "../models/productModel.js";
 
 export const addCartItem = asyncHandler(
     async (req, res) => {
@@ -221,6 +222,125 @@ export const updateCart = asyncHandler(
             success: true,
             message: "Cart updated successfully",
             cart: updatedCart
+        });
+    }
+);
+
+//for processing data for the buyNow feature
+export const processCartItems = asyncHandler(
+    async (req, res) => {
+        const userId = req.user._id;
+        const { productId, variants } = req.body;
+
+        if (!productId || !variants) {
+            res.status(400);
+            throw new Error("Product ID and variants are required");
+        }
+
+        // Fetch product details first to validate
+        const product = await Product.findById(productId)
+            .select('productName images variants bulkDiscount basePrice');
+
+        if (!product) {
+            res.status(404);
+            throw new Error("Product not found");
+        }
+
+        // Create a temporary cart structure
+        let tempCart = {
+            user: userId,
+            items: [{
+                product: product,
+                variants: variants.map((variantItem) => ({
+                    variantId: variantItem.variant,
+                    attributes: variantItem.variantDescription,
+                    quantity: variantItem.qty,
+                })),
+            }]
+        };
+
+        // Process items in the same way as getCartItems
+        const processedItems = tempCart.items.map(item => {
+            const product = item.product;
+            
+            const processedVariants = item.variants.map(variant => {
+                const productVariant = product.variants.find(
+                    pv => pv.variantId === variant.variantId
+                );
+
+                const basePrice = productVariant ? productVariant.basePrice : product.basePrice;
+                const quantity = variant.quantity;
+                const variantTotal = basePrice * quantity;
+
+                return {
+                    variantId: variant.variantId,
+                    attributes: variant.attributes,
+                    quantity: quantity,
+                    basePrice,
+                    variantTotal,
+                    stock: productVariant ? productVariant.stock : product.stock,
+                    inStock: productVariant ? productVariant.inStock : product.inStock
+                };
+            });
+
+            const productTotalQuantity = processedVariants.reduce((sum, variant) => 
+                sum + variant.quantity, 0
+            );
+            const productSubtotal = processedVariants.reduce((sum, variant) => 
+                sum + variant.variantTotal, 0
+            );
+            
+            let productDiscount = 0;
+            if (product.bulkDiscount) {
+                const applicableDiscount = product.bulkDiscount.find(
+                    discount => productTotalQuantity >= discount.minQuantity
+                );
+                if (applicableDiscount) {
+                    productDiscount = (productSubtotal * applicableDiscount.discountPercentage) / 100;
+                }
+            }
+
+            return {
+                productId: product._id,
+                productName: product.productName,
+                image: product.images[0],
+                variants: processedVariants,
+                bulkDiscount: product.bulkDiscount,
+                productSubtotal,
+                productDiscount,
+                productTotal: productSubtotal - productDiscount,
+                totalQuantity: productTotalQuantity
+            };
+        });
+
+        // Calculate cart totals
+        const totalQuantity = processedItems.reduce((sum, item) => 
+            sum + item.totalQuantity, 0
+        );
+        const subtotalBeforeDiscount = processedItems.reduce((sum, item) => 
+            sum + item.productSubtotal, 0
+        );
+        const totalDiscount = processedItems.reduce((sum, item) => 
+            sum + item.productDiscount, 0
+        );
+        const shippingCharge = totalQuantity < 50 ? 500 : 0;
+        const platformFee = 30;
+
+        const cartTotal = subtotalBeforeDiscount - totalDiscount + shippingCharge + platformFee;
+
+        res.status(200).json({
+            success: true,
+            cart: {
+                items: processedItems,
+                summary: {
+                    subtotalBeforeDiscount,
+                    totalDiscount,
+                    subtotalAfterDiscount: subtotalBeforeDiscount - totalDiscount,
+                    shippingCharge,
+                    platformFee,
+                    cartTotal
+                }
+            }
         });
     }
 );
