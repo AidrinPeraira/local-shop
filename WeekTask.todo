@@ -120,17 +120,17 @@ User side:
         ✔ Display user-added addresses. @done (3/20/2025, 5:50:04 PM)
         ✔ Provide an option to add a new address and edit existing addresses. @done (3/20/2025, 5:50:06 PM)
         ✔ Ensure one address is selected as the default. @done (3/20/2025, 5:50:08 PM)
-        ☐ Display products moved to checkout with:
+        ✔ Display products moved to checkout with: @done (3/20/2025, 10:18:19 PM)
         ✔ Product image @done (3/20/2025, 6:00:53 PM)
-        ☐ Quantity
-        ☐ Item total (price based on quantity)
-        ☐ Taxes (optional)
-        ☐ Applicable discount
-        ☐ Final price summary (including taxes, discounts, and shipping)
+        ✔ Quantity @done (3/20/2025, 10:17:47 PM)
+        ✔ Item total (price based on quantity) @done (3/20/2025, 10:17:48 PM)
+        ✔ Taxes (optional) @done (3/20/2025, 10:17:49 PM)
+        ✔ Applicable discount @done (3/20/2025, 10:17:53 PM)
+        ✔ Final price summary (including taxes, discounts, and shipping) @done (3/20/2025, 10:17:55 PM)
     
-        ☐ Place order with Cash on Delivery
+        ✔ Place order with Cash on Delivery @done (3/20/2025, 10:18:21 PM)
     
-        ☐ Order successful page with thanking statement and illustration and should contain buttons to redirect user to order detail page and continue shopping page.
+        ✔ Order successful page with thanking statement and illustration and should contain buttons to redirect user to order detail page and continue shopping page. @done (3/20/2025, 10:18:24 PM)
     
     
     ☐ Order Management
@@ -145,16 +145,16 @@ User side:
     
 Admin side : 
     ☐ Order Management
-        ☐ List order in desc order by order date
-        ☐ Show basic details like  
-            ☐ orderID,date,,
-            ☐ detail of user ,
-            ☐ view button to show detailed view of order etc..
-        ☐ Implement functionality to change order Status(pending,shipped,out for delivery,delivered,cancelled)
+        ✔ List order in desc order by order date @done (3/20/2025, 10:18:30 PM)
+        ✔ Show basic details like @done (3/20/2025, 10:18:31 PM)
+            ✔ orderID,date,, @done (3/20/2025, 10:18:32 PM)
+            ✔ detail of user , @done (3/20/2025, 10:18:33 PM)
+            ✔ view button to show detailed view of order etc.. @done (3/20/2025, 10:18:36 PM)
+        ✔ Implement functionality to change order Status(pending,shipped,out for delivery,delivered,cancelled) @done (3/20/2025, 10:18:38 PM)
         ☐ Implement a functionality to verify the  return request of product
         ☐ If the verification is accepted ,then return the previously paid amount by the consumer or user to the wallet.
-        ☐ Implement search,sort and filter along with clear search functionality.
-        ☐ Implement Pagination
+        ✔ Implement search,sort and filter along with clear search functionality. @done (3/20/2025, 10:18:44 PM)
+        ✔ Implement Pagination @done (3/20/2025, 10:18:45 PM)
 
-    ☐ Inventory/Stock management.
+    ✔ Inventory/Stock management. @done (3/20/2025, 10:18:49 PM)
     

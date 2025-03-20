@@ -19,9 +19,8 @@ import {
 import { useToast } from "../../components/hooks/use-toast";
 import { getSellerOrdersApi, updateOrderStatusApi } from "../../api/orderApi";
 
-const orderStatuses = ["PROCESSING", "SHIPPED", "DELIVERED", "RETURNED" , "RETURN-PROCESSING"];
 
-const orderStatusesFilters = [
+const orderStatuses = [
   "ALL",
   "PENDING",
   "PROCESSING",
@@ -154,7 +153,7 @@ export default function SellerOrders() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {orderStatusesFilters.map((status) => (
+                {orderStatuses.map((status) => (
                   <DropdownMenuItem
                     key={status}
                     onClick={() => setSelectedStatus(status)}

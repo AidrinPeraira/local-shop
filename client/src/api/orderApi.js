@@ -7,8 +7,9 @@ export const getUserOrdersApi = (page = 1, limit = 5, sort = 'desc', search = ''
   API.get(`/orders/get?page=${page}&limit=${limit}&sort=${sort}&search=${search}`);
 
 export const cancelOrderApi = (orderId) => 
-  API.post(`/orders/${orderId}/cancel`);
+  API.patch(`/orders/cancel/${orderId}`);
 
+export const returnOrderApi = (orderId, returnReason) => API.patch(`/orders/return/${orderId}`, returnReason);
 
 
 //order apis for sellers
@@ -17,3 +18,4 @@ export const getSellerOrdersApi = (page = 1, limit = 6, status = '', sort = 'des
 
 export const updateOrderStatusApi = (orderId, status) => 
   API.patch(`/orders/status/${orderId}`, { status });
+

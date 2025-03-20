@@ -40,3 +40,7 @@
 ☐ the otp keeps being sent when the user enters incorrecct data. button is deactivated
 
 ☐ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store
+
+☐ platform fee collected from user should be deducted before showing the seller the order details.
+☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
+☐ returning order with items from multiple sellers?

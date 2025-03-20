@@ -8,7 +8,7 @@ import {
   Box,
   Users,
   ShoppingBag,
-  Computer,
+  Package,
   Store,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
@@ -51,6 +51,7 @@ export function AdminLayout() {
     { name: "Users", icon: Users, href: "/admin/users" },
     { name: "Sellers", icon: Store, href: "/admin/sellers" },
     { name: "Products", icon: ShoppingBag, href: "/admin/products" },
+    { name: "Orders", icon: Package, href: "/admin/orders" },
   ];
 
   return (

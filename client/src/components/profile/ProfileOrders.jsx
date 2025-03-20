@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { getUserOrdersApi, cancelOrderApi } from '../../api/orderApi';
+import React, { useState, useEffect } from "react";
+import { getUserOrdersApi, cancelOrderApi, returnOrderApi } from "../../api/orderApi";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../../components/ui/dialog";
+import { Textarea } from "../../components/ui/textarea";
 import {
   Accordion,
   AccordionContent,
@@ -37,7 +45,7 @@ const OrderTimeline = ({ status, trackingDetails }) => {
           <div className="flex flex-col items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                index <= currentStep ? 'bg-primary text-white' : 'bg-gray-200'
+                index <= currentStep ? "bg-primary text-white" : "bg-gray-200"
               }`}
             >
               {index === 0 && <Clock className="w-4 h-4" />}
@@ -50,7 +58,7 @@ const OrderTimeline = ({ status, trackingDetails }) => {
           {index < statusSteps.length - 1 && (
             <div
               className={`h-0.5 flex-1 ${
-                index < currentStep ? 'bg-primary' : 'bg-gray-200'
+                index < currentStep ? "bg-primary" : "bg-gray-200"
               }`}
             />
           )}
@@ -65,9 +73,13 @@ const ProfileOrders = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [sort, setSort] = useState('desc');
-  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState("desc");
+  const [search, setSearch] = useState("");
   const { toast } = useToast();
+
+  const [returnDialogOpen, setReturnDialogOpen] = useState(false);
+  const [returnReason, setReturnReason] = useState("");
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   const fetchOrders = async () => {
     try {
@@ -107,11 +119,36 @@ const ProfileOrders = () => {
     }
   };
 
+  const handleReturn = async (orderId) => {
+    try {
+      await returnOrderApi(orderId, returnReason);
+      toast({
+        title: "Success",
+        description: "Return request submitted successfully",
+      });
+      setReturnDialogOpen(false);
+      setReturnReason("");
+      setSelectedOrderId(null);
+      fetchOrders();
+    } catch (error) {
+      console.log("retunr error", error)
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to submit return request",
+        variant: "destructive",
+      });
+    }
+  };
+  const openReturnDialog = (orderId) => {
+    setSelectedOrderId(orderId);
+    setReturnDialogOpen(true);
+  };
+
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -216,7 +253,8 @@ const ProfileOrders = () => {
                     </div>
                   ))}
                 </div>
-                {order.orderStatus === "PENDING" && (
+                {(order.orderStatus === "PENDING" ||
+                  order.orderStatus === "PROCESSING") && (
                   <Button
                     variant="destructive"
                     className="mt-4"
@@ -224,6 +262,15 @@ const ProfileOrders = () => {
                   >
                     Cancel Order
                   </Button>
+                )}
+                {order.orderStatus === "DELIVERED" && (
+                <Button
+                  variant="secondary"
+                  className="mt-4"
+                  onClick={() => openReturnDialog(order._id)}
+                >
+                  Return Order
+                </Button>
                 )}
               </AccordionContent>
             </AccordionItem>
@@ -252,6 +299,43 @@ const ProfileOrders = () => {
           </Button>
         </div>
       )}
+
+      <Dialog open={returnDialogOpen} onOpenChange={setReturnDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Return Order</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <label className="text-sm font-medium mb-2 block">
+              Please provide a reason for return
+            </label>
+            <Textarea
+              placeholder="Enter return reason..."
+              value={returnReason}
+              onChange={(e) => setReturnReason(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setReturnDialogOpen(false);
+                setReturnReason("");
+                setSelectedOrderId(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleReturn(selectedOrderId)}
+              disabled={!returnReason.trim()}
+            >
+              Submit Return Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

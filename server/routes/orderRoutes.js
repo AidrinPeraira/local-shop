@@ -1,12 +1,14 @@
 import express from "express";
 import { authenticateSeller, authenticateUser, authorizeSeller } from "../middlewares/authMiddleware.js";
-import { createUserOrder, getSellerOrders, getUserOrders, sellerUpdateOrderStatus} from "../controller/orderController.js";
+import { cancelUserOrders, createUserOrder, getSellerOrders, getUserOrders, returnUserOrders, sellerUpdateOrderStatus} from "../controller/orderController.js";
 
 
 const orderRoutes = express.Router();
 
 orderRoutes.route("/create").post(authenticateUser, createUserOrder)
 orderRoutes.route("/get").get(authenticateUser, getUserOrders)
+orderRoutes.route("/cancel/:orderId").patch(authenticateUser, cancelUserOrders)
+orderRoutes.route("/return/:orderId").patch(authenticateUser, returnUserOrders)
 
 
 //seller routes
