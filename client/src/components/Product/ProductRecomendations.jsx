@@ -40,9 +40,11 @@ const ProductRecommendations = ({ productId, categoryId }) => {
           ? JSON.parse(localStorage.getItem("recentProducts"))
           : [];
 
+          console.log("recentProductIds", recentProductIds);
+
         //lets use promise.all to fetch each products one by one. later make a separate function to fetch recent products
         const promises = recentProductIds
-          .filter((id) => id !== productId)
+          .filter((id) => id !== productId && id)
           .slice(0, 10)
           .map((id) => getProductDetailsApi("slug",id));
 
@@ -62,7 +64,7 @@ const ProductRecommendations = ({ productId, categoryId }) => {
   }, [productId]);
 
   const ProductCard = ({ product }) => (
-    <Link to={`/product/${product._id}`} className="group block">
+    <Link to={`/product/slug?id=${product._id}`} className="group block">
       <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
         <img
           src={

@@ -19,6 +19,7 @@ import productRouter from './routes/productRoutes.js'
 import sellerRouter from './routes/sellerRoutes.js';
 import { errorHandler } from './middlewares/errorHandlerMiddleware.js';
 import cartRouter from './routes/cartRoutes.js'
+import orderRouter from './routes/orderRoutes.js'
 
 
 dotenv.config() //load dot env data into 'process.env' by default
@@ -102,6 +103,7 @@ app.use('/api/verify', verifyRouter)
 app.use('/api/category', categoryRouter)
 app.use('/api/products', productRouter)
 app.use('/api/cart', cartRouter)
+app.use('/api/orders', orderRouter)
 
 
 

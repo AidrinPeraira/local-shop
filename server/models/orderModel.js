@@ -20,11 +20,19 @@ const orderItemVariantSchema = new mongoose.Schema({
   variantTotal: {
     type: Number,
     required: true,
+  },
+  stock: {
+    type: Number,
+    required: true,
+  },
+  inStock: {
+    type: Boolean,
+    default: true,
   }
 });
 
 const orderItemSchema = new mongoose.Schema({
-  product: {
+  productId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
     required: true,
@@ -33,16 +41,37 @@ const orderItemSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  image: String,
+  image: {
+    type: String,
+    required: true,
+  },
   variants: [orderItemVariantSchema],
   bulkDiscount: [{
-    minQty: Number,
-    priceDiscountPerUnit: Number
+    minQty: {
+      type: Number,
+      required: true
+    },
+    priceDiscountPerUnit: {
+      type: Number,
+      required: true
+    }
   }],
-  productSubtotal: Number,
-  productDiscount: Number,
-  productTotal: Number,
-  totalQuantity: Number,
+  productSubtotal: {
+    type: Number,
+    required: true,
+  },
+  productDiscount: {
+    type: Number,
+    default: 0,
+  },
+  productTotal: {
+    type: Number,
+    required: true,
+  },
+  totalQuantity: {
+    type: Number,
+    required: true,
+  },
   seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Seller",
@@ -51,15 +80,10 @@ const orderItemSchema = new mongoose.Schema({
 });
 
 const shippingAddressSchema = new mongoose.Schema({
-  fullName: {
+  street: {
     type: String,
     required: true,
   },
-  addressLine1: {
-    type: String,
-    required: true,
-  },
-  addressLine2: String,
   city: {
     type: String,
     required: true,
@@ -75,10 +99,15 @@ const shippingAddressSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true,
-  },
+  }
 });
 
 const orderSchema = new mongoose.Schema({
+  orderId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -87,12 +116,30 @@ const orderSchema = new mongoose.Schema({
   items: [orderItemSchema],
   shippingAddress: shippingAddressSchema,
   summary: {
-    subtotalBeforeDiscount: Number,
-    totalDiscount: Number,
-    subtotalAfterDiscount: Number,
-    shippingCharge: Number,
-    platformFee: Number,
-    cartTotal: Number,
+    subtotalBeforeDiscount: {
+      type: Number,
+      required: true,
+    },
+    totalDiscount: {
+      type: Number,
+      required: true,
+    },
+    subtotalAfterDiscount: {
+      type: Number,
+      required: true,
+    },
+    shippingCharge: {
+      type: Number,
+      required: true,
+    },
+    platformFee: {
+      type: Number,
+      required: true,
+    },
+    cartTotal: {
+      type: Number,
+      required: true,
+    }
   },
   payment: {
     method: {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   Trash2,
@@ -39,7 +39,7 @@ const CartContent = () => {
     try {
       const response = await getCartItemsAPI();
       if (response.data.success) {
-        dispatch(setCart(response.data.cart))
+        dispatch(setCart(response.data.cart));
         setCartData(response.data.cart);
       } else {
         throw new Error("Failed to fetch cart data");
@@ -142,8 +142,8 @@ const CartContent = () => {
 
   const updateCart = async () => {
     try {
-      const updates = localCartData.items.flatMap(item =>
-        item.variants.map(variant => ({
+      const updates = localCartData.items.flatMap((item) =>
+        item.variants.map((variant) => ({
           productId: item.productId,
           variantId: variant.variantId,
           quantity: variant.quantity,
@@ -152,12 +152,12 @@ const CartContent = () => {
       );
 
       const response = await updateCartAPI({ variants: updates });
-      
+
       if (response.data.success) {
         const freshCartData = await getCartItemsAPI();
         if (freshCartData.data.success) {
           setCartData(freshCartData.data.cart);
-          dispatch(setCart(freshCartData.data.cart))
+          dispatch(setCart(freshCartData.data.cart));
           setLocalCartData(JSON.parse(JSON.stringify(freshCartData.data.cart))); // Ensure exact copy
         }
         toast({
@@ -177,41 +177,57 @@ const CartContent = () => {
   };
 
   const removeVariant = (productId, variantId) => {
-    setLocalCartData(prevData => {
+    setLocalCartData((prevData) => {
       const newData = JSON.parse(JSON.stringify(prevData));
-      
+
       // Find the product
-      const productIndex = newData.items.findIndex(item => item.productId === productId);
+      const productIndex = newData.items.findIndex(
+        (item) => item.productId === productId
+      );
       if (productIndex === -1) return prevData;
-      
+
       const product = newData.items[productIndex];
-      
+
       // Remove the variant
-      product.variants = product.variants.filter(v => v.variantId !== variantId);
-      
+      product.variants = product.variants.filter(
+        (v) => v.variantId !== variantId
+      );
+
       // If no variants left, remove the entire product
       if (product.variants.length === 0) {
-        newData.items = newData.items.filter(item => item.productId !== productId);
+        newData.items = newData.items.filter(
+          (item) => item.productId !== productId
+        );
       } else {
         // Update product totals
-        product.totalQuantity = product.variants.reduce((sum, v) => sum + v.quantity, 0);
-        product.productSubtotal = product.variants.reduce((sum, v) => sum + v.variantTotal, 0);
-        
+        product.totalQuantity = product.variants.reduce(
+          (sum, v) => sum + v.quantity,
+          0
+        );
+        product.productSubtotal = product.variants.reduce(
+          (sum, v) => sum + v.variantTotal,
+          0
+        );
+
         // Recalculate bulk discount if applicable
         if (product.bulkDiscount && product.bulkDiscount.length > 0) {
           const applicableDiscount = product.bulkDiscount
-            .filter(discount => product.totalQuantity >= discount.minQty)
+            .filter((discount) => product.totalQuantity >= discount.minQty)
             .sort((a, b) => b.minQty - a.minQty)[0];
-          
-          const discountPerUnit = applicableDiscount ? applicableDiscount.priceDiscountPerUnit : 0;
-          product.productDiscount = discountPerUnit > 0 ? product.totalQuantity * discountPerUnit : 0;
-          product.productTotal = product.productSubtotal - product.productDiscount;
+
+          const discountPerUnit = applicableDiscount
+            ? applicableDiscount.priceDiscountPerUnit
+            : 0;
+          product.productDiscount =
+            discountPerUnit > 0 ? product.totalQuantity * discountPerUnit : 0;
+          product.productTotal =
+            product.productSubtotal - product.productDiscount;
         } else {
           product.productDiscount = 0;
           product.productTotal = product.productSubtotal;
         }
       }
-      
+
       // Update cart summary
       newData.summary.subtotalBeforeDiscount = newData.items.reduce(
         (sum, item) => sum + item.productSubtotal,
@@ -221,13 +237,13 @@ const CartContent = () => {
         (sum, item) => sum + item.productDiscount,
         0
       );
-      newData.summary.subtotalAfterDiscount = 
+      newData.summary.subtotalAfterDiscount =
         newData.summary.subtotalBeforeDiscount - newData.summary.totalDiscount;
       newData.summary.cartTotal =
         newData.summary.subtotalAfterDiscount +
         newData.summary.shippingCharge +
         newData.summary.platformFee;
-      
+
       return newData;
     });
   };
@@ -254,11 +270,14 @@ const CartContent = () => {
       .filter((discount) => totalQuantity >= discount.minQty)
       .sort((a, b) => b.minQty - a.minQty)[0];
 
-
     if (!applicableDiscount) return null;
 
-    const discountPercentage = applicableDiscount.priceDiscountPerUnit
-    const totalDiscountPrice = variant.basePrice * variant.quantity * applicableDiscount.priceDiscountPerUnit /100;
+    const discountPercentage = applicableDiscount.priceDiscountPerUnit;
+    const totalDiscountPrice =
+      (variant.basePrice *
+        variant.quantity *
+        applicableDiscount.priceDiscountPerUnit) /
+      100;
     const totalPrice = variant.basePrice * variant.quantity;
     const totalDiscountedPrice = totalPrice - totalDiscountPrice;
 
@@ -327,26 +346,30 @@ const CartContent = () => {
               return (
                 <Card key={item.productId} className="overflow-hidden">
                   <CardContent className="p-4">
-                    <div className="flex gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.productName}
-                        className="w-24 h-24 object-cover rounded bg-gray-100"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{item.productName}</h3>
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-sm text-gray-600">
-                            Price: ₹{formatPrice(item.variants[0].basePrice)}
-                          </span>
-                          <span className="text-sm text-gray-600">
-                            Total Qty: {item.totalQuantity}
-                          </span>
+                    <Link
+                      to={`/product?id=${item.productId}`}
+                      className="group block"
+                    >
+                      <div className="flex gap-4">
+                        <img
+                          src={item.image}
+                          alt={item.productName}
+                          className="w-24 h-24 object-cover rounded bg-gray-100"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-semibold">{item.productName}</h3>
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="text-sm text-gray-600">
+                              Price: ₹{formatPrice(item.variants[0].basePrice)}
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              Total Qty: {item.totalQuantity}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
 
-                   
                     <div className="mt-3 space-y-3">
                       {item.variants.map((variant) => {
                         const variantPricing = getVariantPricing(variant);
@@ -361,7 +384,8 @@ const CartContent = () => {
                               </span>
                               {variantPricing?.discountPercentage > 0 && (
                                 <span className="text-xs text-green-600 mt-1 block">
-                                  {variantPricing.discountPercentage.toFixed(0)}% discount applied
+                                  {variantPricing.discountPercentage.toFixed(0)}
+                                  % discount applied
                                 </span>
                               )}
                             </div>
@@ -422,14 +446,24 @@ const CartContent = () => {
                             <div className="flex items-center gap-3 min-w-[100px] justify-end">
                               <div className="text-right">
                                 <span className="font-semibold block">
-                                  ₹{formatPrice(variantPricing ? variantPricing.totalDiscountedPrice : variant.basePrice * variant.quantity)}
+                                  ₹
+                                  {formatPrice(
+                                    variantPricing
+                                      ? variantPricing.totalDiscountedPrice
+                                      : variant.basePrice * variant.quantity
+                                  )}
                                 </span>
                               </div>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8"
-                                onClick={() => removeVariant(item.productId, variant.variantId)}
+                                onClick={() =>
+                                  removeVariant(
+                                    item.productId,
+                                    variant.variantId
+                                  )
+                                }
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -438,7 +472,6 @@ const CartContent = () => {
                         );
                       })}
                     </div>
-                   
                   </CardContent>
                 </Card>
               );
@@ -500,7 +533,10 @@ const CartContent = () => {
                   onClick={() => navigate("/checkout")}
                   disabled={hasUnsavedChanges()}
                 >
-                  {hasUnsavedChanges() ? "Save changes before checkout" : "Checkout"} <ArrowRight className="h-4 w-4" />
+                  {hasUnsavedChanges()
+                    ? "Save changes before checkout"
+                    : "Checkout"}{" "}
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </CardFooter>
             </Card>

@@ -17,8 +17,11 @@ import {
   Lock,
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserProfileApi, getUserAddressesApi } from "../../api/userDataApi";
+import { createOrderApi } from "../../api/orderApi";
+import OrderSuccess from "./OrderSuccess";
+import { clearCart } from "../../redux/features/cartSlice";
 
 const CheckoutContent = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -27,6 +30,7 @@ const CheckoutContent = () => {
   const navigate = useNavigate();
   const cart = useSelector((state) => state.cart.cart);
   const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
 
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -76,15 +80,47 @@ const CheckoutContent = () => {
     fetchAddresses();
   }, []);
 
-  const handleSubmit = (e) => {
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, would process payment and create order
-    toast({
-      title: "Order placed successfully!",
-      description: "Thank you for your purchase.",
-    });
-    navigate("/profile/orders");
-  };
+  
+    if (!selectedAddressId) {
+      toast({
+        title: "Error",
+        description: "Please select a shipping address",
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    try {
+      const orderData = {
+        cart,
+        selectedAddressId,
+        paymentMethod,
+        userProfile
+      };
+  
+      const response = await createOrderApi(orderData);
+  
+
+        toast({
+          title: "Order placed successfully!",
+          description: response.data.message,
+        });
+        dispatch(clearCart())
+        setOrderId(response.data.order.orderId);
+        setOrderSuccess(true);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error.response.data.message || "Failed to place order",
+          variant: "destructive",
+        });
+      }
+    };
 
   const formatPrice = (price) => {
     const priceStr = price.toFixed(2);
@@ -341,7 +377,10 @@ const CheckoutContent = () => {
           </div>
         </div>
       </form>
+
+      {orderSuccess && <OrderSuccess orderId={orderId} />}
     </div>
+    
   );
 };
 
