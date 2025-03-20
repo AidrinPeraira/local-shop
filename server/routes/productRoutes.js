@@ -5,7 +5,7 @@ import {
   authorizeAdmin,
   authorizeSeller,
 } from "../middlewares/authMiddleware.js";
-import { addProduct, deleteProduct, editProduct, getProductDetails, getSellerProducts, getShopProducts } from "../controller/productController.js";
+import { addProduct, blockProduct, deleteProduct, editProduct, getAllProducts, getProductDetails, getSellerProducts, getShopProducts } from "../controller/productController.js";
 import { upload } from "../middlewares/multer.js";
 
 const productRoute = express.Router();
@@ -28,9 +28,14 @@ productRoute
   .delete(authenticateSeller, authorizeSeller, deleteProduct)
 
 
-  productRoute
+productRoute
   .route("/block/:id")
-  .post(authenticateAdmin, authorizeAdmin, deleteProduct)
+  .patch(authenticateAdmin, authorizeAdmin, blockProduct)
+  
+
+productRoute
+ .route("/all")
+ .get(authenticateAdmin, authorizeAdmin, getAllProducts)
 
 productRoute
   .route("/:slug/:id")

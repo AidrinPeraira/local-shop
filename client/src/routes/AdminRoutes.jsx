@@ -30,7 +30,7 @@ const AdminRoutes = () => {
           <Route path="users" element={<AdminUsers />} />
           <Route path="sellers" element={<AdminSellers />} />
           <Route path="categories" element={<Categories />} />
-          {/* <Route path="products" element={<AdminProductsPage />} /> */}
+          <Route path="products" element={<AdminProductsPage />} />
           <Route path="*" element={<AdminNotFound />} />
         </Route>
       </Route>

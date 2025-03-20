@@ -24,7 +24,7 @@ import { useToast } from "../../components/hooks/use-toast";
 import ProductDialogs from "../../components/Product/ProductDialog";
 import { getSellerProductsApi, sellerAddProductApi, sellerDeleteProductApi, sellerEditProductApi } from "../../api/productApi";
 import { useSelector } from 'react-redux'
-import { useOutletContext } from "react-router-dom";
+import { getAllProductsApi, blockProductApi } from "../../api/productApi";
 
 const initialProducts = []
 
@@ -41,19 +41,44 @@ export default function AdminProductsPage() {
     
   const {categories} = useSelector(store => store.categories)
   
-  const fetchSellerProducts = async () => {
+  const fetchAllProducts = async () => {
     try {
-      const response = await getSellerProductsApi();
+      const response = await getAllProductsApi();
       setProducts(response.data.products);
     } catch (error) {
-      console.error("Error fetching seller products", error);
+      console.error("Error fetching products", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch products",
+        variant: "destructive"
+      });
     }
   };
 
   useEffect(() => {
-    
-    fetchSellerProducts();
+    fetchAllProducts();
   }, []);
+
+  const handleBlockProduct = async (id, isCurrentlyBlocked) => {
+    try {
+      const response = await blockProductApi(id, !isCurrentlyBlocked);
+      if(response.data) {
+        toast({
+          title: "Success",
+          description: `Product ${!isCurrentlyBlocked ? 'blocked' : 'unblocked'} successfully!`,
+          variant: 'default'
+        });
+        fetchAllProducts();
+      }
+    } catch (error) {
+      console.log("Error handling block product: ", error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to update product status",
+        variant: 'destructive'
+      });
+    }
+  };
 
   // Toggle accordion state
   const toggleAccordion = (productId) => {
@@ -72,12 +97,16 @@ export default function AdminProductsPage() {
     if (selectedStatus === "active" && !product.isActive ) return false;
     if (selectedStatus === "inactive" && product.isActive ) return false;
     if (selectedStatus !== "deleted" && product.isBlocked) return false;
-
+  
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      return product.productName.toLowerCase().includes(query);
+      return (
+        product.productName.toLowerCase().includes(query) ||
+        product.seller?.sellerName?.toLowerCase().includes(query) ||
+        product.seller?.email?.toLowerCase().includes(query)
+      );
     }
-
+  
     return true;
   });
 
@@ -179,9 +208,10 @@ export default function AdminProductsPage() {
     setIsDialogOpen(true);
   };
   
-  // too many nested if in div is moved here to make the badge for status
-  const getStockStatusBadge = (product) => {
-    if (!product.isActive) {
+const getStockStatusBadge = (product) => {
+    if (product.isBlocked) {
+      return <Badge variant="destructive">Blocked</Badge>;
+    } else if (!product.isActive) {
       return <Badge variant="outline" className="bg-gray-200 text-gray-700">Inactive</Badge>;
     } else if (!product.inStock) {
       return <Badge variant="destructive">Out of Stock</Badge>;
@@ -191,21 +221,12 @@ export default function AdminProductsPage() {
       return <Badge variant="success" className="bg-green-500">In Stock</Badge>;
     }
   };
-
   // Format price from cents to dollars
  
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">My Products</h1>
-        <Button 
-          className="bg-primary text-white" 
-          onClick={() => handleOpenDialog('create')}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add New Product
-        </Button>
-      </div>
+
 
       <div className="grid gap-4 md:grid-cols-4">
         {/* Sort By Filter */}
@@ -294,7 +315,7 @@ export default function AdminProductsPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search by product name..."
+              placeholder="Search by product name or seller..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -313,7 +334,6 @@ export default function AdminProductsPage() {
                 <th className="text-left p-3">Image</th>
                 <th className="text-left p-3">Product Name</th>
                 <th className="text-left p-3">Price</th>
-                <th className="text-left p-3">Stock</th>
                 <th className="text-left p-3">Status</th>
                 <th className="text-right p-3">Actions</th>
               </tr>
@@ -356,44 +376,55 @@ export default function AdminProductsPage() {
                         )}
                       </td>
                       <td className="p-3">{product.productName}</td>
+                      <td className="p-3">{product.seller?.sellerName || 'Unknown Seller'}</td>
                       <td className="p-3">₹{product.basePrice}</td>
-                      <td className="p-3">{product.stock}</td>
                       <td className="p-3">{getStockStatusBadge(product)}</td>
                       <td className="p-3 text-right space-x-2 whitespace-nowrap">
-                        <Button
-                         variant="ghost"
-                          size="sm"
-                          onClick={() => handleOpenDialog("edit", product)}
-                        >
-                          <Edit className="h-4 w-4 mr-1" /> Edit
-                        </Button>
-                        {product.isActive ? (
-                          <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-600 border-red-600"
-                          onClick={() => handleDeleteProduct(product._id)}
-                        >
-                          <Trash className="h-4 w-4 mr-1" /> Delete
-                        </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-green-600 border-green-600"
-                            onClick={() => handleRestoreProduct(product._id)}
-                          >
-                            <Eye className="h-4 w-4 mr-1" /> Restore
-                          </Button>
-                          
-                        )}
-                      </td>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => handleOpenDialog("edit", product)}
+      >
+        <Edit className="h-4 w-4 mr-1" /> Edit
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        className={product.isBlocked ? "text-green-600 border-green-600" : "text-red-600 border-red-600"}
+        onClick={() => handleBlockProduct(product._id, product.isBlocked)}
+      >
+        {product.isBlocked ? (
+          <Eye className="h-4 w-4 mr-1" />
+        ) : (
+          <Trash className="h-4 w-4 mr-1" />
+        )}
+        {product.isBlocked ? "Unblock" : "Block"}
+      </Button>
+    </td>
                     </tr>
                     {/* Variants Accordion Content */}
                     {expandedProducts.includes(product._id) && product.variants && (
                       <tr>
                         <td colSpan={8} className="p-0 border-b">
                           <div className="bg-gray-50 p-4">
+                            {/* Seller Details Section */}
+                            <div className="mb-4">
+                              <h3 className="font-medium text-sm mb-3">Seller Information</h3>
+                              <div className="bg-white p-3 rounded-lg shadow-sm">
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div>
+                                    <p className="text-sm text-gray-500">Name</p>
+                                    <p className="font-medium">{product.seller?.sellerName || 'N/A'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-gray-500">Email</p>
+                                    <p className="font-medium">{product.seller?.email || 'N/A'}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Existing Variants Section */}
                             <h3 className="font-medium text-sm mb-3">Variants</h3>
                             
                             {/* info about the vaiants */}

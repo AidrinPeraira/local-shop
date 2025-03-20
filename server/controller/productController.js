@@ -466,3 +466,35 @@ export const getProductDetails = asyncHandler(async (req, res) => {
     product: transformedProduct
   });
 });
+
+export const getAllProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find()
+    .populate('seller', 'sellerName email')
+    .select("-createdAt -updatedAt");
+
+  res.status(HTTP_CODES.OK).json({
+    success: true,
+    count: products.length,
+    products: products,
+  });
+});
+
+export const blockProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { isBlocked } = req.body;
+
+  const product = await Product.findById(id);
+  
+  if (!product) {
+    res.status(HTTP_CODES.NOT_FOUND);
+    throw new Error("Product not found");
+  }
+
+  product.isBlocked = isBlocked;
+  await product.save();
+
+  res.status(HTTP_CODES.OK).json({
+    success: true,
+    message: `Product ${isBlocked ? 'blocked' : 'unblocked'} successfully`,
+  });
+});
