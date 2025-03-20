@@ -328,6 +328,7 @@ const CheckoutContent = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
+            {/* Order Summary Card */}
             <Card>
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
@@ -373,6 +374,42 @@ const CheckoutContent = () => {
                   Place Order
                 </Button>
               </CardFooter>
+            </Card>
+
+            {/* Add the new Order Items Summary card */}
+            <Card className="mt-4">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Order Items</h3>
+                <div className="space-y-4">
+                  {cart.items.map((item) => (
+                    <div key={item.productId} className="flex items-center space-x-4">
+                      <img
+                        src={item.image}
+                        alt={item.productName}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-medium">{item.productName}</h4>
+                        <div className="text-sm text-gray-500">
+                          {item.variants.map((variant) => (
+                            <div key={variant.variantId}>
+                              {variant.attributes} × {variant.quantity}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium">₹{formatPrice(item.productTotal)}</div>
+                        {item.productDiscount > 0 && (
+                          <div className="text-sm text-green-600">
+                            Save ₹{formatPrice(item.productDiscount)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
             </Card>
           </div>
         </div>

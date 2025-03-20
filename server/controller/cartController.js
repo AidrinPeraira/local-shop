@@ -270,13 +270,28 @@ export const processCartItems = asyncHandler(
 
                 const basePrice = productVariant ? productVariant.basePrice : product.basePrice;
                 const quantity = variant.quantity;
-                const variantTotal = basePrice * quantity;
+                
+                // Calculate applicable discount for this variant quantity
+                let variantDiscount = 0;
+                if (product.bulkDiscount) {
+                    const applicableDiscount = product.bulkDiscount.find(
+                        discount => quantity >= discount.minQty
+                    );
+                    if (applicableDiscount) {
+                        variantDiscount = (basePrice * applicableDiscount.priceDiscountPerUnit) / 100;
+                    }
+                }
+
+                const discountedPrice = basePrice - variantDiscount;
+                const variantTotal = discountedPrice * quantity;
 
                 return {
                     variantId: variant.variantId,
                     attributes: variant.attributes,
                     quantity: quantity,
                     basePrice,
+                    discountedPrice,
+                    variantDiscount,
                     variantTotal,
                     stock: productVariant ? productVariant.stock : product.stock,
                     inStock: productVariant ? productVariant.inStock : product.inStock
@@ -287,18 +302,11 @@ export const processCartItems = asyncHandler(
                 sum + variant.quantity, 0
             );
             const productSubtotal = processedVariants.reduce((sum, variant) => 
-                sum + variant.variantTotal, 0
+                sum + (variant.basePrice * variant.quantity), 0
             );
-            
-            let productDiscount = 0;
-            if (product.bulkDiscount) {
-                const applicableDiscount = product.bulkDiscount.find(
-                    discount => productTotalQuantity >= discount.minQuantity
-                );
-                if (applicableDiscount) {
-                    productDiscount = (productSubtotal * applicableDiscount.discountPercentage) / 100;
-                }
-            }
+            const productDiscount = processedVariants.reduce((sum, variant) => 
+                sum + (variant.variantDiscount * variant.quantity), 0
+            );
 
             return {
                 productId: product._id,

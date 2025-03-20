@@ -15,7 +15,7 @@ import { useToast } from "../../components/hooks/use-toast";
 import { getCartItemsAPI, updateCartAPI } from "../../api/cartApi";
 import { PageLoading } from "../ui/PageLoading";
 import { useDispatch } from "react-redux";
-import { setCart } from "../../redux/features/cartSlice";
+import { clearCart, setCart } from "../../redux/features/cartSlice";
 
 const CartContent = () => {
   const [cartData, setCartData] = useState(null);
@@ -26,6 +26,7 @@ const CartContent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(clearCart())
     fetchCartData();
   }, []);
 

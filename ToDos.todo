@@ -44,3 +44,4 @@
 ☐ platform fee collected from user should be deducted before showing the seller the order details.
 ☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
 ☐ returning order with items from multiple sellers?
+☐ buy now feature not updating the discounts
