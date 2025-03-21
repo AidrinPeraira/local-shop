@@ -19,6 +19,7 @@ import {
   Plus,
   Search,
   Trash,
+  ArrowDown
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
 import ProductDialogs from "../../components/Product/ProductDialog";

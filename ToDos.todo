@@ -1,10 +1,10 @@
 ✔ Add querry params when navigating to the shop and product page @done (3/13/2025, 10:34:07 AM)
-☐ make the dashboard side nav autoclose for responsiveness
+✘ make the dashboard side nav autoclose for responsiveness @cancelled (3/21/2025, 12:02:25 PM)
 ✘ after verifying email. set the verification status to global state in redux @cancelled (2/21/2025, 4:05:22 PM)
 ✔ add a count for the number of invalid otp attempts @done (3/13/2025, 10:34:23 AM)
 ✔ check if otp doc is being deleted form mongodb collection @done (2/21/2025, 4:05:07 PM)
-☐ check if timer is clearing otp
-☐ add cart and wishlist to global state on signup or login
+✘ check if timer is clearing otp @cancelled (3/21/2025, 12:02:30 PM)
+✘ add cart and wishlist to global state on signup or login @cancelled (3/21/2025, 12:05:34 PM)
 ✔ when buyer registers there is a small delay before showing the model for email verification @done (3/13/2025, 10:34:35 AM)
 ✔ need to re arrange seller registration to give it a proper structure @done (3/13/2025, 10:34:43 AM)
 ✔ how do we use the remember me function? @done (3/13/2025, 10:36:10 AM)
@@ -18,30 +18,290 @@
 ✔ make some components reusab @done (3/13/2025, 10:36:49 AM)
 ✔ block access to blocked users @done (3/13/2025, 10:42:18 AM)
 ✔ make blocking parent category block all child category?? @done (3/19/2025, 2:31:51 PM)
-☐ category page edit and delte button not responsive
-☐ how do we cache pages to optimise loding times and reduce the number of requests?
-☐ do we cache it in the browser or where?
-☐ should we do pagination form backend or front end when using react
-☐ how do i verify the varients submitted by the user
+✔ category page edit and delte button not responsive @done (3/21/2025, 12:05:44 PM)
+✘ how do we cache pages to optimise loding times and reduce the number of requests? @cancelled (3/21/2025, 12:05:53 PM)
+✘ do we cache it in the browser or where? @cancelled (3/21/2025, 12:05:57 PM)
+✔ should we do pagination form backend or front end when using react @done (3/21/2025, 12:06:03 PM)
+✘ how do i verify the varients submitted by the user @cancelled (3/21/2025, 12:06:08 PM)
 ✔ back to ligin restriction @done (3/13/2025, 10:33:56 AM)
-☐ add use memo for pages
+✘ add use memo for pages @cancelled (3/21/2025, 12:06:23 PM)
 ☐ check for bugs in delete / deactivate category by admin
 ✔ add rensend otp function and email @done (3/13/2025, 10:42:42 AM)
 ☐ add pagination from backend for categories
 ✔ the logout is causing a rendering bug when logging out from admin and seller dash. Check for other pages also @done (3/13/2025, 10:42:51 AM)
-☐ the prevent accessing page causees a bug, after loggin in as seller try changing the path to try and acess the login page and then logging out
-☐ PRON??
+✔ the prevent accessing page causees a bug, after loggin in as seller try changing the path to try and acess the login page and then logging out @done (3/21/2025, 12:07:24 PM)
+✘ PRON?? @cancelled (3/21/2025, 12:07:29 PM)
 ✘ can we use querryClient from tanstack query or something else to reduce api calls @cancelled (3/13/2025, 10:43:22 AM)
 
 
-☐ blocled category???
+☐ blocked category???
 ☐ varaints are not showing when trying to edit product
 ☐ need to add unit for existing products
 ☐ the otp keeps being sent when the user enters incorrecct data. button is deactivated
-
 ☐ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store
-
 ☐ platform fee collected from user should be deducted before showing the seller the order details.
 ☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
 ☐ returning order with items from multiple sellers?
 ☐ buy now feature not updating the discounts
+
+
+Assigned Pendings:
+    ✔ Proper homepage for regular customers @done (3/15/2025, 11:16:31 AM)
+    ✔ Product search bug @done (3/14/2025, 12:27:12 PM)
+    ✔ Variant management - user side @done (3/21/2025, 9:06:19 AM)
+    ☐ Image crop
+    ☐ Seller - product pagination
+    ✔ Admin - product management @done (3/21/2025, 9:06:23 AM)
+    ✔ add to cart buy now on homepage @done (3/14/2025, 12:46:07 PM)
+    ☐ add image crop
+    ✔ buy now and add to cart button @done (3/21/2025, 9:07:16 AM)
+    ☐ login seller from sign in page link
+    ☐ same categoryi seller reg
+    ☐ checked blocked status
+    ☐ not loggedd in error
+    ☐ ADD ADRESS AT CHECKOUT
+    ☐ SHOW MORE DETAILED ORDERS PAGE DATE ADRESS ETC
+
+    ☐ Give choose option in signing for seller and buyer
+    ☐ Seller signup validation - recheck
+    ☐ Same cat can be added multiple times in signup
+    ☐ Blocking users and sellers
+    ☐ Add category not working
+    ☐ Pagination handle in backend
+    ☐ Add to cart not working - add error message like login to add product to cart
+    ☐ Give option to add addres from checkout
+    ☐ Order details need more info
+    ☐ Order return handle by diff sellers
+    ☐ Search cap letters are not taking
+    ☐ Admin order list shows error
+    ☐ Listing of order in admin side not done
+
+Admin side :
+✔ Admin sign in @done (3/10/2025, 4:02:41 PM)
+✔ User management. @done (3/10/2025, 10:54:39 PM)
+    ✔ Implement block and unblock user (should ask for confirmation before the action) @done (3/10/2025, 10:54:19 PM)
+    ✔ Implement search along with cancel or clear button to reset the results (should be done from backend) @done (3/10/2025, 10:54:26 PM)
+    ✔ Implement Pagination (should be done from backend) @done (3/10/2025, 10:54:30 PM)
+    ✔ Table should be in sorted in descending order (latest data should be at first) @done (3/10/2025, 10:54:33 PM)
+✔ Category management @done (3/10/2025, 10:54:47 PM)
+    ✔ Implement Add,Edit and Delete (soft delete) @done (3/2/2025, 4:03:00 PM)
+    ✔ Implement search along with cancel or clear button to reset the results (should be done from backend). @done (3/2/2025, 4:03:05 PM)
+    ✔ Pagination  (should be done from backend). @done (3/10/2025, 12:52:28 PM) 
+        //too little categories since main categories are few others are nested
+    ✔ Table should be in sorted in descending order (latest data should be at first) @done (3/2/2025, 4:03:13 PM)
+✔ Product management @done (3/6/2025, 3:14:27 PM)
+    ✔ Implement Add,Edit and Delete(Soft Delete) products. @done (3/6/2025, 3:13:34 PM)
+        //Delte is done by setting status as inactive. admin need to set isblocked status
+    ✔ Product must have multiple images and should be uploaded using a single file field (Minimum 3 Images) @done (3/6/2025, 3:13:38 PM)
+        //set min lenght of array as 3
+    ✔ Images should be cropped and resized properly before upload. @done (3/6/2025, 3:13:43 PM)
+        //image cropping done by cloudnary settingsd in multer
+
+User side :
+☐ Home page
+    ✔ Users sign up & login with validation. @done (3/2/2025, 4:03:37 PM)
+    ✔ Sign up using OTP with OTP timer and Resend Otp @done (3/10/2025, 4:02:57 PM)
+    ✔ Login or signup with single sign on (google , facebook …) @done (3/10/2025, 4:02:53 PM)
+    ✔ Implement forgot password. @done (3/14/2025, 12:24:13 PM)
+    ✔ List products on the user side. @done (3/10/2025, 12:54:16 PM)
+    ✔ Implement Product Listing @done (3/10/2025, 12:54:20 PM)
+    ✔ Implement search along with cancel or clear button to reset the results (should be done from backend) @done (3/10/2025, 12:54:25 PM)
+
+✔ Shop Page @done (3/14/2025, 12:24:31 PM)
+    ✔ Sort based on @done (3/14/2025, 12:24:29 PM)
+        ✔ Price: low to high anf high to low @done (3/10/2025, 12:54:39 PM)
+        ✔ Name : aA - zZ and zZ - aA @done (3/10/2025, 12:54:46 PM)
+        ✔ Popularity  (Optional) @done (3/10/2025, 4:03:44 PM) 
+            //by the number of ratings
+        ✔ Average ratings (Optional) @done (3/10/2025, 4:04:10 PM)
+        ✔ New arrivals (Optional) @done (3/10/2025, 4:04:15 PM)
+            //latest first
+        ✘ Featured (Optional) @cancelled (3/14/2025, 12:24:26 PM)
+        ✔ Filter based on @done (3/14/2025, 12:24:35 PM)
+            ✔ Category @done (3/10/2025, 12:54:54 PM)
+            ✔ Price Range @done (3/10/2025, 12:55:00 PM)
+            ✘ Brand (Optional). @cancelled (3/14/2025, 12:24:24 PM)
+
+Additional Note: 
+    ✔ Search, sort, and filter should work together in combination. @done (3/6/2025, 3:15:40 PM)
+        //done by making the mapped item the result of multiple filter stages
+        //moved to backend
+        //also set the url params before fetching the data
+    ✔ Ensure blocked/unlisted  products are hidden. @done (3/6/2025, 3:15:05 PM)
+        //user cannot see the products blocked by the admin. The data is not being sent
+
+Product Details Page:
+    ✔ Product details view on the user side with image zoom. @done (3/14/2025, 9:35:21 AM)
+    ☐ Product detailed page should contain following
+        ✔ Breadcrumbs @done (3/14/2025, 9:35:04 AM)
+        ☐ Ratings
+        ✔ Price @done (3/14/2025, 9:35:11 AM)
+        ✔ Discounts or coupons applied @done (3/6/2025, 3:17:57 PM)
+            //no discount coupons. discounted price is shown based on the quantity of itmes
+        ☐ Reviews
+        ✔ Stock @done (3/14/2025, 9:35:13 AM)
+    ☐ Proper error handles Sold out / unavailable  and  out of stock EXAMPLE
+    ✔ Highlights / specs of product @done (3/14/2025, 2:29:47 PM)
+    ✔ Related product recommendations @done (3/14/2025, 2:29:49 PM)
+    ☐ Redirect users to product listing page,  if 
+        ✔ the product is blocked or @done (3/14/2025, 2:43:31 PM)
+        ✔ unavailable on refresh or on other actions (example: onclick of a addtocart Button) @done (3/14/2025, 2:56:32 PM)
+        ✔ User profile(Show user details, show address, show orders, edit profile, cancel orders, forgot password). @done (3/21/2025, 9:21:16 AM)
+
+
+
+
+
+
+WEEK 2 Project
+
+User side: 
+    ☐ User profile
+        ✔ Show user details @done (3/19/2025, 2:52:17 PM)
+            ✔ Show user details including profile image and address. @done (3/19/2025, 2:52:16 PM)
+        ✔ show address, @done (3/19/2025, 2:52:13 PM)
+        ✔ show orders, @done (3/20/2025, 6:01:18 PM)
+        ☐ edit profile, 
+            ✔ Implement Edit profile (edit profile and profile page should not be the same) @done (3/19/2025, 2:51:35 PM)
+            ☐ Note : When editing email need to verify the emails via OTP or Token.
+            ✔ Implement an option to change password followed by its functionality. @done (3/19/2025, 2:52:07 PM)
+        ☐ cancel orders, 
+        ✔ forgot password @done (3/19/2025, 2:51:32 PM)
+
+    ☐ Address Management
+        ✔ Implement Add, @done (3/19/2025, 2:51:28 PM)
+        ✔ Edit and @done (3/19/2025, 2:51:29 PM)
+        ✔ Delete. @done (3/19/2025, 2:51:29 PM)
+    
+    ☐ Cart management 
+        ☐ Add to cart
+            ☐ Ensure that if a product or its category is blocked or unlisted, the product cannot be added to the cart, even if the user is on the product detail page.
+            ✔ If the product is already in cart increase its quantity @done (3/18/2025, 6:58:29 PM)
+            ☐ If a product is added to the cart, ensure it is removed from the wishlist if it exists there.
+            ✔ Implement increment and decrement functionality for quantity. Ensure validation based on the stock left in inventory. @done (3/18/2025, 6:58:40 PM)
+            ✔ Handle the maximum quantity a person can add to the cart for a single product @done (3/18/2025, 6:58:46 PM)
+            ☐ Out-of-stock products should be displayed as disabled and ensure they cannot be moved to checkout upon proceeding.    
+        ✔ list products in cart, @done (3/18/2025, 6:59:06 PM)
+        ✔ remove products from cart @done (3/18/2025, 6:59:07 PM)
+
+    ☐ Checkout page
+        ✔ Display user-added addresses. @done (3/20/2025, 5:50:04 PM)
+        ✔ Provide an option to add a new address and edit existing addresses. @done (3/20/2025, 5:50:06 PM)
+        ✔ Ensure one address is selected as the default. @done (3/20/2025, 5:50:08 PM)
+        ✔ Display products moved to checkout with: @done (3/20/2025, 10:18:19 PM)
+        ✔ Product image @done (3/20/2025, 6:00:53 PM)
+        ✔ Quantity @done (3/20/2025, 10:17:47 PM)
+        ✔ Item total (price based on quantity) @done (3/20/2025, 10:17:48 PM)
+        ✔ Taxes (optional) @done (3/20/2025, 10:17:49 PM)
+        ✔ Applicable discount @done (3/20/2025, 10:17:53 PM)
+        ✔ Final price summary (including taxes, discounts, and shipping) @done (3/20/2025, 10:17:55 PM)
+    
+        ✔ Place order with Cash on Delivery @done (3/20/2025, 10:18:21 PM)
+    
+        ✔ Order successful page with thanking statement and illustration and should contain buttons to redirect user to order detail page and continue shopping page. @done (3/20/2025, 10:18:24 PM)
+    
+    
+    ☐ Order Management
+        ✔ Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS). @done (3/20/2025, 6:01:40 PM)
+        ✔ Show basic details in the listing, such as status, order date, etc. @done (3/20/2025, 6:01:42 PM)
+        ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
+        ✔ when canceling an order should ask for reason(optional) . @done (3/21/2025, 12:20:20 AM)
+        ✔ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory). @done (3/21/2025, 12:20:23 AM)
+        ✔ Include a detail page for each respective order. @done (3/21/2025, 12:20:31 AM)
+        ☐ Provide the option to download the invoice for each order.(pdf)
+        ✔ Implement search to find specific order @done (3/21/2025, 12:20:36 AM)
+    
+Admin side : 
+    ☐ Order Management
+        ✔ List order in desc order by order date @done (3/20/2025, 10:18:30 PM)
+        ✔ Show basic details like @done (3/20/2025, 10:18:31 PM)
+            ✔ orderID,date,, @done (3/20/2025, 10:18:32 PM)
+            ✔ detail of user , @done (3/20/2025, 10:18:33 PM)
+            ✔ view button to show detailed view of order etc.. @done (3/20/2025, 10:18:36 PM)
+        ✔ Implement functionality to change order Status(pending,shipped,out for delivery,delivered,cancelled) @done (3/20/2025, 10:18:38 PM)
+        ✔ Implement a functionality to verify the  return request of product @done (3/21/2025, 12:20:51 AM)
+        ☐ If the verification is accepted ,then return the previously paid amount by the consumer or user to the wallet.
+        ✔ Implement search,sort and filter along with clear search functionality. @done (3/20/2025, 10:18:44 PM)
+        ✔ Implement Pagination @done (3/20/2025, 10:18:45 PM)
+
+    ✔ Inventory/Stock management. @done (3/20/2025, 10:18:49 PM)
+
+
+Week 3 Project: 
+
+    User side :
+        ☐ Integrate online payment method(Razorpay or Paypal). The integration of multiple payment gateways will be an add-on..
+        ☐ After a successful payment, redirect the user to the order success page. 
+            ☐ The page should contain a thank-you or success statement, 
+            ☐ an illustration, and
+            ☐ buttons to redirect the user to the order details page and the continue shopping page
+        ☐ After a payment failure, redirect the user to the order 
+            ☐ transaction failure or order failure page. 
+            ☐ The page should contain an illustration, a statement, a button to retry the payment, 
+            ☐ and a button to redirect to the order details page.
+            ☐ Once the order is successfully placed, redirect the user to the successful page.
+        ☐ Provide an option to cancel the entire order or specific products. 
+            ☐ Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
+            ☐ when canceling an order should ask for reason(optional) .
+            ☐ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory).
+        
+        ☐ Coupon Management (Apply Coupon, Remove Coupon)
+            ☐ Implement an option to apply and remove a coupon on the checkout page. 
+            ☐ Ensure that a coupon cannot be applied multiple times and that the breakdown of the grand total price, including the coupon discount, is properly displayed on the checkout page.
+        
+        ☐ Search, 
+        ☐ Category filtering
+        
+        ☐ Wishlist (Add, Remove)
+            ☐ Implement add to wishlist and remove from wishlist. 
+            ☐ When a product is moved to cart from wishlist, ensure that the product is not present in the wishlist anymore. 
+            ☐ Add to wishlist buttons should be present both on product listing pages and product detail pages.
+      
+        ☐ Wallet Management
+        ☐ Implement a wallet system for canceled and returned orders.
+        ☐ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin.
+        ☐ In case of canceled orders, refund the amount directly.
+        
+    Admin side : 
+
+        ☐ Offer module(Product offer, Category offer, Referral offer).
+            ☐ Implement Product offer
+            ☐ This offer can be only applied to specific products
+            ☐ Implement Category offer
+            ☐ This offer can be applied to a specific category.
+            Note:
+            ☐ Handle cases where both category and product offers are available for a product.
+            ☐ Apply the largest offer to the specific product.
+        
+            Example:
+            If a shirt has a 20% product offer and a 30% category offer, consider only the 
+            greater offer—in this case, the category offer.
+            Referral offer
+            This offer is like a reward to the user for inviting other users to your ecommerce platform.
+        
+            This can be done in two approaches:
+            Using a token url
+            The existing user can invite a new user by sharing a link that contains a token.
+            Once the new user registers using this link, provide a unique coupon to the existing user.
+            Using referral code
+            The existing user can share a unique referral code, which should be generated during the creation of the account and remain consistent.
+            Add a new field to the registration page (optional) for new users to manually enter the referral code, accommodating non-referred users.
+            Once the new user registers, provide a unique coupon to the existing user.
+        
+        ☐ Coupon Management (Create, Delete)
+            ☐ Implement functionality to create new coupon with proper validations.
+        ☐ Sales report(Daily, Weekly, Yearly, Custom date)
+            ☐ Generate sales report
+            ☐ Should be able to filter based on
+                ☐ Custom date range
+                ☐ 1 Day / week / month
+            ☐ Show discount and coupons deduction in sales report
+            ☐ Overall sales count
+            ☐ Overall order amount
+            ☐ Overall discount
+        
+        ☐ Report download (Pdf, Excel)
+        ☐ Ensure that the sales report download adheres to the selected filters.
+        
+        
+    
