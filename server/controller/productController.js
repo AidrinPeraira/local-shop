@@ -9,18 +9,101 @@ import Category from "../models/categoryModel.js";
 
 export const getSellerProducts = asyncHandler(async (req, res) => {
   const sellerId = req.user._id;
+  const { page = 1, limit = 10, status, search, sortBy } = req.query;
+
+  const query = {
+    seller: sellerId,
+    isBlocked: false,
+  };
+
+  if (status) {
+    switch (status) {
+      case 'in-stock':
+        query.inStock = true;
+        break;
+      case 'out-of-stock':
+        query.inStock = false;
+        break;
+      case 'low-stock':
+        query.stock = { $gt: 0, $lte: 10 };
+        break;
+      case 'active':
+        query.isActive = true;
+        break;
+      case 'inactive':
+        query.isActive = false;
+        break;
+      case 'deleted':
+        query.isBlocked = true;
+        break;
+    }
+  }
+
+  if (status) {
+    switch (status) {
+      case 'in-stock':
+        query.inStock = true;
+        break;
+      case 'out-of-stock':
+        query.inStock = false;
+        break;
+      case 'low-stock':
+        query.stock = { $gt: 0, $lte: 10 };
+        break;
+      case 'active':
+        query.isActive = true;
+        break;
+      case 'inactive':
+        query.isActive = false;
+        break;
+      case 'deleted':
+        query.isBlocked = true;
+        break;
+    }
+  }
+
+  let sortOptions = {};
+  switch (sortBy) {
+    case 'az':
+      sortOptions.productName = 1;
+      break;
+    case 'za':
+      sortOptions.productName = -1;
+      break;
+    case 'price-high':
+      sortOptions.basePrice = -1;
+      break;
+    case 'price-low':
+      sortOptions.basePrice = 1;
+      break;
+    case 'sales':
+      sortOptions.sales = -1;
+      break;
+    case 'latest':
+    default:
+      sortOptions.createdAt = -1;
+  }
+
+  const skip = (page - 1) * limit;
+
 
   //get all products related to the seller
 
-  const products = await Product.find({
-    seller: sellerId,
-    isBlocked: false,
-  }).select("-createdAt -updatedAt -isBlocked");
+  const [products, total] = await Promise.all([
+    Product.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .select("-updatedAt"),
+    Product.countDocuments(query)
+  ]);
 
   res.status(HTTP_CODES.OK).json({
     success: true,
-    count: products.length,
-    products: products,
+    products,
+    total,
+    currentPage: parseInt(page),
+    totalPages: Math.ceil(total / limit)
   });
 });
 

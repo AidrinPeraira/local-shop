@@ -38,7 +38,7 @@
 ✔ blocked category??? @done (3/23/2025, 11:19:48 AM)
 ✔ varaints are not showing when trying to edit product @done (3/23/2025, 11:29:03 AM)
 ✔ need to add unit for existing products @done (3/23/2025, 11:23:47 AM)
-☐ the otp keeps being sent when the user enters incorrecct data. button is deactivated
+✔ the otp keeps being sent when the user enters incorrecct data. button is deactivated @done (3/23/2025, 7:54:45 PM)
 ☐ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store
 ☐ platform fee collected from user should be deducted before showing the seller the order details.
 ☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
@@ -55,7 +55,7 @@ Assigned Pendings:
     ✔ Proper homepage for regular customers @done (3/15/2025, 11:16:31 AM)
     ✔ Product search bug @done (3/14/2025, 12:27:12 PM)
     ✔ Variant management - user side @done (3/21/2025, 9:06:19 AM)
-    ☐ Image crop
+    ✔ Image crop @done (3/23/2025, 8:07:35 PM)
     ☐ Seller - product pagination
     ✔ Admin - product management @done (3/21/2025, 9:06:23 AM)
     ✔ add to cart buy now on homepage @done (3/14/2025, 12:46:07 PM)

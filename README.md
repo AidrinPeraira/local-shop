@@ -69,3 +69,11 @@ Features Added
     
 
 
+
+
+
+
+Features to add
+
+- restructure the databse to be consistent with book keeping standards. chek saved notes
+
