@@ -16,6 +16,7 @@ import { useForm, Controller } from "react-hook-form";
 import { NestedCategoryDropdown } from "../seller/NestedCategoryDropdown";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import CropModal from "./ProductCropImage";
 
 const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   // Set up react-hook-form with default values from initialData
@@ -47,7 +48,9 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
 
   // State for complex fields that need special handling
   const [images, setImages] = useState(initialData.images || []);
-  const [variantTypes, setVariantTypes] = useState(initialData.variantTypes || []);
+  const [variantTypes, setVariantTypes] = useState(
+    initialData.variantTypes || []
+  );
   const [variants, setVariants] = useState(initialData.variants || []);
   const [tierPrices, setTierPrices] = useState(
     initialData.tierPrices || [
@@ -56,24 +59,34 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
     ]
   );
 
-  const formData = new FormData();
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempFile, setTempFile] = useState(null);
 
   // Image upload logic
   const handleImageUpload = (e) => {
     if (!e.target.files || e.target.files.length === 0) return;
 
-    const newImages = [];
+    const file = e.target.files[0];
+    setTempFile(file);
+    setCropModalOpen(true);
+  };
 
-    Array.from(e.target.files).forEach((file, index) => {
-      newImages.push({
-        id: Date.now() + index.toString(),
-        file,
-        url: URL.createObjectURL(file),
-        order: images.length + index,
-      });
-      // formData.append("images", file); this might be causingth e bug in upload middlewar
-    });
-    setImages([...images, ...newImages]);
+  const handleCropComplete = (croppedFile) => {
+    const newImage = {
+      id: Date.now().toString(),
+      file: croppedFile,
+      url: URL.createObjectURL(croppedFile),
+      order: images.length,
+    };
+
+    setImages([...images, newImage]);
+    setCropModalOpen(false);
+    setTempFile(null);
+  };
+
+  const handleCropCancel = () => {
+    setCropModalOpen(false);
+    setTempFile(null);
   };
 
   const removeImage = (id) => {
@@ -844,6 +857,14 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
           {initialData.id ? "Update Product" : "Create Product"}
         </Button>
       </div>
+
+      {cropModalOpen && (
+        <CropModal
+          imageFile={tempFile}
+          onComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+        />
+      )}
     </form>
   );
 };
