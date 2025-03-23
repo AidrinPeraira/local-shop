@@ -25,24 +25,30 @@
 ✘ how do i verify the varients submitted by the user @cancelled (3/21/2025, 12:06:08 PM)
 ✔ back to ligin restriction @done (3/13/2025, 10:33:56 AM)
 ✘ add use memo for pages @cancelled (3/21/2025, 12:06:23 PM)
-☐ check for bugs in delete / deactivate category by admin
+✔ check for bugs  in delete / deactivate category by admin @done (3/23/2025, 11:19:43 AM)
 ✔ add rensend otp function and email @done (3/13/2025, 10:42:42 AM)
-☐ add pagination from backend for categories
+✘ add pagination from backend for categories @cancelled (3/23/2025, 11:25:58 AM)
+    //catgegories have only very limited data. Front end handling is better. reduced querries to backend. seems more efficient
 ✔ the logout is causing a rendering bug when logging out from admin and seller dash. Check for other pages also @done (3/13/2025, 10:42:51 AM)
 ✔ the prevent accessing page causees a bug, after loggin in as seller try changing the path to try and acess the login page and then logging out @done (3/21/2025, 12:07:24 PM)
 ✘ PRON?? @cancelled (3/21/2025, 12:07:29 PM)
 ✘ can we use querryClient from tanstack query or something else to reduce api calls @cancelled (3/13/2025, 10:43:22 AM)
 
 
-☐ blocked category???
-☐ varaints are not showing when trying to edit product
-☐ need to add unit for existing products
+✔ blocked category??? @done (3/23/2025, 11:19:48 AM)
+✔ varaints are not showing when trying to edit product @done (3/23/2025, 11:29:03 AM)
+✔ need to add unit for existing products @done (3/23/2025, 11:23:47 AM)
 ☐ the otp keeps being sent when the user enters incorrecct data. button is deactivated
 ☐ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store
 ☐ platform fee collected from user should be deducted before showing the seller the order details.
 ☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
 ☐ returning order with items from multiple sellers?
 ☐ buy now feature not updating the discounts
+☐ need to show units wherever necessary
+    - orders
+    - products
+    - cart
+    - summmary
 
 
 Assigned Pendings:

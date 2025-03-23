@@ -138,14 +138,27 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     throw new Error("Category not found");
   }
 
-  // Check if this category has subcategories
+  // Function to recursively deactivate all subcategories
+    const deactivateSubcategories = async (categoryId) => {
+      // Get direct subcategories
+      const subcategories = await Category.find({ parentCategory: categoryId });
+      
+      for (const subcat of subcategories) {
+        // Deactivate current subcategory
+        await Category.findByIdAndUpdate(subcat._id, {
+          isActive: false,
+          updatedBy: adminId
+        });
+        
+        // Recursively deactivate its subcategories
+        await deactivateSubcategories(subcat._id);
+      }
+    };
+  
+  // Check if this category has subcategories and deactivate them
   const hasSubcategories = await Category.exists({ parentCategory: id });
   if (hasSubcategories) {
-    // Update all subcategories to inactive as well
-    await Category.updateMany(
-      { parentCategory: id },
-      { isActive: false, updatedBy: adminId }
-    );
+    await deactivateSubcategories(id);
   }
 
   // Soft delete by setting status to inactive
