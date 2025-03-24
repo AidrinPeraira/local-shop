@@ -8,7 +8,7 @@ import { Separator } from "../../components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import {
   CreditCard,
-  Truck,
+  Plus,
   MapPin,
   User,
   Phone,
@@ -18,10 +18,17 @@ import {
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserProfileApi, getUserAddressesApi } from "../../api/userDataApi";
+import { getUserProfileApi, getUserAddressesApi, addUserAddressApi } from "../../api/userDataApi";
 import { createOrderApi } from "../../api/orderApi";
 import OrderSuccess from "./OrderSuccess";
 import { clearCart } from "../../redux/features/cartSlice";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../components/ui/dialog";
 
 const CheckoutContent = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -32,8 +39,21 @@ const CheckoutContent = () => {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
 
+  
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [addressForm, setAddressForm] = useState({
+    street: "",
+    city: "",
+    state: "",
+    pincode: "",
+    isDefault: false,
+  });
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -45,7 +65,7 @@ const CheckoutContent = () => {
           title: "Error",
           description: error.message || "Failed to fetch user profile",
           variant: "destructive",
-        });
+        }); 
       }
     };
 
@@ -80,12 +100,50 @@ const CheckoutContent = () => {
     fetchAddresses();
   }, []);
 
-  const [orderSuccess, setOrderSuccess] = useState(false);
-  const [orderId, setOrderId] = useState(null);
+  const handleAddressSubmit = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      const response = await addUserAddressApi(addressForm);
+      if (response.data) {
+        // Refresh addresses list first
+        const addressesResponse = await getUserAddressesApi();
+        if (addressesResponse.data.addresses) {
+          setAddresses(addressesResponse.data.addresses);
+          // Select the newly added address
+          const newAddress = addressesResponse.data.addresses[addressesResponse.data.addresses.length - 1];
+          setSelectedAddressId(newAddress._id);
+        }
+
+        // Reset form and close dialog
+        setAddressForm({
+          street: "",
+          city: "",
+          state: "",
+          pincode: "",
+          isDefault: false,
+        });
+        setIsAddingNew(false);  
+
+        toast({
+          title: "Success",
+          description: "Address added successfully",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to add address",
+        variant: "destructive",
+      });
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!selectedAddressId) {
       toast({
         title: "Error",
@@ -94,33 +152,32 @@ const CheckoutContent = () => {
       });
       return;
     }
-  
+
     try {
       const orderData = {
         cart,
         selectedAddressId,
         paymentMethod,
-        userProfile
+        userProfile,
       };
-  
-      const response = await createOrderApi(orderData);
-  
 
-        toast({
-          title: "Order placed successfully!",
-          description: response.data.message,
-        });
-        
-        setOrderId(response.data.order.orderId);
-        setOrderSuccess(true);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: error.response.data.message || "Failed to place order",
-          variant: "destructive",
-        });
-      }
-    };
+      const response = await createOrderApi(orderData);
+
+      toast({
+        title: "Order placed successfully!",
+        description: response.data.message,
+      });
+
+      setOrderId(response.data.order.orderId);
+      setOrderSuccess(true);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response.data.message || "Failed to place order",
+        variant: "destructive",
+      });
+    }
+  };
 
   const formatPrice = (price) => {
     const priceStr = price.toFixed(2);
@@ -210,9 +267,83 @@ const CheckoutContent = () => {
             {/* Shipping Address */}
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-center space-x-2 mb-4">
-                  <MapPin className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold">Shipping Address</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="h-5 w-5 text-primary" />
+                    <h2 className="text-lg font-semibold">Shipping Address</h2>
+                  </div>
+                  <Dialog open={isAddingNew} onOpenChange={setIsAddingNew}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="flex items-center gap-2">
+                        <Plus className="h-4 w-4" /> Add New Address
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Address</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleAddressSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="street">Street Address</Label>
+                          <Input
+                            id="street"
+                            value={addressForm.street}
+                            onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="city">City</Label>
+                            <Input
+                              id="city"
+                              value={addressForm.city}
+                              onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="state">State</Label>
+                            <Input
+                              id="state"
+                              value={addressForm.state}
+                              onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="pincode">PIN Code</Label>
+                          <Input
+                            id="pincode"
+                            value={addressForm.pincode}
+                            onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="isDefault"
+                            checked={addressForm.isDefault}
+                            onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
+                            className="rounded border-gray-300"
+                          />
+                          <Label htmlFor="isDefault">Set as default address</Label>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={() => setIsAddingNew(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button type="submit">Save Address</Button>
+                        </div>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 {addresses.length > 0 ? (
@@ -253,13 +384,6 @@ const CheckoutContent = () => {
                 ) : (
                   <div className="text-center py-4">
                     <p className="text-gray-500">No saved addresses found.</p>
-                    <Button
-                      variant="outline"
-                      className="mt-2"
-                      onClick={() => navigate("/profile/addresses")}
-                    >
-                      Add New Address
-                    </Button>
                   </div>
                 )}
               </CardContent>
@@ -284,7 +408,6 @@ const CheckoutContent = () => {
                       Cash On Delivery
                     </Label>
                   </div>
-
 
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="card" id="card" />
@@ -382,7 +505,10 @@ const CheckoutContent = () => {
                 <h3 className="text-lg font-semibold mb-4">Order Items</h3>
                 <div className="space-y-4">
                   {cart.items.map((item) => (
-                    <div key={item.productId} className="flex items-center space-x-4">
+                    <div
+                      key={item.productId}
+                      className="flex items-center space-x-4"
+                    >
                       <img
                         src={item.image}
                         alt={item.productName}
@@ -399,7 +525,9 @@ const CheckoutContent = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium">₹{formatPrice(item.productTotal)}</div>
+                        <div className="font-medium">
+                          ₹{formatPrice(item.productTotal)}
+                        </div>
                         {item.productDiscount > 0 && (
                           <div className="text-sm text-green-600">
                             Save ₹{formatPrice(item.productDiscount)}
@@ -417,7 +545,6 @@ const CheckoutContent = () => {
 
       {orderSuccess && <OrderSuccess orderId={orderId} />}
     </div>
-    
   );
 };
 
