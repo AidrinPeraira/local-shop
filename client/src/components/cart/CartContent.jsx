@@ -7,7 +7,17 @@ import {
   Minus,
   ArrowRight,
   ShoppingBag,
+  Package,
+  ShieldCheck,
+  Info,
+  Tag
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../components/ui/tooltip";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardFooter } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
@@ -26,7 +36,7 @@ const CartContent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(clearCart())
+    dispatch(clearCart());
     fetchCartData();
   }, []);
 
@@ -77,27 +87,10 @@ const CartContent = () => {
       const variant = item.variants[variantIndex];
       variant.quantity = newQuantity;
 
-      // Calculate new variantTotal
-      variant.variantTotal = variant.basePrice * newQuantity;
-
-      // Calculate bulk discount if applicable
-      let discountPerUnit = 0;
-      if (item.bulkDiscount && item.bulkDiscount.length > 0) {
-        // Total quantity of all variants for this product
-        const totalProductQuantity = item.variants.reduce(
-          (sum, v) => sum + v.quantity,
-          0
-        );
-
-        // Find the applicable discount tier
-        const applicableDiscount = item.bulkDiscount
-          .filter((discount) => totalProductQuantity >= discount.minQty)
-          .sort((a, b) => b.minQty - a.minQty)[0];
-
-        discountPerUnit = applicableDiscount
-          ? applicableDiscount.priceDiscountPerUnit
-          : 0;
-      }
+      // Update totals for all variants
+      item.variants.forEach(v => {
+        v.variantTotal = v.basePrice * v.quantity;
+      });
 
       // Update product totals
       item.totalQuantity = item.variants.reduce(
@@ -110,27 +103,39 @@ const CartContent = () => {
         0
       );
 
-      if (discountPerUnit > 0) {
-        item.productDiscount = item.totalQuantity * discountPerUnit;
-        item.productTotal = item.productSubtotal - item.productDiscount;
+      // Calculate bulk discount if applicable
+      if (item.bulkDiscount && item.bulkDiscount.length > 0) {
+        const applicableDiscount = item.bulkDiscount
+          .filter((discount) => item.totalQuantity >= discount.minQty)
+          .sort((a, b) => b.minQty - a.minQty)[0];
+
+        if (applicableDiscount) {
+          const discountPercentage = applicableDiscount.priceDiscountPerUnit;
+          item.productDiscount = (item.productSubtotal * discountPercentage) / 100;
+        } else {
+          item.productDiscount = 0;
+        }
       } else {
         item.productDiscount = 0;
-        item.productTotal = item.productSubtotal;
       }
 
-      // Update summary
+      item.productTotal = item.productSubtotal - item.productDiscount;
+
+      // Update cart summary
       newData.summary.subtotalBeforeDiscount = newData.items.reduce(
         (sum, item) => sum + item.productSubtotal,
         0
       );
-
       newData.summary.totalDiscount = newData.items.reduce(
         (sum, item) => sum + item.productDiscount,
         0
       );
-
       newData.summary.subtotalAfterDiscount =
         newData.summary.subtotalBeforeDiscount - newData.summary.totalDiscount;
+
+      // Update shipping charge based on total amount
+      newData.summary.shippingCharge = 
+        newData.summary.subtotalAfterDiscount >= 5000 ? 0 : 500;
 
       newData.summary.cartTotal =
         newData.summary.subtotalAfterDiscount +
@@ -263,23 +268,31 @@ const CartContent = () => {
     );
 
     if (!product?.bulkDiscount || product.bulkDiscount.length === 0) {
-      return null;
+      return {
+        discountPercentage: 0,
+        totalDiscountPrice: 0,
+        totalPrice: variant.basePrice * variant.quantity,
+        totalDiscountedPrice: variant.basePrice * variant.quantity,
+      };
     }
 
-    const totalQuantity = variant.quantity;
+    const totalQuantity = product.totalQuantity; // Use total product quantity
     const applicableDiscount = product.bulkDiscount
       .filter((discount) => totalQuantity >= discount.minQty)
       .sort((a, b) => b.minQty - a.minQty)[0];
 
-    if (!applicableDiscount) return null;
+    if (!applicableDiscount) {
+      return {
+        discountPercentage: 0,
+        totalDiscountPrice: 0,
+        totalPrice: variant.basePrice * variant.quantity,
+        totalDiscountedPrice: variant.basePrice * variant.quantity,
+      };
+    }
 
-    const discountPercentage = applicableDiscount.priceDiscountPerUnit;
-    const totalDiscountPrice =
-      (variant.basePrice *
-        variant.quantity *
-        applicableDiscount.priceDiscountPerUnit) /
-      100;
     const totalPrice = variant.basePrice * variant.quantity;
+    const discountPercentage = applicableDiscount.priceDiscountPerUnit;
+    const totalDiscountPrice = (totalPrice * discountPercentage) / 100;
     const totalDiscountedPrice = totalPrice - totalDiscountPrice;
 
     return {
@@ -321,6 +334,16 @@ const CartContent = () => {
     );
   }
 
+  const getInvalidProducts = () => {
+    if (!localCartData?.items) return [];
+    return localCartData.items.filter(
+      (item) =>
+        item.isBlocked ||
+        !item.isActive ||
+        item.variants.some((v) => !v.inStock)
+    );
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center space-x-2 mb-6">
@@ -344,9 +367,37 @@ const CartContent = () => {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {localCartData.items.map((item) => {
+              const isInvalid = item.isBlocked || !item.isActive;
+              const hasOutOfStock = item.variants.some((v) => !v.inStock);
+
               return (
-                <Card key={item.productId} className="overflow-hidden">
+                <Card
+                  key={item.productId}
+                  className={`overflow-hidden ${
+                    isInvalid ? "border-red-500" : ""
+                  }`}
+                >
                   <CardContent className="p-4">
+                    {/* Add warning message if product is invalid */}
+                    {(isInvalid || hasOutOfStock) && (
+                      <div className="mb-3 p-2 bg-red-50 text-red-600 rounded">
+                        {/* {item.isBlocked && "This product has been blocked."} */}
+                        {(item.isBlocked || !item.isActive) &&
+                          "This product is no longer available."}
+                        {hasOutOfStock && "Some variants are out of stock."}
+                        <Button
+                          variant="link"
+                          className="text-red-600 p-0 ml-2"
+                          onClick={() =>
+                            item.variants.forEach((v) =>
+                              removeVariant(item.productId, v.variantId)
+                            )
+                          }
+                        >
+                          Remove from cart
+                        </Button>
+                      </div>
+                    )}
                     <Link
                       to={`/product?id=${item.productId}`}
                       className="group block"
@@ -485,34 +536,78 @@ const CartContent = () => {
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Cart Summary</h3>
                 <div className="space-y-4">
+                  {/* Subtotal */}
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal</span>
-                    <span>
-                      ₹{formatPrice(cartData.summary.subtotalBeforeDiscount)}
-                    </span>
+                    <span>₹{formatPrice(cartData.summary.subtotalBeforeDiscount)}</span>
                   </div>
 
+                  {/* Bulk Discount */}
                   {cartData.summary.totalDiscount > 0 && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Bulk Discount</span>
-                      <span>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-green-600" />
+                        <span className="text-green-600">Bulk Discount</span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="h-4 w-4 text-gray-400" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Discount applied for bulk purchases</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <span className="text-green-600">
                         -₹{formatPrice(cartData.summary.totalDiscount)}
                       </span>
                     </div>
                   )}
 
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
-                    <span>₹{formatPrice(cartData.summary.shippingCharge)}</span>
+                  {/* Shipping */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-4 w-4 text-gray-600" />
+                      <span className="text-gray-600">Shipping</span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info className="h-4 w-4 text-gray-400" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Free shipping on orders above ₹5000</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <span>{cartData.summary.shippingCharge > 0 ? 
+                      `₹${formatPrice(cartData.summary.shippingCharge)}` : 
+                      'FREE'}</span>
                   </div>
 
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Platform Fee</span>
+                  {/* Platform Fee */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="h-4 w-4 text-gray-600" />
+                      <span className="text-gray-600">Platform Fee</span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info className="h-4 w-4 text-gray-400" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Covers secure payment processing and buyer protection</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <span>₹{formatPrice(cartData.summary.platformFee)}</span>
                   </div>
 
                   <Separator />
 
+                  {/* Total */}
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>
                     <span>₹{formatPrice(cartData.summary.cartTotal)}</span>
@@ -532,10 +627,14 @@ const CartContent = () => {
                 <Button
                   className="w-full flex items-center justify-center gap-2"
                   onClick={() => navigate("/checkout")}
-                  disabled={hasUnsavedChanges()}
+                  disabled={
+                    hasUnsavedChanges() || getInvalidProducts().length > 0
+                  }
                 >
                   {hasUnsavedChanges()
                     ? "Save changes before checkout"
+                    : getInvalidProducts().length > 0
+                    ? "Remove invalid items to proceed"
                     : "Checkout"}{" "}
                   <ArrowRight className="h-4 w-4" />
                 </Button>

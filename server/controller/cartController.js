@@ -69,9 +69,8 @@ export const getCartItems = asyncHandler(
         const cart = await Cart.findOne({ user: userId })
             .populate({
                 path: 'items.product',
-                select: 'productName images variants bulkDiscount basePrice'
+                select: 'productName images variants bulkDiscount basePrice isActive isBlocked'
             });
-
 
         if (!cart) {
             res.status(404)
@@ -81,6 +80,16 @@ export const getCartItems = asyncHandler(
         const processedItems = cart.items.map(item => {
             const product = item.product;
             
+            // Calculate total quantity first for bulk discount determination
+            const totalProductQuantity = item.variants.reduce((sum, variant) => sum + variant.quantity, 0);
+            
+            // Find applicable bulk discount based on total product quantity
+            const applicableDiscount = product.bulkDiscount && product.bulkDiscount.length > 0
+                ? product.bulkDiscount
+                    .filter(discount => totalProductQuantity >= discount.minQty)
+                    .sort((a, b) => b.minQty - a.minQty)[0]
+                : null;
+
             const processedVariants = item.variants.map(variant => {
                 const productVariant = product.variants.find(
                     pv => pv.variantId === variant.variantId
@@ -88,33 +97,39 @@ export const getCartItems = asyncHandler(
 
                 const basePrice = productVariant ? productVariant.basePrice : product.basePrice;
                 const quantity = variant.quantity;
+                
+                // Calculate variant discount if applicable
+                let variantDiscount = 0;
+                if (applicableDiscount) {
+                    variantDiscount = (basePrice * applicableDiscount.priceDiscountPerUnit) / 100;
+                }
+                
+                const discountedPrice = basePrice - variantDiscount;
                 const variantTotal = basePrice * quantity;
+                const variantDiscountTotal = variantDiscount * quantity;
 
                 return {
                     variantId: variant.variantId,
                     attributes: variant.attributes,
                     quantity: quantity,
                     basePrice,
+                    discountedPrice,
+                    variantDiscount: variantDiscountTotal,
                     variantTotal,
                     stock: productVariant ? productVariant.stock : product.stock,
                     inStock: productVariant ? productVariant.inStock : product.inStock
                 };
             });
 
-            // Calculate total quantity and amount for this product
-            const productTotalQuantity = processedVariants.reduce((sum, variant) => sum + variant.quantity, 0);
-            const productSubtotal = processedVariants.reduce((sum, variant) => sum + variant.variantTotal, 0);
+            const productSubtotal = processedVariants.reduce(
+                (sum, variant) => sum + variant.variantTotal, 
+                0
+            );
             
-            // Calculate bulk discount if applicable
-            let productDiscount = 0;
-            if (product.bulkDiscount) {
-                const applicableDiscount = product.bulkDiscount.find(
-                    discount => productTotalQuantity >= discount.minQuantity
-                );
-                if (applicableDiscount) {
-                    productDiscount = (productSubtotal * applicableDiscount.discountPercentage) / 100;
-                }
-            }
+            const productDiscount = processedVariants.reduce(
+                (sum, variant) => sum + variant.variantDiscount,
+                0
+            );
 
             return {
                 productId: product._id,
@@ -125,7 +140,9 @@ export const getCartItems = asyncHandler(
                 productSubtotal,
                 productDiscount,
                 productTotal: productSubtotal - productDiscount,
-                totalQuantity: productTotalQuantity
+                totalQuantity: totalProductQuantity,
+                isActive: product.isActive,
+                isBlocked: product.isBlocked
             };
         });
 
@@ -134,7 +151,7 @@ export const getCartItems = asyncHandler(
         const subtotalBeforeDiscount = processedItems.reduce((sum, item) => sum + item.productSubtotal, 0);
         const totalDiscount = processedItems.reduce((sum, item) => sum + item.productDiscount, 0);
         const shippingCharge = totalQuantity < 50 ? 500 : 0;
-        const platformFee = 30;
+        const platformFee = 1000;
 
         const cartTotal = subtotalBeforeDiscount - totalDiscount + shippingCharge + platformFee;
 
@@ -237,7 +254,6 @@ export const processCartItems = asyncHandler(
             throw new Error("Product ID and variants are required");
         }
 
-        // Fetch product details first to validate
         const product = await Product.findById(productId)
             .select('productName images variants bulkDiscount basePrice');
 
@@ -246,7 +262,6 @@ export const processCartItems = asyncHandler(
             throw new Error("Product not found");
         }
 
-        // Create a temporary cart structure
         let tempCart = {
             user: userId,
             items: [{
@@ -259,10 +274,19 @@ export const processCartItems = asyncHandler(
             }]
         };
 
-        // Process items in the same way as getCartItems
         const processedItems = tempCart.items.map(item => {
             const product = item.product;
             
+            // Calculate total quantity first for bulk discount determination
+            const totalProductQuantity = item.variants.reduce((sum, variant) => sum + variant.quantity, 0);
+            
+            // Find applicable bulk discount based on total product quantity
+            const applicableDiscount = product.bulkDiscount && product.bulkDiscount.length > 0
+                ? product.bulkDiscount
+                    .filter(discount => totalProductQuantity >= discount.minQty)
+                    .sort((a, b) => b.minQty - a.minQty)[0]
+                : null;
+
             const processedVariants = item.variants.map(variant => {
                 const productVariant = product.variants.find(
                     pv => pv.variantId === variant.variantId
@@ -271,19 +295,15 @@ export const processCartItems = asyncHandler(
                 const basePrice = productVariant ? productVariant.basePrice : product.basePrice;
                 const quantity = variant.quantity;
                 
-                // Calculate applicable discount for this variant quantity
+                // Calculate variant discount if applicable
                 let variantDiscount = 0;
-                if (product.bulkDiscount) {
-                    const applicableDiscount = product.bulkDiscount.find(
-                        discount => quantity >= discount.minQty
-                    );
-                    if (applicableDiscount) {
-                        variantDiscount = (basePrice * applicableDiscount.priceDiscountPerUnit) / 100;
-                    }
+                if (applicableDiscount) {
+                    variantDiscount = (basePrice * applicableDiscount.priceDiscountPerUnit) / 100;
                 }
-
+                
                 const discountedPrice = basePrice - variantDiscount;
-                const variantTotal = discountedPrice * quantity;
+                const variantTotal = basePrice * quantity;
+                const variantDiscountTotal = variantDiscount * quantity;
 
                 return {
                     variantId: variant.variantId,
@@ -291,21 +311,21 @@ export const processCartItems = asyncHandler(
                     quantity: quantity,
                     basePrice,
                     discountedPrice,
-                    variantDiscount,
+                    variantDiscount: variantDiscountTotal,
                     variantTotal,
                     stock: productVariant ? productVariant.stock : product.stock,
                     inStock: productVariant ? productVariant.inStock : product.inStock
                 };
             });
 
-            const productTotalQuantity = processedVariants.reduce((sum, variant) => 
-                sum + variant.quantity, 0
+            const productSubtotal = processedVariants.reduce(
+                (sum, variant) => sum + variant.variantTotal, 
+                0
             );
-            const productSubtotal = processedVariants.reduce((sum, variant) => 
-                sum + (variant.basePrice * variant.quantity), 0
-            );
-            const productDiscount = processedVariants.reduce((sum, variant) => 
-                sum + (variant.variantDiscount * variant.quantity), 0
+            
+            const productDiscount = processedVariants.reduce(
+                (sum, variant) => sum + variant.variantDiscount,
+                0
             );
 
             return {
@@ -317,11 +337,11 @@ export const processCartItems = asyncHandler(
                 productSubtotal,
                 productDiscount,
                 productTotal: productSubtotal - productDiscount,
-                totalQuantity: productTotalQuantity
+                totalQuantity: totalProductQuantity
             };
         });
 
-        // Calculate cart totals
+        // Rest of the calculations remain the same
         const totalQuantity = processedItems.reduce((sum, item) => 
             sum + item.totalQuantity, 0
         );
@@ -332,7 +352,7 @@ export const processCartItems = asyncHandler(
             sum + item.productDiscount, 0
         );
         const shippingCharge = totalQuantity < 50 ? 500 : 0;
-        const platformFee = 30;
+        const platformFee = 1000; // Changed to match getCartItems
 
         const cartTotal = subtotalBeforeDiscount - totalDiscount + shippingCharge + platformFee;
 

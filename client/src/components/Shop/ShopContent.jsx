@@ -484,8 +484,13 @@ const ShopContent = () => {
                         onClick={(e) => e.preventDefault()} // Prevent Link navigation when clicking buttons
                       >
                         <Sheet>
-                          <SheetTrigger>
-                            <Button size="sm" variant="secondary">
+                          <SheetTrigger disabled={!product.inStock}>
+                            <Button 
+                              size="sm" 
+                              variant="secondary"
+                              disabled={!product.inStock}
+                              className={!product.inStock ? "cursor-not-allowed opacity-50" : ""}
+                            >
                               Add to Cart
                             </Button>
                           </SheetTrigger>
@@ -500,8 +505,14 @@ const ShopContent = () => {
                         </Sheet>
 
                         <Sheet>
-                          <SheetTrigger>
-                            <Button size="sm">Buy Now</Button>
+                          <SheetTrigger disabled={!product.inStock}>
+                            <Button 
+                              size="sm"
+                              disabled={!product.inStock}
+                              className={!product.inStock ? "cursor-not-allowed opacity-50" : ""}
+                            >
+                              Buy Now
+                            </Button>
                           </SheetTrigger>
                           <SheetContent className="sm:max-w-[500px] flex flex-col h-full">
                             <SheetHeader className="flex-none">
