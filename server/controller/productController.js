@@ -462,13 +462,19 @@ export const getShopProducts = asyncHandler(async (req, res) => {
 
     const totalPages = Math.ceil(totalProducts / Number(limit));
 
-    res.status(HTTP_CODES.OK).json({
-      success: true,
-      currentPage: Number(page),
-      totalPages,
-      totalProducts,
-      productsPerPage: Number(limit),
-      products: products.map((product) => ({
+    // Get blocked or inactive categories
+    const blockedCategories = await Category.find({ 
+      $or: [
+        { isBlocked: true },
+        { isActive: false }
+      ]
+    });
+    const blockedCategoryIds = blockedCategories.map(category => category._id.toString());
+
+    // Transform and filter products
+    const transformedProducts = products
+      .filter(product => !blockedCategoryIds.includes(product.category._id.toString()))
+      .map(product => ({
         _id: product._id,
         productName: product.productName,
         slug: product.slug,
@@ -484,7 +490,15 @@ export const getShopProducts = asyncHandler(async (req, res) => {
         seller: product.seller,
         variants: product.variants,
         bulkDiscount: product.bulkDiscount,
-      })),
+      }));
+
+    res.status(HTTP_CODES.OK).json({
+      success: true,
+      currentPage: Number(page),
+      totalPages,
+      totalProducts: transformedProducts.length, // Update total count after filtering
+      productsPerPage: Number(limit),
+      products: transformedProducts,
     });
   } catch (error) {
     res.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
