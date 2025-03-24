@@ -270,23 +270,39 @@ export const getAllCategories = asyncHandler(async (req, res) => {
 //controller to get only active categories in nested fashion
 export const getActiveCategories = asyncHandler(async (req, res) => {
   const categories = await Category.aggregate([
-    { $match: { level: 1, isActive: true } }, // Get only top-level categories
+    // Get only active top-level categories
+    { $match: { level: 1, isActive: true } },
 
-    {$project: {
-      _id: 1,   // Include field1
-      name: 1,   // Include field2
-      level: 1,   // Exclude field3
-      parentCategory : 1
-    }
-    },
-    // Lookup level 2 categories
+    { $project: {
+      _id: 1,
+      name: 1,
+      level: 1,
+      parentCategory: 1
+    }},
+
+    // Lookup active level 2 categories
     {
       $lookup: {
         from: "categories",
-        localField: "_id",
-        foreignField: "parentCategory",
-        as: "subCategories",
-      },
+        let: { parentId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$parentCategory", "$$parentId"] },
+              isActive: true // Only get active subcategories
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              level: 1,
+              parentCategory: 1
+            }
+          }
+        ],
+        as: "subCategories"
+      }
     },
 
     // Only keep required fields for level 2
@@ -300,14 +316,14 @@ export const getActiveCategories = asyncHandler(async (req, res) => {
               _id: "$$subCat._id",
               name: "$$subCat.name",
               level: "$$subCat.level",
-              subSubCategories: [] // Initialize empty array
+              subSubCategories: []
             }
           }
         }
       }
     },
 
-    // Lookup level 3 categories
+    // Lookup active level 3 categories
     {
       $lookup: {
         from: "categories",
@@ -316,17 +332,23 @@ export const getActiveCategories = asyncHandler(async (req, res) => {
           {
             $match: {
               $expr: { $in: ["$parentCategory", "$$subCategoryIds"] },
-            },
+              isActive: true // Only get active sub-subcategories
+            }
           },
           {
-            $project: { _id: 1, name: 1, level: 1, parentCategory: 1 },
-          },
+            $project: {
+              _id: 1,
+              name: 1,
+              level: 1,
+              parentCategory: 1
+            }
+          }
         ],
-        as: "allSubSubCategories",
-      },
+        as: "allSubSubCategories"
+      }
     },
 
-    // Properly nest level 3 categories
+    // Properly nest active level 3 categories
     {
       $addFields: {
         subCategories: {
@@ -341,21 +363,21 @@ export const getActiveCategories = asyncHandler(async (req, res) => {
                 $filter: {
                   input: "$allSubSubCategories",
                   as: "subSubCat",
-                  cond: { $eq: ["$$subSubCat.parentCategory", "$$subCat._id"] },
-                },
-              },
-            },
-          },
-        },
-      },
+                  cond: { $eq: ["$$subSubCat.parentCategory", "$$subCat._id"] }
+                }
+              }
+            }
+          }
+        }
+      }
     },
 
-    // Remove unnecessary fields
+    // Remove temporary fields
     {
       $project: {
-        allSubSubCategories: 0,
-      },
-    },
+        allSubSubCategories: 0
+      }
+    }
   ]);
 
   res.status(200).json(categories);
