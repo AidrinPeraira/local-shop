@@ -21,13 +21,19 @@ const steps = [
 
 export default () => {
   useRedirectIfAuthenticated();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(2);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   //react hook form to get all the data into one object efficiently
   const {
-    register, handleSubmit, control, setValue, formState: { errors }, trigger, watch,
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+    trigger,
+    watch,
   } = useForm({
     mode: "onBlur",
     defaultValues: {
@@ -59,6 +65,15 @@ export default () => {
   const { toast } = useToast();
 
   const handleCategorySelect = (index, categoryId, categoryPath) => {
+    const categories = watch("productCategories").map((cat) => cat.id);
+    if (categories.includes(categoryId)) {
+      toast({
+        title: "Category Already Selected",
+        description: "You have already selected this category",
+        variant: "destructive",
+      });
+      return;
+    }
     setValue(`productCategories.${index}.id`, categoryId);
     setValue(`productCategories.${index}.path`, categoryPath);
   };
@@ -136,13 +151,18 @@ export default () => {
             </h1>
             <div className="flex justify-between items-center">
               {steps.map((step) => (
-                <div key={step.id} className="flex flex-col items-center flex-1">
+                <div
+                  key={step.id}
+                  className="flex flex-col items-center flex-1"
+                >
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${step.id === currentStep
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      step.id === currentStep
                         ? "bg-accent text-black"
                         : step.id < currentStep
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-200 text-gray-500"}`}
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-500"
+                    }`}
                   >
                     {step.id < currentStep ? (
                       <Check className="w-5 h-5" />
@@ -167,86 +187,98 @@ export default () => {
                     required: true,
                     pattern: {
                       value: /^[a-zA-Z\s]{3,50}$/,
-                      message: "Invalid seller name. Must be 3-50 characters long.",
+                      message:
+                        "Invalid seller name. Must be 3-50 characters long.",
                     },
                   })}
                   onBlur={async () => {
                     const result = await trigger("sellerName");
                     if (!result) validationErrorToast("sellerName");
-                  } }
+                  }}
                   placeholder="Seller Name"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <textarea
                   {...register("address.officeName", {
                     required: true,
                     pattern: {
                       value: /^[a-zA-Z0-9\s,./-]{3,50}$/,
-                      message: "Invalid office name. Must be 3-50 characters long.",
+                      message:
+                        "Invalid office name. Must be 3-50 characters long.",
                     },
                   })}
                   onBlur={async () => {
                     const result = await trigger("address.officeName");
                     if (!result) validationErrorToast("address.officeName");
-                  } }
+                  }}
                   placeholder="Office Address"
                   className="form-input w-full border p-2 rounded-md"
-                  rows={3} />
+                  rows={3}
+                />
                 <input
                   {...register("address.city", {
                     required: true,
                     pattern: {
                       value: /^[a-zA-Z\s]{3,50}$/,
-                      message: "Invalid city name. Must be 3-50 characters long.",
+                      message:
+                        "Invalid city name. Must be 3-50 characters long.",
                     },
                   })}
                   onBlur={async () => {
                     const result = await trigger("address.city");
                     if (!result) validationErrorToast("address.city");
-                  } }
+                  }}
                   placeholder="City"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("address.state", {
                     required: true,
                     pattern: {
                       value: /^[a-zA-Z\s]{3,50}$/,
-                      message: "Invalid state name. Must be 3-50 characters long.",
+                      message:
+                        "Invalid state name. Must be 3-50 characters long.",
                     },
                   })}
                   onBlur={async () => {
                     const result = await trigger("address.state");
                     if (!result) validationErrorToast("address.state");
-                  } }
+                  }}
                   placeholder="State"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("address.pincode", {
                     required: true,
                     pattern: {
                       value: /^\d{6}$/,
-                      message: "Invalid pincode format. Must be Indian postal code.",
+                      message:
+                        "Invalid pincode format. Must be Indian postal code.",
                     },
                   })}
                   onBlur={async () => {
                     const result = await trigger("address.pincode");
                     if (!result) validationErrorToast("address.pincode");
-                  } }
+                  }}
                   placeholder="Pin Code"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("taxId", {
                     required: true,
                     pattern: {
-                      value: /(^[A-Z]{5}[0-9]{4}[A-Z]$)|(^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][0-9]$)/,
+                      value:
+                        /(^[A-Z]{5}[0-9]{4}[A-Z]$)|(^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][0-9]$)/,
                       message: "Invalid tax ID. Must be a PAN or GST Number",
                     },
                   })}
                   onBlur={async () => {
                     const result = await trigger("taxId");
                     if (!result) validationErrorToast("taxId");
-                  } }
+                  }}
                   placeholder="GST/PAN Number"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("phone", {
                     required: true,
@@ -258,9 +290,10 @@ export default () => {
                   onBlur={async () => {
                     const result = await trigger("phone");
                     if (!result) validationErrorToast("phone");
-                  } }
+                  }}
                   placeholder="Phone Number"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("email", {
                     required: true,
@@ -272,9 +305,10 @@ export default () => {
                   onBlur={async () => {
                     const result = await trigger("email");
                     if (!result) validationErrorToast("email");
-                  } }
+                  }}
                   placeholder="Email"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
               </div>
             )}
 
@@ -296,10 +330,18 @@ export default () => {
                         type="hidden"
                         {...register(`productCategories.${index}.id`, {
                           required: true,
-                        })} />
+                        })}
+                      />
                       <div className="flex-1">
                         <NestedCategoryDropdown
-                          onSelectCategory={(categoryId, categoryPath) => handleCategorySelect(index, categoryId, categoryPath)} />
+                          onSelectCategory={(categoryId, categoryPath) =>
+                            handleCategorySelect(
+                              index,
+                              categoryId,
+                              categoryPath
+                            )
+                          }
+                        />
                         {errors?.categories?.[index]?.id && (
                           <p className="text-red-500 text-xs mt-1">
                             Please select a category
@@ -341,16 +383,20 @@ export default () => {
                     required: true,
                     pattern: {
                       value: /^[a-zA-Z\s]{3,50}$/,
-                      message: "Invalid account holder name. Must be 3-50 charcters",
+                      message:
+                        "Invalid account holder name. Must be 3-50 charcters",
                     },
                   })}
                   onBlur={async () => {
-                    const result = await trigger("bankDetails.accountHolderName");
+                    const result = await trigger(
+                      "bankDetails.accountHolderName"
+                    );
                     if (!result)
                       validationErrorToast("bankDetails.accountHolderName");
-                  } }
+                  }}
                   placeholder="Account Holder Name"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("bankDetails.bankName", {
                     required: true,
@@ -362,24 +408,27 @@ export default () => {
                   onBlur={async () => {
                     const result = await trigger("bankDetails.bankName");
                     if (!result) validationErrorToast("bankDetails.bankName");
-                  } }
+                  }}
                   placeholder="Bank Name"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("bankDetails.accountNumber", {
                     required: true,
                     pattern: {
                       value: /^\d{10}$/,
-                      message: "Invalid Account Number. Must be a at least 10 digits",
+                      message:
+                        "Invalid Account Number. Must be a at least 10 digits",
                     },
                   })}
                   onBlur={async () => {
                     const result = await trigger("bankDetails.accountNumber");
                     if (!result)
                       validationErrorToast("bankDetails.accountNumber");
-                  } }
+                  }}
                   placeholder="Account Number"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("bankDetails.ifscCode", {
                     required: true,
@@ -391,9 +440,10 @@ export default () => {
                   onBlur={async () => {
                     const result = await trigger("bankDetails.ifscCode");
                     if (!result) validationErrorToast("bankDetails.ifscCode");
-                  } }
+                  }}
                   placeholder="IFSC Code"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
               </div>
             )}
 
@@ -404,31 +454,36 @@ export default () => {
                   {...register("password", {
                     required: true,
                     pattern: {
-                      value: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                      message: "Password must be at least 6 characters long, contain one uppercase letter, one number, and one special character.",
+                      value:
+                        /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+                      message:
+                        "Password must be at least 6 characters long, contain one uppercase letter, one number, and one special character.",
                     },
                   })}
                   onBlur={async () => {
                     const result = await trigger("password");
                     if (!result) validationErrorToast("password");
-                  } }
+                  }}
                   type="password"
                   placeholder="Password"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
                 <input
                   {...register("confirmPassword", {
                     required: true,
 
-                    validate: (value) => value === watch("password") ||
+                    validate: (value) =>
+                      value === watch("password") ||
                       "The passwords do not match!",
                   })}
                   onBlur={async () => {
                     const result = await trigger("confirmPassword");
                     if (!result) validationErrorToast("confirmPassword");
-                  } }
+                  }}
                   type="password"
                   placeholder="Confirm Password"
-                  className="form-input w-full border p-2 rounded-md" />
+                  className="form-input w-full border p-2 rounded-md"
+                />
               </div>
             )}
 
@@ -446,7 +501,7 @@ export default () => {
               ) : (
                 <button
                   type="button"
-                  onClick={() => navigate('/seller/login')}
+                  onClick={() => navigate("/seller/login")}
                   className="btn-secondary py-2 px-4 bg-white-300 rounded-md text-blue-800"
                 >
                   <ArrowLeft className="w-6 h-4 mr-2 inline-block" />

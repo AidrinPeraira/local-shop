@@ -323,25 +323,26 @@ export default function SellerProducts() {
             />
           </div>
         </Card>
-
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 p-4 justify-end items-center md:col-span-1 sm:col-span-2">
+        <Card className="p-4  md:col-span-1 sm:col-span-2">
           <Button
             variant="outline"
             onClick={handleClearFilters}
             disabled={isLoading}
-            className="w-full sm:w-auto"
+            className="w-full my-2 sm:w-auto"
           >
             Clear Filters
           </Button>
           <Button
             onClick={handleApplyFilters}
             disabled={isLoading}
-            className="w-full sm:w-auto"
+            className="w-full my-2 sm:w-auto"
           >
             Apply Filters
           </Button>
-        </div>
+        </Card>
+
+        {/* Buttons */}
+        
       </div>
 
       {/* Products Table with Accordion to shoew the nested varaints*/}

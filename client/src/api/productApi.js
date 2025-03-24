@@ -10,4 +10,5 @@ export const getShopProductsApi = (querry) => API.get(`/products/shop?${querry}`
 export const getProductDetailsApi = (slug, id) => API.get(`/products/${slug}/${id}`)
 
 export const getAllProductsApi = () => API.get('/products/all');
-export const blockProductApi = (id, isBlocked) => API.patch(`/products/block/${id}`, { isBlocked });
+export const blockProductApi = (id) => API.patch(`/products/block/${id}`);
+export const unblockProductApi = (id) => API.patch(`/products/unblock/${id}`);

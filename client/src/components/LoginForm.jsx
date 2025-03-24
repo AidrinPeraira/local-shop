@@ -141,7 +141,16 @@ const LoginForm = () => {
         >
           Forgot password?
         </Link>
+
+        <Link
+          to="/seller/login"
+          className="text hover:opacity-70 font-medium"
+        >
+          Are you a seller? Click Here
+        </Link>
       </div>
+
+      
 
       <Button type="submit" className="w-full hover:opacity-90">
         Sign in
