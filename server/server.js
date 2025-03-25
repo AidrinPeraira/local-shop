@@ -21,6 +21,7 @@ import { errorHandler } from './middlewares/errorHandlerMiddleware.js';
 import cartRouter from './routes/cartRoutes.js'
 import orderRouter from './routes/orderRoutes.js'
 import whishlistRouter from './routes/whishlistRoutes.js'
+import couponRouter from './routes/couponRoutes.js'
 
 
 dotenv.config() //load dot env data into 'process.env' by default
@@ -106,6 +107,7 @@ app.use('/api/products', productRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/wishlist', whishlistRouter)
 app.use('/api/orders', orderRouter)
+app.use('/api/coupons', couponRouter)
 
 
 

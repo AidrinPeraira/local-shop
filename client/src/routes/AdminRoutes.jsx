@@ -4,6 +4,7 @@ import { AdminLayout } from "../components/admin/AdminLayout";
 import ProtectedRoute from "./ProtectedRoutes";
 import { PageLoading } from "../components/ui/PageLoading";
 
+
 // Lazy load components. This is easy way to wrap all components in a single go
 const LazyComponent = (Component) => (props) => (
   <Suspense fallback={<PageLoading />}>
@@ -20,6 +21,7 @@ const AdminProductsPage = LazyComponent(lazy(() => import("../pages/AdminPages/A
 const Categories = LazyComponent(lazy(() => import("../pages/AdminPages/AdminCategories")));
 const AdminOrdersPage = LazyComponent(lazy(() => import("../pages/AdminPages/AdminOrdersPage")));
 const AdminNotFound = LazyComponent(lazy(() => import("../pages/AdminPages/AdminNotFound")));
+const AdminCoupons = LazyComponent(lazy(() => import("../pages/AdminPages/AdminCoupons")));
 
 const AdminRoutes = () => {
   return (
@@ -33,6 +35,7 @@ const AdminRoutes = () => {
           <Route path="categories" element={<Categories />} />
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="coupons" element={<AdminCoupons />} />
           <Route path="*" element={<AdminNotFound />} />
         </Route>
       </Route>
