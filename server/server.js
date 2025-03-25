@@ -22,6 +22,7 @@ import cartRouter from './routes/cartRoutes.js'
 import orderRouter from './routes/orderRoutes.js'
 import whishlistRouter from './routes/whishlistRoutes.js'
 import couponRouter from './routes/couponRoutes.js'
+import { checkUserBlocked } from './middlewares/authRestrictionMiddleware.js';
 
 
 dotenv.config() //load dot env data into 'process.env' by default
@@ -93,6 +94,8 @@ app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups"); // Allow popups
   next();
 });
+
+app.use(checkUserBlocked);
 
 
 //add necessary routing
