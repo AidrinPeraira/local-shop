@@ -26,7 +26,11 @@ import {
   addUserAddressApi,
 } from "../../api/userDataApi";
 import { getBuyerCouponsApi } from "../../api/couponApi";
-import { createOrderApi } from "../../api/orderApi";
+import {
+  createOrderApi,
+  createRazorpayOrderApi,
+  verifyRazorpayPaymentApi,
+} from "../../api/orderApi";
 import OrderSuccess from "./OrderSuccess";
 import {
   Dialog,
@@ -35,6 +39,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../components/ui/dialog";
+import { loadScript } from "../../utils/loadScript";
+import { razorPayKey } from "../../configuration";
 
 const CheckoutContent = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -127,6 +133,21 @@ const CheckoutContent = () => {
     fetchCoupons();
   }, []);
 
+  const initializeRazorpay = async () => {
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+    if (!res) {
+      toast({
+        title: "Error",
+        description: "Razorpay SDK failed to load",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleApplyCoupon = (event, coupon) => {
     event.stopPropagation();
     setSelectedCoupon(coupon);
@@ -178,7 +199,7 @@ const CheckoutContent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedAddressId) {
       toast({
         title: "Error",
@@ -189,27 +210,135 @@ const CheckoutContent = () => {
     }
 
     try {
-      const orderData = {
-        cart,
-        selectedAddressId,
-        paymentMethod,
-        userProfile,
-        couponId: selectedCoupon?._id // Add this line
-      };
-  
-      const response = await createOrderApi(orderData);
+      if (paymentMethod === "card") {
+        const initialized = await initializeRazorpay();
+        if (!initialized) return;
 
-      toast({
-        title: "Order placed successfully!",
-        description: response.data.message,
-      });
+        let amount =
+          cart.summary.cartTotal -
+          (selectedCoupon
+            ? Math.min(
+                selectedCoupon.discountType === "percentage"
+                  ? (cart.summary.subtotalBeforeDiscount *
+                      selectedCoupon.discountValue) /
+                      100
+                  : selectedCoupon.discountValue,
+                selectedCoupon.maxDiscount
+              )
+            : 0);
+        // Create Razorpay order
+        const orderResponse = await createRazorpayOrderApi({
+          amount: amount,
+        });
 
-      setOrderId(response.data.order.orderId);
-      setOrderSuccess(true);
+        const options = {
+          key: razorPayKey,
+          amount: orderResponse.data.order.amount,
+          currency: "INR",
+          name: "Local Shop",
+          description: "Payment for your order",
+          order_id: orderResponse.data.order.id,
+          prefill: {
+            name: userProfile?.username,
+            email: userProfile?.email,
+            contact: userProfile?.phone,
+          },
+          config: {
+            display: {
+              blocks: {
+                upi: {
+                  name: "Pay via UPI",
+                  instruments: [
+                    {
+                      method: "upi",
+                    },
+                  ],
+                },
+                card: {
+                  name: "Pay via Card",
+                  instruments: [
+                    {
+                      method: "card",
+                    },
+                  ],
+                },
+              },
+              sequence: ["block.upi", "block.card"],
+              preferences: {
+                show_default_blocks: true,
+              },
+            },
+          },
+          handler: async (response) => {
+            try {
+              // Verify payment
+              await verifyRazorpayPaymentApi({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+
+              // Create order after payment verification
+              const orderData = {
+                cart,
+                selectedAddressId,
+                paymentMethod,
+                userProfile,
+                couponId: selectedCoupon?._id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+              };
+
+              const orderResponse = await createOrderApi(orderData);
+              setOrderId(orderResponse.data.order.orderId);
+              setOrderSuccess(true);
+            } catch (error) {
+              toast({
+                title: "Error",
+                description:
+                  error.response?.data?.message ||
+                  "Payment verification failed",
+                variant: "destructive",
+              });
+            }
+          },
+          prefill: {
+            name: userProfile?.username,
+            email: userProfile?.email,
+            contact: userProfile?.phone,
+          },
+          theme: {
+            color: "#000000",
+          },
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.open();
+      } else {
+        //for cod
+        const orderData = {
+          cart,
+          selectedAddressId,
+          paymentMethod,
+          userProfile,
+          couponId: selectedCoupon?._id, // Add this line
+        };
+
+        const response = await createOrderApi(orderData);
+
+        toast({
+          title: "Order placed successfully!",
+          description: response.data.message,
+        });
+
+        setOrderId(response.data.order.orderId);
+        setOrderSuccess(true);
+      }
     } catch (error) {
+      console.error("Error placing order:", error);
       toast({
         title: "Error",
-        description: error.response.data.message || "Failed to place order",
+        description: error.response?.data?.message || "Failed to place order",
         variant: "destructive",
       });
     }
@@ -485,34 +614,6 @@ const CheckoutContent = () => {
                       Credit/Debit Card
                     </Label>
                   </div>
-
-                  {paymentMethod === "card" && (
-                    <div className="mt-4 grid gap-4">
-                      <div>
-                        <Label htmlFor="cardNumber">Card Number</Label>
-                        <Input
-                          id="cardNumber"
-                          placeholder="1234 5678 9012 3456"
-                          required
-                        />
-                      </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="col-span-2">
-                          <Label htmlFor="expiry">Expiry Date</Label>
-                          <Input id="expiry" placeholder="MM/YY" required />
-                        </div>
-                        <div>
-                          <Label htmlFor="cvv">CVV</Label>
-                          <Input
-                            id="cvc"
-                            type="password"
-                            placeholder="123"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </RadioGroup>
               </CardContent>
             </Card>
@@ -541,7 +642,7 @@ const CheckoutContent = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
-                        setIsApplyingCoupon(true)
+                        setIsApplyingCoupon(true);
                       }}
                     >
                       Select Coupon
@@ -552,7 +653,9 @@ const CheckoutContent = () => {
                 {selectedCoupon ? (
                   <div className="mt-4 space-y-3 bg-primary/5 p-4 rounded-lg">
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-semibold text-primary">{selectedCoupon.code}</span>
+                      <span className="text-lg font-semibold text-primary">
+                        {selectedCoupon.code}
+                      </span>
                       <span className="font-medium text-primary">
                         {selectedCoupon.discountType === "percentage"
                           ? `${selectedCoupon.discountValue}% OFF`
@@ -570,12 +673,18 @@ const CheckoutContent = () => {
                       </div>
                       <div className="flex justify-between">
                         <span>Valid Until:</span>
-                        <span>{new Date(selectedCoupon.validUntil).toLocaleDateString()}</span>
+                        <span>
+                          {new Date(
+                            selectedCoupon.validUntil
+                          ).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 mt-2">Select a coupon to get discount on your order</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Select a coupon to get discount on your order
+                  </p>
                 )}
 
                 <Dialog

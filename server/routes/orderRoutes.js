@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateSeller, authenticateUser, authorizeSeller } from "../middlewares/authMiddleware.js";
-import { cancelUserOrders, createUserOrder, getSellerOrders, getUserOrders, returnUserOrders, sellerUpdateOrderStatus} from "../controller/orderController.js";
+import { cancelUserOrders, createRazorpayOrder, createUserOrder, getSellerOrders, getUserOrders, returnUserOrders, sellerUpdateOrderStatus, verifyRazorpayPayment} from "../controller/orderController.js";
 
 
 const orderRoutes = express.Router();
@@ -14,5 +14,9 @@ orderRoutes.route("/return/:orderId").patch(authenticateUser, returnUserOrders)
 //seller routes
 orderRoutes.route("/seller").get(authenticateSeller, authorizeSeller, getSellerOrders)
 orderRoutes.route("/status/:orderId").patch(authenticateSeller, authorizeSeller, sellerUpdateOrderStatus)
+
+//razor pay
+orderRoutes.post("/create-razorpay-order", authenticateUser, createRazorpayOrder);
+orderRoutes.post("/verify-payment", authenticateUser,  verifyRazorpayPayment);
 
 export default orderRoutes;

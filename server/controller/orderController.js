@@ -4,7 +4,8 @@ import Product from "../models/productModel.js";
 import Address from "../models/userAddresssModel.js";
 import Cart from "../models/cartModel.js";
 import Coupon from "../models/couponModel.js";
-
+import { razorpay } from "../utils/razorpay.js";
+import crypto from 'crypto';
 //buyer side controllers
 
 export const createUserOrder = asyncHandler(async (req, res) => {
@@ -379,6 +380,55 @@ export const returnUserOrders = asyncHandler(async (req, res) => {
       success: false,
       message: "Error processing return request",
       error: error.message
+    });
+  }
+});
+
+//razor pay
+export const createRazorpayOrder = asyncHandler(async (req, res) => {
+  const { amount } = req.body;
+  
+  try {
+    const options = {
+      amount: Math.round(amount * 100), // Razorpay expects amount in paise
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`,
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error creating Razorpay order",
+      error: error.message,
+    });
+  }
+});
+
+// Add this to verify payment
+export const verifyRazorpayPayment = asyncHandler(async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+  
+  const sign = razorpay_order_id + "|" + razorpay_payment_id;
+  const expectedSign = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(sign.toString())
+    .digest("hex");
+
+  if (razorpay_signature === expectedSign) {
+    return res.status(200).json({
+      success: true,
+      message: "Payment verified successfully",
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid signature sent",
     });
   }
 });
