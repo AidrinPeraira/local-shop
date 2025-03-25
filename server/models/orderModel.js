@@ -139,6 +139,14 @@ const orderSchema = new mongoose.Schema(
         type: Number,
         required: true,
       },
+      couponDiscount: {
+        type: Number,
+        default: 0,
+      },
+      coupon: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Coupon",
+      },
       cartTotal: {
         type: Number,
         required: true,

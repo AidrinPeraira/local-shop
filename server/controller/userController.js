@@ -130,12 +130,18 @@ export const googleAuthController = asyncHandler(async (req, res) => {
     `https://www.googleapis.com/oauth2/v3/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
   );
 
-  const { email, name } = userRes.data;
-  console.log(email, name);
+  const { email, name } = userRes.data; 
   let user = await User.findOne({ email });
+
+  if (!user.isActive) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("Account Blocked! Please contact admin!");
+  }
+  
   const randomPassword =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
+    
   if (!user) {
     user = await User.create({
       username: name,

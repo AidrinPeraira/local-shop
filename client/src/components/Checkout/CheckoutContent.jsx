@@ -15,13 +15,19 @@ import {
   Mail,
   ChevronLeft,
   Lock,
+  Tag,
+  X,
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserProfileApi, getUserAddressesApi, addUserAddressApi } from "../../api/userDataApi";
+import {
+  getUserProfileApi,
+  getUserAddressesApi,
+  addUserAddressApi,
+} from "../../api/userDataApi";
+import { getBuyerCouponsApi } from "../../api/couponApi";
 import { createOrderApi } from "../../api/orderApi";
 import OrderSuccess from "./OrderSuccess";
-import { clearCart } from "../../redux/features/cartSlice";
 import {
   Dialog,
   DialogContent,
@@ -38,14 +44,13 @@ const CheckoutContent = () => {
   const cart = useSelector((state) => state.cart.cart);
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
-
-  
+  const [availableCoupons, setAvailableCoupons] = useState([]);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderId, setOrderId] = useState(null);
-
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
-
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [addressForm, setAddressForm] = useState({
     street: "",
@@ -55,6 +60,7 @@ const CheckoutContent = () => {
     isDefault: false,
   });
 
+  // fetch user profile
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -65,7 +71,7 @@ const CheckoutContent = () => {
           title: "Error",
           description: error.message || "Failed to fetch user profile",
           variant: "destructive",
-        }); 
+        });
       }
     };
 
@@ -74,6 +80,7 @@ const CheckoutContent = () => {
     }
   }, [user?._id]);
 
+  // fetch addresses
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
@@ -100,10 +107,36 @@ const CheckoutContent = () => {
     fetchAddresses();
   }, []);
 
+  // fetch coupons
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const response = await getBuyerCouponsApi();
+        if (response.data.success) {
+          setAvailableCoupons(response.data.coupons);
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch available coupons",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchCoupons();
+  }, []);
+
+  const handleApplyCoupon = (event, coupon) => {
+    event.stopPropagation();
+    setSelectedCoupon(coupon);
+    setIsApplyingCoupon(false);
+  };
+
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     try {
       const response = await addUserAddressApi(addressForm);
       if (response.data) {
@@ -112,7 +145,10 @@ const CheckoutContent = () => {
         if (addressesResponse.data.addresses) {
           setAddresses(addressesResponse.data.addresses);
           // Select the newly added address
-          const newAddress = addressesResponse.data.addresses[addressesResponse.data.addresses.length - 1];
+          const newAddress =
+            addressesResponse.data.addresses[
+              addressesResponse.data.addresses.length - 1
+            ];
           setSelectedAddressId(newAddress._id);
         }
 
@@ -124,7 +160,7 @@ const CheckoutContent = () => {
           pincode: "",
           isDefault: false,
         });
-        setIsAddingNew(false);  
+        setIsAddingNew(false);
 
         toast({
           title: "Success",
@@ -140,10 +176,9 @@ const CheckoutContent = () => {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!selectedAddressId) {
       toast({
         title: "Error",
@@ -159,8 +194,9 @@ const CheckoutContent = () => {
         selectedAddressId,
         paymentMethod,
         userProfile,
+        couponId: selectedCoupon?._id // Add this line
       };
-
+  
       const response = await createOrderApi(orderData);
 
       toast({
@@ -274,7 +310,10 @@ const CheckoutContent = () => {
                   </div>
                   <Dialog open={isAddingNew} onOpenChange={setIsAddingNew}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex items-center gap-2"
+                      >
                         <Plus className="h-4 w-4" /> Add New Address
                       </Button>
                     </DialogTrigger>
@@ -282,13 +321,21 @@ const CheckoutContent = () => {
                       <DialogHeader>
                         <DialogTitle>Add New Address</DialogTitle>
                       </DialogHeader>
-                      <form onSubmit={handleAddressSubmit} className="space-y-4">
+                      <form
+                        onSubmit={handleAddressSubmit}
+                        className="space-y-4"
+                      >
                         <div className="space-y-2">
                           <Label htmlFor="street">Street Address</Label>
                           <Input
                             id="street"
                             value={addressForm.street}
-                            onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                street: e.target.value,
+                              })
+                            }
                             required
                           />
                         </div>
@@ -298,7 +345,12 @@ const CheckoutContent = () => {
                             <Input
                               id="city"
                               value={addressForm.city}
-                              onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                              onChange={(e) =>
+                                setAddressForm({
+                                  ...addressForm,
+                                  city: e.target.value,
+                                })
+                              }
                               required
                             />
                           </div>
@@ -307,7 +359,12 @@ const CheckoutContent = () => {
                             <Input
                               id="state"
                               value={addressForm.state}
-                              onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                              onChange={(e) =>
+                                setAddressForm({
+                                  ...addressForm,
+                                  state: e.target.value,
+                                })
+                              }
                               required
                             />
                           </div>
@@ -317,7 +374,12 @@ const CheckoutContent = () => {
                           <Input
                             id="pincode"
                             value={addressForm.pincode}
-                            onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value })}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                pincode: e.target.value,
+                              })
+                            }
                             required
                           />
                         </div>
@@ -326,15 +388,22 @@ const CheckoutContent = () => {
                             type="checkbox"
                             id="isDefault"
                             checked={addressForm.isDefault}
-                            onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                isDefault: e.target.checked,
+                              })
+                            }
                             className="rounded border-gray-300"
                           />
-                          <Label htmlFor="isDefault">Set as default address</Label>
+                          <Label htmlFor="isDefault">
+                            Set as default address
+                          </Label>
                         </div>
                         <div className="flex justify-end gap-2">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
+                          <Button
+                            type="button"
+                            variant="outline"
                             onClick={() => setIsAddingNew(false)}
                           >
                             Cancel
@@ -451,6 +520,112 @@ const CheckoutContent = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
+            {/* select coupons */}
+            <Card className="mb-4">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <Tag className="h-5 w-5 text-primary" />
+                    <h2 className="text-lg font-semibold">Apply Coupon</h2>
+                  </div>
+                  {selectedCoupon ? (
+                    <button
+                      onClick={() => setSelectedCoupon(null)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        setIsApplyingCoupon(true)
+                      }}
+                    >
+                      Select Coupon
+                    </Button>
+                  )}
+                </div>
+
+                {selectedCoupon ? (
+                  <div className="mt-4 space-y-3 bg-primary/5 p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-semibold text-primary">{selectedCoupon.code}</span>
+                      <span className="font-medium text-primary">
+                        {selectedCoupon.discountType === "percentage"
+                          ? `${selectedCoupon.discountValue}% OFF`
+                          : `₹${selectedCoupon.discountValue} OFF`}
+                      </span>
+                    </div>
+                    <div className="text-sm space-y-1 text-gray-600">
+                      <div className="flex justify-between">
+                        <span>Minimum Purchase:</span>
+                        <span>₹{selectedCoupon.minPurchase}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Maximum Discount:</span>
+                        <span>₹{selectedCoupon.maxDiscount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Valid Until:</span>
+                        <span>{new Date(selectedCoupon.validUntil).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 mt-2">Select a coupon to get discount on your order</p>
+                )}
+
+                <Dialog
+                  open={isApplyingCoupon}
+                  onOpenChange={setIsApplyingCoupon}
+                >
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Available Coupons</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                      {availableCoupons.map((coupon) => (
+                        <div
+                          key={coupon._id}
+                          className="border rounded-lg p-4 space-y-2 hover:border-primary cursor-pointer"
+                          onClick={(e) => handleApplyCoupon(e, coupon)}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="font-medium text-lg">
+                              {coupon.code}
+                            </div>
+                            <div className="text-sm font-medium text-primary">
+                              {coupon.discountType === "percentage"
+                                ? `${coupon.discountValue}% OFF`
+                                : `₹${coupon.discountValue} OFF`}
+                            </div>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Min. Purchase: ₹{coupon.minPurchase}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Max Discount: ₹{coupon.maxDiscount}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            Valid until{" "}
+                            {new Date(coupon.validUntil).toLocaleDateString()}
+                          </div>
+                        </div>
+                      ))}
+                      {availableCoupons.length === 0 && (
+                        <div className="text-center py-4 text-gray-500">
+                          No coupons available
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+
             {/* Order Summary Card */}
             <Card>
               <CardContent className="p-6">
@@ -482,9 +657,45 @@ const CheckoutContent = () => {
 
                   <Separator />
 
+                  {selectedCoupon && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Coupon Discount ({selectedCoupon.code})</span>
+                      <span>
+                        -₹
+                        {formatPrice(
+                          Math.min(
+                            selectedCoupon.discountType === "percentage"
+                              ? (cart.summary.subtotalBeforeDiscount *
+                                  selectedCoupon.discountValue) /
+                                  100
+                              : selectedCoupon.discountValue,
+                            selectedCoupon.maxDiscount
+                          )
+                        )}
+                      </span>
+                    </div>
+                  )}
+
+                  <Separator />
+
                   <div className="flex justify-between font-semibold">
                     <span>Total</span>
-                    <span>₹{formatPrice(cart.summary.cartTotal)}</span>
+                    <span>
+                      ₹
+                      {formatPrice(
+                        cart.summary.cartTotal -
+                          (selectedCoupon
+                            ? Math.min(
+                                selectedCoupon.discountType === "percentage"
+                                  ? (cart.summary.subtotalBeforeDiscount *
+                                      selectedCoupon.discountValue) /
+                                      100
+                                  : selectedCoupon.discountValue,
+                                selectedCoupon.maxDiscount
+                              )
+                            : 0)
+                      )}
+                    </span>
                   </div>
                 </div>
               </CardContent>

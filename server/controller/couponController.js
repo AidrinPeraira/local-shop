@@ -35,7 +35,7 @@ export const adminCreateCoupon = asyncHandler(
       validFrom,
       validUntil,
       isActive: true,
-      usageLimit: usageLimit || 1, // Default usage limit
+      usageLimit: usageLimit || 100, // Default usage limit
     });
 
     res.status(HTTP_CODES.CREATED).json({
@@ -193,5 +193,36 @@ export const adminGetCoupons = asyncHandler(
       currentPage: page,
     });
   }
+);
+
+export const getBuyerCoupons = asyncHandler(
+  async (req, res) => {
+    const userId = req.user._id;
+
+    const allCoupons = await Coupon.find({
+      validUntil: { $gt: new Date() },
+      isActive: true,
+    });
+
+    const availableCoupons = allCoupons.filter(coupon => {
+      // Check if user has used this coupon
+      const hasUsed = coupon.usedBy.includes(userId);
+      
+      if(hasUsed) return false; // If user has used, don't show i
+      
+      // If user hasn't used the coupon or coupon hasn't reached usage limit
+      if (!hasUsed && coupon.usedCount < coupon.usageLimit) {
+        return true;
+      }
+
+      return false;
+    });
+
+    res.status(HTTP_CODES.OK).json({
+      success: true,
+      coupons: availableCoupons,
+    });
+  }
+
 );
 

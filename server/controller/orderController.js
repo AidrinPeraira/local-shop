@@ -3,12 +3,13 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import Address from "../models/userAddresssModel.js";
 import Cart from "../models/cartModel.js";
+import Coupon from "../models/couponModel.js";
 
 //buyer side controllers
 
 export const createUserOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { cart, selectedAddressId, paymentMethod, userProfile } = req.body;
+  const { cart, selectedAddressId, paymentMethod, userProfile, couponId } = req.body;
 
   try {
     // 1. Generate custom order ID
@@ -70,8 +71,48 @@ export const createUserOrder = asyncHandler(async (req, res) => {
     );
 
     // 3. Create new order
+    // Add coupon validation and calculation
+    let couponDiscount = 0;
+    let appliedCoupon = null;
+    if (couponId) {
+      appliedCoupon = await Coupon.findById(couponId);
+      if (!appliedCoupon) {
+        throw new Error("Invalid coupon");
+      }
+
+      // Validate coupon
+      if (!appliedCoupon.isActive || appliedCoupon.validUntil < new Date()) {
+        throw new Error("Coupon has expired");
+      }
+
+      if (appliedCoupon.usedCount >= appliedCoupon.usageLimit) {
+        throw new Error("Coupon usage limit exceeded");
+      }
+
+      // Calculate coupon discount
+      if (cart.summary.subtotalBeforeDiscount >= appliedCoupon.minPurchase) {
+        couponDiscount = appliedCoupon.discountType === "percentage"
+          ? Math.min(
+              (cart.summary.subtotalBeforeDiscount * appliedCoupon.discountValue) / 100,
+              appliedCoupon.maxDiscount
+            )
+          : Math.min(appliedCoupon.discountValue, appliedCoupon.maxDiscount);
+      } else {
+        throw new Error(`Minimum purchase amount of ₹${appliedCoupon.minPurchase} required for this coupon`);
+      }
+
+      // Update coupon usage
+      appliedCoupon.usedCount += 1;
+      appliedCoupon.usedBy.push(userId);
+      await appliedCoupon.save();
+    }
+
+    // Update cart total with coupon discount
+    const finalCartTotal = cart.summary.cartTotal - couponDiscount;
+
+    // Create new order with coupon details
     const order = new Order({
-      orderId: customOrderId, // Add this line
+      orderId: customOrderId,
       user: userId,
       items: itemsWithSeller,
       shippingAddress: {
@@ -79,7 +120,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         city: shippingAddress.city,
         state: shippingAddress.state,
         pincode: shippingAddress.pincode,
-        phone: shippingAddress.phone || userProfile?.phone || req.body.phone, // Add fallback options for phone
+        phone: shippingAddress.phone || userProfile?.phone || req.body.phone,
       },
       summary: {
         subtotalBeforeDiscount: cart.summary.subtotalBeforeDiscount,
@@ -87,7 +128,9 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         subtotalAfterDiscount: cart.summary.subtotalAfterDiscount,
         shippingCharge: cart.summary.shippingCharge,
         platformFee: cart.summary.platformFee,
-        cartTotal: cart.summary.cartTotal,
+        couponDiscount: couponDiscount,
+        coupon: couponId,
+        cartTotal: finalCartTotal,
       },
       payment: {
         method: paymentMethod === "card" ? "ONLINE" : "COD",
@@ -119,8 +162,9 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       message: "Order created successfully",
       order: {
         orderId: order._id,
-        total: order.summary.cartTotal,
+        total: finalCartTotal,
         status: order.orderStatus,
+        couponDiscount: couponDiscount,
       },
     });
   } catch (error) {

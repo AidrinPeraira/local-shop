@@ -68,7 +68,7 @@ const AdminCoupons = () => {
     maxDiscount: "",
     validFrom: "",
     validUntil: "",
-    usageLimit: 1,
+    usageLimit: 100,
     description: "",
   });
 
@@ -346,7 +346,7 @@ const AdminCoupons = () => {
                     </span>
                   </td>
                   <td className="p-3">
-                    {coupon.usedCount}
+                    {coupon.usedCount}/{coupon.usageLimit}
                   </td>
                   <td className="p-3 text-right space-x-2">
                     <Dialog
