@@ -225,7 +225,7 @@ const CheckoutContent = () => {
                   : selectedCoupon.discountValue,
                 selectedCoupon.maxDiscount
               )
-            : 0);
+            : 0) ;
         // Create Razorpay order
         const orderResponse = await createRazorpayOrderApi({
           amount: amount,
@@ -246,28 +246,36 @@ const CheckoutContent = () => {
           config: {
             display: {
               blocks: {
-                upi: {
+                banks: {
+                  name: "Pay via Bank Transfer",
+                  instruments: [
+                    {
+                      method: "netbanking"
+                    }
+                  ]
+                },
+                upis: {
                   name: "Pay via UPI",
                   instruments: [
                     {
-                      method: "upi",
-                    },
-                  ],
+                      method: "upi"
+                    }
+                  ]
                 },
-                card: {
+                cards: {
                   name: "Pay via Card",
                   instruments: [
                     {
-                      method: "card",
-                    },
-                  ],
-                },
+                      method: "card"
+                    }
+                  ]
+                }
               },
-              sequence: ["block.upi", "block.card"],
+              sequence: ["block.upis", "block.cards", "block.banks"],
               preferences: {
-                show_default_blocks: true,
-              },
-            },
+                show_default_blocks: false
+              }
+            }
           },
           handler: async (response) => {
             try {

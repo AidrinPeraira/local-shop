@@ -71,16 +71,16 @@ Assigned Pendings:
     ✔ Give choose option in signing for seller and buyer @done (3/25/2025, 6:40:20 PM)
     ☐ Seller signup validation - recheck
     ☐ Same cat can be added multiple times in signup
-    ☐ Blocking users and sellers
+    ✔ Blocking users and sellers @done (3/25/2025, 8:34:24 PM)
     ☐ Add category not working
-    ☐ Pagination handle in backend
+    ✔ Pagination handle in backend @done (3/25/2025, 8:34:30 PM)
     ☐ Add to cart not working - add error message like login to add product to cart
-    ☐ Give option to add addres from checkout
+    ✔ Give option to add addres from checkout @done (3/25/2025, 8:34:52 PM)
     ☐ Order details need more info
     ☐ Order return handle by diff sellers
-    ☐ Search cap letters are not taking
+    ✔ Search cap letters are not taking @done (3/25/2025, 8:34:57 PM)
     ☐ Admin order list shows error
-    ☐ Listing of order in admin side not done
+    ✔ Listing of order in admin side not done @done (3/25/2025, 8:35:01 PM)
 
 Admin side :
 ✔ Admin sign in @done (3/10/2025, 4:02:41 PM)
@@ -236,7 +236,7 @@ Admin side :
 Week 3 Project: 
 
     User side :
-        ☐ Integrate online payment method(Razorpay or Paypal). The integration of multiple payment gateways will be an add-on..
+        ✔ Integrate online payment method(Razorpay or Paypal). The integration of multiple payment gateways will be an add-on.. @done (3/25/2025, 8:35:11 PM)
         ☐ After a successful payment, redirect the user to the order success page. 
             ☐ The page should contain a thank-you or success statement, 
             ☐ an illustration, and
@@ -296,8 +296,8 @@ Week 3 Project:
             Add a new field to the registration page (optional) for new users to manually enter the referral code, accommodating non-referred users.
             Once the new user registers, provide a unique coupon to the existing user.
         
-        ☐ Coupon Management (Create, Delete)
-            ☐ Implement functionality to create new coupon with proper validations.
+        ✔ Coupon Management (Create, Delete) @done (3/25/2025, 8:35:22 PM)
+            ✔ Implement functionality to create new coupon with proper validations. @done (3/25/2025, 8:35:23 PM)
         ☐ Sales report(Daily, Weekly, Yearly, Custom date)
             ☐ Generate sales report
             ☐ Should be able to filter based on
