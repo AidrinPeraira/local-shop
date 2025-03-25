@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Star, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronUp, Star, ChevronRight , Heart} from "lucide-react";
 import { Button } from "../../components/ui/button.jsx";
 import { Slider } from "../../components/ui/slider.jsx";
 import { Checkbox } from "../../components/ui/checkbox.jsx";
@@ -29,6 +29,7 @@ import {
   SheetTrigger,
 } from "../../components/ui/sheet";
 import ProductPurchaseCard from "../Product/ProducPurchaseCard";
+import { addToWishlistApi, removeFromWishlistApi, getWishlistApi } from "../../api/wishlistApi";
 
 const ShopContent = () => {
   const [products, setProducts] = useState([]);
@@ -44,11 +45,13 @@ const ShopContent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  const [wishlistedItems, setWishlistedItems] = useState(new Set());
+
   //SETTING THE pagination values
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   //temp????
   const [endIndex, setEndIndex] = useState(12);
@@ -85,6 +88,54 @@ const ShopContent = () => {
     setIsLoading(false);
   }, [searchParams]);
 
+  //get widhlisted items
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const response = await getWishlistApi();
+        const productIds = new Set(
+          response.data.wishlist?.products?.map((product) => product._id) || []
+        );
+        setWishlistedItems(productIds);
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+      }
+    };
+    fetchWishlist();
+  }, []);
+
+  const handleWishlist = async (e, productId) => {
+    e.preventDefault(); // Prevent navigation
+    try {
+      if (wishlistedItems.has(productId)) {
+        await removeFromWishlistApi(productId);
+        setWishlistedItems((prev) => {
+          const next = new Set(prev);
+          next.delete(productId);
+          return next;
+        });
+        toast({
+          title: "Removed from wishlist",
+          description: "Product removed from your saved list",
+        });
+      } else {
+        await addToWishlistApi({ productId });
+        setWishlistedItems((prev) => new Set([...prev, productId]));
+        toast({
+          title: "Added to wishlist",
+          description: "Product saved to your list",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error.response?.data?.message || "Failed to update wishlist",
+        variant: "destructive",
+      });
+    }
+  };
+
   //getting products
   async function fetchProducts() {
     try {
@@ -105,7 +156,7 @@ const ShopContent = () => {
         description: error.response.data.message,
         variant: "destructive",
       });
-      navigate(-1)
+      navigate(-1);
     } finally {
       setIsLoading(false);
     }
@@ -469,8 +520,8 @@ const ShopContent = () => {
               // Products display
               products.map((product) => (
                 <div key={product._id} className="group">
-                  <Link 
-                    to={`/product/${product.slug}?id=${product._id}`} 
+                  <Link
+                    to={`/product/${product.slug}?id=${product._id}`}
                     className="block"
                   >
                     <div className="relative aspect-square rounded-xl bg-gray-100 overflow-hidden mb-4">
@@ -479,17 +530,36 @@ const ShopContent = () => {
                         alt={product.productName}
                         className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
                       />
-                      <div 
+
+                      {/* wishlist buttomn */}
+                      <button
+                        onClick={(e) => handleWishlist(e, product._id)}
+                        className="absolute top-4 right-4 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
+                      >
+                        <Heart
+                          className={`h-5 w-5 ${
+                            wishlistedItems.has(product._id)
+                              ? "fill-red-500 text-red-500"
+                              : "text-gray-600"
+                          }`}
+                        />
+                      </button>
+
+                      <div
                         className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2"
-                        onClick={(e) => e.preventDefault()} // Prevent Link navigation when clicking buttons
+                        onClick={(e) => e.preventDefault()}
                       >
                         <Sheet>
                           <SheetTrigger disabled={!product.inStock}>
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               variant="secondary"
                               disabled={!product.inStock}
-                              className={!product.inStock ? "cursor-not-allowed opacity-50" : ""}
+                              className={
+                                !product.inStock
+                                  ? "cursor-not-allowed opacity-50"
+                                  : ""
+                              }
                             >
                               Add to Cart
                             </Button>
@@ -499,17 +569,24 @@ const ShopContent = () => {
                               <SheetTitle>Add to Cart</SheetTitle>
                             </SheetHeader>
                             <div className="mt-4 flex-1 overflow-y-auto">
-                              <ProductPurchaseCard product={product} mode="cart" />
+                              <ProductPurchaseCard
+                                product={product}
+                                mode="cart"
+                              />
                             </div>
                           </SheetContent>
                         </Sheet>
 
                         <Sheet>
                           <SheetTrigger disabled={!product.inStock}>
-                            <Button 
+                            <Button
                               size="sm"
                               disabled={!product.inStock}
-                              className={!product.inStock ? "cursor-not-allowed opacity-50" : ""}
+                              className={
+                                !product.inStock
+                                  ? "cursor-not-allowed opacity-50"
+                                  : ""
+                              }
                             >
                               Buy Now
                             </Button>
@@ -519,7 +596,10 @@ const ShopContent = () => {
                               <SheetTitle>Buy Now</SheetTitle>
                             </SheetHeader>
                             <div className="mt-4 flex-1 overflow-y-auto">
-                              <ProductPurchaseCard product={product} mode="buy" />
+                              <ProductPurchaseCard
+                                product={product}
+                                mode="buy"
+                              />
                             </div>
                           </SheetContent>
                         </Sheet>

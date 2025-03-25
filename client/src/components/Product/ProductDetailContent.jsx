@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Heart } from 'lucide-react';
 import { Container } from '../../components/ui/container';
 import ProductBreadcrumbs from './ProductBreadcrumbs';
 import ProductGallery from './ProductGallery';
@@ -7,9 +8,11 @@ import ProductPurchaseCard from './ProducPurchaseCard';
 import ProductRecommendations from './ProductRecomendations';
 import { getProductDetailsApi } from '../../api/productApi';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { addToWishlistApi, removeFromWishlistApi, getWishlistApi } from '../../api/wishlistApi';
 
 const ProductDetailContent = () => {
   const [product, setProduct] = useState(null);
+  const [isWishlisted, setIsWishlisted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchParams] = useSearchParams();
@@ -47,6 +50,49 @@ const ProductDetailContent = () => {
       fetchProductDetails();
     }
   }, [id]);
+
+  //cehck wishlist status
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      if (!id) return;
+      try {
+        const response = await getWishlistApi();
+        const wishlistedProducts = response.data.wishlist?.products || [];
+        setIsWishlisted(wishlistedProducts.some(item => item._id === id));
+      } catch (error) {
+        console.error('Error checking wishlist status:', error);
+      }
+    };
+    checkWishlistStatus();
+  }, [id]);
+
+  const handleWishlist = async () => {
+    if (!product) return;
+    
+    try {
+      if (isWishlisted) {
+        await removeFromWishlistApi(product._id);
+        setIsWishlisted(false);
+        toast({
+          title: "Removed from wishlist",
+          description: "Product removed from your saved list",
+        });
+      } else {
+        await addToWishlistApi({ productId: product._id });
+        setIsWishlisted(true);
+        toast({
+          title: "Added to wishlist",
+          description: "Product saved to your list",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to update wishlist",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Extract unique attributes for selection
   const getUniqueAttributes = () => {
@@ -129,6 +175,19 @@ const ProductDetailContent = () => {
           {/* Product Purchase Card - 5 columns */}
           <div className="mt-8 lg:mt-0 lg:col-span-5">
             <div className="lg:sticky lg:top-6">
+              
+            <button
+                onClick={handleWishlist}
+                className="mb-4 w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              >
+                <Heart
+                  className={`h-5 w-5 ${
+                    isWishlisted ? "fill-red-500 text-red-500" : "text-gray-600"
+                  }`}
+                />
+                <span>{isWishlisted ? "Saved to Wishlist" : "Save for Later"}</span>
+              </button>
+
               <ProductPurchaseCard 
                 product={{
                   id: product._id,
