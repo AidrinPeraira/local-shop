@@ -34,6 +34,8 @@ const CartContent = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [currentSeller, setCurrentSeller] = useState(null);
 
   useEffect(() => {
     dispatch(clearCart());
@@ -45,6 +47,30 @@ const CartContent = () => {
       setLocalCartData(JSON.parse(JSON.stringify(cartData)));
     }
   }, [cartData]);
+
+  useEffect(() => {
+    // Clear selections when cart data changes
+    setSelectedItems([]);
+    setCurrentSeller(null);
+  }, [cartData]);
+
+  const handleItemSelection = (productId, sellerId) => {
+    if (!currentSeller || currentSeller === sellerId) {
+      setCurrentSeller(sellerId);
+      setSelectedItems(prev => {
+        const newSelection = prev.includes(productId)
+          ? prev.filter(id => id !== productId)
+          : [...prev, productId];
+        
+        // Clear current seller if no items are selected
+        if (newSelection.length === 0) {
+          setCurrentSeller(null);
+        }
+        
+        return newSelection;
+      });
+    }
+  };
 
   const fetchCartData = async () => {
     try {
@@ -309,6 +335,70 @@ const CartContent = () => {
     return JSON.stringify(cartData) !== JSON.stringify(localCartData);
   };
 
+  const handleCheckout = async () => {
+    const selectedProducts = localCartData.items.filter(
+      item => selectedItems.includes(item.productId)
+    );
+
+    // Calculate totals for selected items only
+    const subtotalBeforeDiscount = selectedProducts.reduce(
+      (sum, item) => sum + item.productSubtotal, 0
+    );
+    const totalDiscount = selectedProducts.reduce(
+      (sum, item) => sum + item.productDiscount, 0
+    );
+    const subtotalAfterDiscount = subtotalBeforeDiscount - totalDiscount;
+    const shippingCharge = subtotalAfterDiscount >= 5000 ? 0 : 500;
+    const platformFee = 1000;
+    const cartTotal = subtotalAfterDiscount + shippingCharge + platformFee;
+
+    // Structure data for checkout
+    const checkoutData = {
+      cart: {
+        items: selectedProducts.map(item => ({
+          productId: item.productId,
+          productName: item.productName,
+          image: item.image,
+          seller: {
+            _id: item.seller._id,
+            sellerName: item.seller.sellerName
+          },
+          variants: item.variants.map(variant => ({
+            variantId: variant.variantId,
+            attributes: variant.attributes,
+            quantity: variant.quantity,
+            basePrice: variant.basePrice,
+            discountedPrice: variant.discountedPrice,
+            variantDiscount: variant.variantDiscount,
+            variantTotal: variant.variantTotal,
+            stock: variant.stock,
+            inStock: variant.inStock
+          })),
+          bulkDiscount: item.bulkDiscount,
+          productSubtotal: item.productSubtotal,
+          productDiscount: item.productDiscount,
+          productTotal: item.productTotal,
+          totalQuantity: item.totalQuantity,
+          isActive: item.isActive,
+          isBlocked: item.isBlocked
+        })),
+        summary: {
+          subtotalBeforeDiscount,
+          totalDiscount,
+          subtotalAfterDiscount,
+          shippingCharge,
+          platformFee,
+          cartTotal
+        }
+      },
+      loading: false,
+      error: null
+    };
+
+    dispatch(setCart(checkoutData.cart));
+    navigate("/checkout");
+  }
+  
   if (loading) {
     return <PageLoading />;
   }
@@ -378,6 +468,22 @@ const CartContent = () => {
                   }`}
                 >
                   <CardContent className="p-4">
+
+                  <div className="flex items-center gap-2 mb-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item.productId)}
+                        onChange={() => handleItemSelection(item.productId, item.seller._id)}
+                        disabled={currentSeller && currentSeller !== item.seller._id}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                      {currentSeller && currentSeller !== item.seller._id && (
+                        <span className="text-sm text-orange-600">
+                          Select items from the same seller
+                        </span>
+                      )}
+                    </div>
+
                     {/* Add warning message if product is invalid */}
                     {(isInvalid || hasOutOfStock) && (
                       <div className="mb-3 p-2 bg-red-50 text-red-600 rounded">
@@ -417,6 +523,12 @@ const CartContent = () => {
                             <span className="text-sm text-gray-600">
                               Total Qty: {item.totalQuantity}
                             </span>
+                          </div>
+                          {/* Add seller details */}
+                          <div className="mt-1 flex items-center gap-1 text-sm text-gray-500">
+                            <ShoppingBag className="h-3 w-3" />
+                            <span>Sold by: </span>                          
+                              {item.seller.sellerName || "Unknown Seller"}
                           </div>
                         </div>
                       </div>
@@ -624,17 +736,21 @@ const CartContent = () => {
                     Update Cart
                   </Button>
                 )}
-                <Button
+               <Button
                   className="w-full flex items-center justify-center gap-2"
-                  onClick={() => navigate("/checkout")}
+                  onClick={handleCheckout}
                   disabled={
-                    hasUnsavedChanges() || getInvalidProducts().length > 0
+                    hasUnsavedChanges() || 
+                    getInvalidProducts().length > 0 || 
+                    selectedItems.length === 0
                   }
                 >
                   {hasUnsavedChanges()
                     ? "Save changes before checkout"
                     : getInvalidProducts().length > 0
                     ? "Remove invalid items to proceed"
+                    : selectedItems.length === 0
+                    ? "Select items to checkout"
                     : "Checkout"}{" "}
                   <ArrowRight className="h-4 w-4" />
                 </Button>

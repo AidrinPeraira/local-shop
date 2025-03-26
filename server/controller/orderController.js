@@ -6,6 +6,7 @@ import Cart from "../models/cartModel.js";
 import Coupon from "../models/couponModel.js";
 import { razorpay } from "../utils/razorpay.js";
 import crypto from 'crypto';
+import Transaction from "../models/adminTransactionModel.js";
 //buyer side controllers
 
 export const createUserOrder = asyncHandler(async (req, res) => {
@@ -150,10 +151,43 @@ export const createUserOrder = asyncHandler(async (req, res) => {
     // 4. Save the order
     await order.save();
 
+    // make transaction
+    const transaction = new Transaction({
+      orderId: order._id,
+      transactionId: `TXN${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+      type: "ORDER_PAYMENT",
+      amount: finalCartTotal,
+      platformFee: {
+        buyerFee: cart.summary.platformFee,
+        sellerFee: 0
+      },
+      status: paymentMethod === "card" ? "PENDING" : "COMPLETED",
+      paymentMethod: paymentMethod === "card" ? "ONLINE" : "COD",
+      from: {
+        entity: userId,
+        type: "BUYER"
+      },
+      to: {
+        entity: "localShop Pvt Ltd", 
+        type: "ADMIN"
+      },
+      scheduledDate: new Date(),
+      processedDate: paymentMethod === "card" ? null : new Date()
+    });
+
+    await transaction.save();
+
     // 5. Clear cart
+    const purchasedProductIds = order.items.map(item => item.productId.toString());
     await Cart.findOneAndUpdate(
       { user: userId },
-      { $set: { items: [] } },
+      { 
+        $pull: { 
+          items: {
+            product: { $in: purchasedProductIds }  // Changed from productId to product
+          }
+        }
+      },
       { new: true }
     );
 
@@ -169,7 +203,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(400).json({
       success: false,
       message: "Failed to create order",

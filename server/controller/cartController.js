@@ -8,7 +8,27 @@ export const addCartItem = asyncHandler(
         const userId = req.user._id
         const {productId, variants} = req.body
 
-        console.log("req.body", req.body)
+        const product = await Product.findById(productId);
+        if (!product) {
+            res.status(404);
+            throw new Error("Product not found");
+        }
+
+        if (!product.isActive || product.isBlocked) {
+            res.status(400);
+            throw new Error("Product is not available");
+        }
+
+        // Validate variants stock
+        for (const variantItem of variants) {
+            const productVariant = product.variants.find(v => v.variantId === variantItem.variant);
+            if (productVariant && (!productVariant.inStock || productVariant.stock < variantItem.qty)) {
+                res.status(400);
+                throw new Error(`Variant ${variantItem.variantDescription} is out of stock or has insufficient quantity`);
+            }
+        }
+
+
 
         let cart = await Cart.findOne({user : userId})
 
@@ -67,10 +87,16 @@ export const getCartItems = asyncHandler(
         const userId = req.user._id;
 
         const cart = await Cart.findOne({ user: userId })
-            .populate({
-                path: 'items.product',
-                select: 'productName images variants bulkDiscount basePrice isActive isBlocked'
-            });
+        .populate({
+            path: 'items.product',
+            select: 'productName images variants bulkDiscount basePrice isActive isBlocked seller',
+            populate: {
+                path: 'seller',
+                model: 'Seller',
+                select: 'sellerName'
+            }
+        });
+
 
         if (!cart) {
             res.status(404)
@@ -135,6 +161,10 @@ export const getCartItems = asyncHandler(
                 productId: product._id,
                 productName: product.productName,
                 image: product.images[0],
+                seller: {
+                    _id: product.seller._id,
+                    sellerName: product.seller.sellerName
+                },
                 variants: processedVariants,
                 bulkDiscount: product.bulkDiscount,
                 productSubtotal,
@@ -176,6 +206,20 @@ export const updateCart = asyncHandler(
     async (req, res) => {
         const userId = req.user._id;
         const { variants } = req.body;
+
+        for (const variant of variants) {
+            const product = await Product.findById(variant.productId);
+            if (!product) {
+                res.status(404);
+                throw new Error(`Product ${variant.productId} not found`);
+            }
+
+            const productVariant = product.variants.find(v => v.variantId === variant.variantId);
+            if (productVariant && (!productVariant.inStock || productVariant.stock < variant.quantity)) {
+                res.status(400);
+                throw new Error(`Variant in product ${product.productName} is out of stock or has insufficient quantity`);
+            }
+        }
 
         let cart = await Cart.findOne({ user: userId });
         if (!cart) {
@@ -229,10 +273,16 @@ export const updateCart = asyncHandler(
         await cart.save();
 
         // Fetch the updated cart with populated product details
+        // In updateCart function, update the populate section:
         const updatedCart = await Cart.findOne({ user: userId })
             .populate({
                 path: 'items.product',
-                select: 'productName images variants bulkDiscount basePrice'
+                select: 'productName images variants bulkDiscount basePrice isActive isBlocked seller',
+                populate: {
+                    path: 'seller',
+                    model: 'Seller',
+                    select: 'sellerName'
+                }
             });
 
         res.status(200).json({
@@ -249,95 +299,123 @@ export const processCartItems = asyncHandler(
         const userId = req.user._id;
         const { productId, variants } = req.body;
 
+        if (!productId || !variants || !Array.isArray(variants) || variants.length === 0) {
+            res.status(400);
+            throw new Error("Invalid product ID or variants data");
+        }
+
         if (!productId || !variants) {
             res.status(400);
             throw new Error("Product ID and variants are required");
         }
 
-        const product = await Product.findById(productId)
-            .select('productName images variants bulkDiscount basePrice');
-
-        if (!product) {
-            res.status(404);
-            throw new Error("Product not found");
+        for (const variant of variants) {
+            if (!variant.variant || !variant.variantDescription || !variant.qty) {
+                res.status(400);
+                throw new Error("Invalid variant data structure");
+            }
+            if (variant.qty < 1) {
+                res.status(400);
+                throw new Error("Variant quantity must be greater than 0");
+            }
         }
 
-        let tempCart = {
-            user: userId,
-            items: [{
-                product: product,
-                variants: variants.map((variantItem) => ({
-                    variantId: variantItem.variant,
-                    attributes: variantItem.variantDescription,
-                    quantity: variantItem.qty,
-                })),
-            }]
-        };
-
-        const processedItems = tempCart.items.map(item => {
-            const product = item.product;
-            
-            // Calculate total quantity first for bulk discount determination
-            const totalProductQuantity = item.variants.reduce((sum, variant) => sum + variant.quantity, 0);
-            
-            // Find applicable bulk discount based on total product quantity
-            const applicableDiscount = product.bulkDiscount && product.bulkDiscount.length > 0
-                ? product.bulkDiscount
-                    .filter(discount => totalProductQuantity >= discount.minQty)
-                    .sort((a, b) => b.minQty - a.minQty)[0]
-                : null;
-
-            const processedVariants = item.variants.map(variant => {
-                const productVariant = product.variants.find(
-                    pv => pv.variantId === variant.variantId
-                );
-
-                const basePrice = productVariant ? productVariant.basePrice : product.basePrice;
-                const quantity = variant.quantity;
-                
-                // Calculate variant discount if applicable
-                let variantDiscount = 0;
-                if (applicableDiscount) {
-                    variantDiscount = (basePrice * applicableDiscount.priceDiscountPerUnit) / 100;
-                }
-                
-                const discountedPrice = basePrice - variantDiscount;
-                const variantTotal = basePrice * quantity;
-                const variantDiscountTotal = variantDiscount * quantity;
-
-                return {
-                    variantId: variant.variantId,
-                    attributes: variant.attributes,
-                    quantity: quantity,
-                    basePrice,
-                    discountedPrice,
-                    variantDiscount: variantDiscountTotal,
-                    variantTotal,
-                    stock: productVariant ? productVariant.stock : product.stock,
-                    inStock: productVariant ? productVariant.inStock : product.inStock
-                };
+        // In processCartItems function, update the product query:
+        const product = await Product.findById(productId)
+            .select('productName images variants bulkDiscount basePrice isActive isBlocked seller')
+            .populate({
+                path: 'seller',
+                model: 'Seller',
+                select: 'sellerName'
             });
 
-            const productSubtotal = processedVariants.reduce(
-                (sum, variant) => sum + variant.variantTotal, 
-                0
-            );
-            
-            const productDiscount = processedVariants.reduce(
-                (sum, variant) => sum + variant.variantDiscount,
-                0
-            );
+            if (!product) {
+                res.status(404);
+                throw new Error("Product not found");
+            }
+    
+            let tempCart = {
+                user: userId,
+                items: [{
+                    product: product,
+                    variants: variants.map((variantItem) => ({
+                        variantId: variantItem.variant,
+                        attributes: variantItem.variantDescription,
+                        quantity: variantItem.qty,
+                    })),
+                }]
+            };
+    
+            const processedItems = tempCart.items.map(item => {
+                const product = item.product;
+                
+                // Calculate total quantity first for bulk discount determination
+                const totalProductQuantity = item.variants.reduce((sum, variant) => sum + variant.quantity, 0);
+                
+                // Find applicable bulk discount based on total product quantity
+                const applicableDiscount = product.bulkDiscount && product.bulkDiscount.length > 0
+                    ? product.bulkDiscount
+                        .filter(discount => totalProductQuantity >= discount.minQty)
+                        .sort((a, b) => b.minQty - a.minQty)[0]
+                    : null;
+    
+                const processedVariants = item.variants.map(variant => {
+                    const productVariant = product.variants.find(
+                        pv => pv.variantId === variant.variantId
+                    );
+    
+                    const basePrice = productVariant ? productVariant.basePrice : product.basePrice;
+                    const quantity = variant.quantity;
+                    
+                    // Calculate variant discount if applicable
+                    let variantDiscount = 0;
+                    if (applicableDiscount) {
+                        variantDiscount = (basePrice * applicableDiscount.priceDiscountPerUnit) / 100;
+                    }
+                    
+                    const discountedPrice = basePrice - variantDiscount;
+                    const variantTotal = basePrice * quantity;
+                    const variantDiscountTotal = variantDiscount * quantity;
+    
+                    return {
+                        variantId: variant.variantId,
+                        attributes: variant.attributes,
+                        quantity: quantity,
+                        basePrice,
+                        discountedPrice,
+                        variantDiscount: variantDiscountTotal,
+                        variantTotal,
+                        stock: productVariant ? productVariant.stock : product.stock,
+                        inStock: productVariant ? productVariant.inStock : product.inStock
+                    };
+                });
+    
+                const productSubtotal = processedVariants.reduce(
+                    (sum, variant) => sum + variant.variantTotal, 
+                    0
+                );
+                
+                const productDiscount = processedVariants.reduce(
+                    (sum, variant) => sum + variant.variantDiscount,
+                    0
+                );
 
             return {
                 productId: product._id,
                 productName: product.productName,
                 image: product.images[0],
+                seller: {
+                    _id: product.seller._id,
+                    sellerName: product.seller.sellerName
+                },
                 variants: processedVariants,
                 bulkDiscount: product.bulkDiscount,
                 productSubtotal,
                 productDiscount,
                 productTotal: productSubtotal - productDiscount,
-                totalQuantity: totalProductQuantity
+                totalQuantity: totalProductQuantity,
+                isActive: product.isActive,
+                isBlocked: product.isBlocked
             };
         });
 
