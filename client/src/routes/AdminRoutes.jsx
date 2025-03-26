@@ -22,6 +22,8 @@ const Categories = LazyComponent(lazy(() => import("../pages/AdminPages/AdminCat
 const AdminOrdersPage = LazyComponent(lazy(() => import("../pages/AdminPages/AdminOrdersPage")));
 const AdminNotFound = LazyComponent(lazy(() => import("../pages/AdminPages/AdminNotFound")));
 const AdminCoupons = LazyComponent(lazy(() => import("../pages/AdminPages/AdminCoupons")));
+const AdminTransactions = LazyComponent(lazy(() => import("../pages/AdminPages/AdminTransactions")));
+const AdminPayouts = LazyComponent(lazy(() => import("../pages/AdminPages/AdminPayouts")));
 
 const AdminRoutes = () => {
   return (
@@ -36,6 +38,8 @@ const AdminRoutes = () => {
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="transactions" element={<AdminTransactions />} />
+          <Route path="payouts" element={<AdminPayouts />} />
           <Route path="*" element={<AdminNotFound />} />
         </Route>
       </Route>

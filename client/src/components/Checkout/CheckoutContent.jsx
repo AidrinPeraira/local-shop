@@ -607,10 +607,22 @@ const CheckoutContent = () => {
                   className="grid gap-4"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="COD" id="cash" />
-                    <Label htmlFor="card" className="flex items-center gap-2">
+                    <RadioGroupItem 
+                      value="COD" 
+                      id="cash" 
+                      disabled={cart.summary.cartTotal > 10000}
+                    />
+                    <Label 
+                      htmlFor="cash" 
+                      className={`flex items-center gap-2 ${cart.summary.cartTotal > 10000 ? 'text-gray-400 cursor-not-allowed' : ''}`}
+                    >
                       <CreditCard className="h-4 w-4" />
                       Cash On Delivery
+                      {cart.summary.cartTotal > 10000 && (
+                        <span className="text-xs text-red-500 ml-2">
+                          (Not available for orders above ₹10,000)
+                        </span>
+                      )}
                     </Label>
                   </div>
 
@@ -618,7 +630,7 @@ const CheckoutContent = () => {
                     <RadioGroupItem value="card" id="card" />
                     <Label htmlFor="card" className="flex items-center gap-2">
                       <CreditCard className="h-4 w-4" />
-                      Credit/Debit Card
+                      Pay Online
                     </Label>
                   </div>
                 </RadioGroup>

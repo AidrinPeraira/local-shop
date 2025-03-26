@@ -22,7 +22,7 @@ const transactionSchema = new mongoose.Schema(
       required: true,
     },
     platformFee: {
-      buyerFee: Number,  // Fee collected from buyer
+      buyerFee: Number, // Fee collected from buyer
       sellerFee: Number, // Fee collected from seller
     },
     status: {
@@ -36,26 +36,24 @@ const transactionSchema = new mongoose.Schema(
     },
     from: {
       entity: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        type: String,
         required: true,
       },
       type: {
         type: String,
-        enum: ["BUYER", "ADMIN", "SELLER"],
         required: true,
       },
     },
     to: {
-        entity: {
-          type: String,
-          required: true
-        },
-        type: {
-          type: String,
-          required: true
-        }
+      entity: {
+        type: String,
+        required: true,
       },
+      type: {
+        type: String,
+        required: true,
+      },
+    },
     scheduledDate: {
       type: Date,
     },

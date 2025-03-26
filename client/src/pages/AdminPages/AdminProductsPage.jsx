@@ -141,7 +141,6 @@ export default function SellerProducts() {
         fetchSellerProducts();
       }
     } catch (error) {
-      console.log("Error handling add product: ", error);
       toast({
         title: "Add Product Error",
         description: error,
@@ -166,7 +165,6 @@ export default function SellerProducts() {
           setIsDialogOpen(false);
         }
       } catch (error) {
-        console.log("Error handling edit product: ", error);
         toast({
           title: "Edit Product Error",
           description:
@@ -193,7 +191,6 @@ export default function SellerProducts() {
         setIsDialogOpen(false);
       }
     } catch (error) {
-      console.log("Error handling edit product: ", error);
       toast({
         title: "Edit Product Error",
         description:

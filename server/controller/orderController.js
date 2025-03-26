@@ -203,7 +203,6 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     res.status(400).json({
       success: false,
       message: "Failed to create order",
@@ -395,6 +394,31 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
       timestamp: new Date(),
       description: "Order cancelled by user"
     });
+
+    const refundTransaction = new Transaction({
+      orderId: order._id,
+      transactionId: `REF${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+      type: "REFUND",
+      amount: order.summary.cartTotal,
+      platformFee: {
+        buyerFee: -order.summary.platformFee, // Negative to indicate refund
+        sellerFee: 0
+      },
+      status: "PROCESSING",
+      paymentMethod: order.payment.method,
+      from: {
+        entity: "localShop Pvt Ltd",
+        type: "ADMIN"
+      },
+      to: {
+        entity: userId,
+        type: "BUYER"
+      },
+      scheduledDate: new Date(),
+      processedDate: null
+    });
+
+    await refundTransaction.save();
 
     // Restore product stock
     for (const item of order.items) {
@@ -693,6 +717,44 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
 
     await order.save();
 
+    if (status === "DELIVERED" && order.payment.method === "COD") {
+      await Transaction.findOneAndUpdate(
+        { orderId: order._id, type: "ORDER_PAYMENT" },
+        { 
+          status: "COMPLETED",
+          processedDate: new Date()
+        }
+      );
+    }
+
+    // Handle return completed status
+    if (status === "RETURNED") {
+      const refundTransaction = new Transaction({
+        orderId: order._id,
+        transactionId: `REF${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+        type: "REFUND",
+        amount: order.summary.cartTotal,
+        platformFee: {
+          buyerFee: -order.summary.platformFee,
+          sellerFee: 0
+        },
+        status: "PROCESSING",
+        paymentMethod: order.payment.method,
+        from: {
+          entity: "localShop Pvt Ltd",
+          type: "ADMIN"
+        },
+        to: {
+          entity: order.user,
+          type: "BUYER"
+        },
+        scheduledDate: new Date(),
+        processedDate: null
+      });
+
+      await refundTransaction.save();
+    }
+
     res.status(200).json({
       success: true,
       message: "Order status updated successfully",
@@ -702,6 +764,7 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
         trackingDetails: order.trackingDetails,
       },
     });
+    
   } catch (error) {
     res.status(500).json({
       success: false,

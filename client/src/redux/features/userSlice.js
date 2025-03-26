@@ -97,7 +97,6 @@ export const registerSeller = createAsyncThunk(
       const response = await sellerRegApi(userData); 
       return response.data; 
     } catch (error) {
-      console.log(error)
       return rejectWithValue(error.message);
     }
   }

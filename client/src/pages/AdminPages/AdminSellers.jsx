@@ -49,7 +49,6 @@ export default function AdminSellers() {
       setSellers(res.data.sellers || []);
       setTotalPages(Math.ceil((res.data.total || 0) / ITEMS_PER_PAGE));
     } catch (err) {
-      console.log(err);
       toast({
         title: "Error",
         description: "Failed to fetch sellers",

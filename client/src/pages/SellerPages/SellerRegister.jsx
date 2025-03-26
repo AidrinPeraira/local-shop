@@ -103,7 +103,6 @@ export default () => {
         ...data,
         productCategories: data.productCategories.map((cat) => cat.id),
       };
-      console.log("Seller Reg Form data:", sellerData);
 
       dispatch(registerSeller(sellerData))
         .unwrap() //breaks open the promise to give value if success and throw rejectWithVakue error if rejected

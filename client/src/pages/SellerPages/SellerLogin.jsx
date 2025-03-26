@@ -32,7 +32,6 @@ const SellerLogin = () => {
         navigate("/seller");
       })
       .catch((error) => {
-        console.log(error);
         toast({
           title: "Registration Error!",
           description: error,

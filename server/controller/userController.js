@@ -449,7 +449,6 @@ export const deleteUserAddress = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const addressId = req.params.id;
 
-  console.log(addressId)
   // Find address and verify ownership
   const address = await Address.findOne({ _id: addressId, userId });
   if (!address) {

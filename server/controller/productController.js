@@ -126,7 +126,6 @@ export const addProduct = asyncHandler(async (req, res) => {
   let valid = validateProductData({ ...req.body, images });
   if (valid !== true) {
     res.status(HTTP_CODES.BAD_REQUEST);
-    console.log(valid);
     throw new Error(`${valid}`);
   }
 
@@ -183,7 +182,6 @@ export const addProduct = asyncHandler(async (req, res) => {
     });
   }
 
-  console.log("this is the variants", productData.variants);
 
   productData.bulkDiscount = JSON.parse(bulkDiscount).map((discountObj) => {
     return {
@@ -348,7 +346,6 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
 //controller to send product data to shop page
 export const getShopProducts = asyncHandler(async (req, res) => {
-  console.log(req.query);
   const {
     search,
     category,
@@ -508,7 +505,6 @@ export const getShopProducts = asyncHandler(async (req, res) => {
 
 //get details of one product
 export const getProductDetails = asyncHandler(async (req, res) => {
-  console.log(req.params);
   const { id } = req.params;
 
   const product = await Product.findOne({

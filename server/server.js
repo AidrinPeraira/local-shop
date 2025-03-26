@@ -22,7 +22,9 @@ import cartRouter from './routes/cartRoutes.js'
 import orderRouter from './routes/orderRoutes.js'
 import whishlistRouter from './routes/whishlistRoutes.js'
 import couponRouter from './routes/couponRoutes.js'
+import transactionRouter from './routes/transactionRoutes.js'
 import { checkUserBlocked } from './middlewares/authRestrictionMiddleware.js';
+import payoutRouter from './routes/payoutRoutes.js';
 
 
 dotenv.config() //load dot env data into 'process.env' by default
@@ -111,6 +113,8 @@ app.use('/api/cart', cartRouter)
 app.use('/api/wishlist', whishlistRouter)
 app.use('/api/orders', orderRouter)
 app.use('/api/coupons', couponRouter)
+app.use('/api/transactions', transactionRouter)
+app.use('/api/transactions', payoutRouter)
 
 
 

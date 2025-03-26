@@ -51,7 +51,6 @@ export default function AdminUsers() {
       setUsers(res.data.users || []); // Add fallback empty array
       setTotalPages(Math.ceil((res.data.total || 0) / ITEMS_PER_PAGE));
     } catch (err) {
-      console.log(err);
       toast({
         title: "Error",
         description: "Failed to fetch users",

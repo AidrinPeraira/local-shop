@@ -10,7 +10,9 @@ import {
   ShoppingBag,
   Package,
   Store,
-  Ticket
+  Ticket,
+  Landmark,
+  Handshake
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useToast } from "../hooks/use-toast";
@@ -54,6 +56,8 @@ export function AdminLayout() {
     { name: "Products", icon: ShoppingBag, href: "/admin/products" },
     { name: "Orders", icon: Package, href: "/admin/orders" },
     { name: "Coupons", icon: Ticket, href: "/admin/coupons" },
+    { name: "Transactions", icon: Landmark, href: "/admin/transactions" },
+    { name: "Payouts", icon: Handshake, href: "/admin/payouts" },
   ];
 
   return (

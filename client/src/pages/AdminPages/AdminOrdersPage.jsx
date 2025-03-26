@@ -108,7 +108,6 @@ export default function SellerOrders() {
       });
       fetchOrders();
     } catch (error) {
-      console.log("status update erroe", error);
       toast({
         title: "Error",
         description: "Failed to update order status",
@@ -438,6 +437,11 @@ export default function SellerOrders() {
                                 <span>Shipping</span>
                                 <span>₹{order.summary.shippingCharge}</span>
                               </div>
+                              <div className="flex justify-between">
+                                <span>Platform Fee</span>
+                                <span>₹{order.summary.platformFee}</span>
+                              </div>
+                             
                               <div className="flex justify-between font-medium pt-2 border-t">
                                 <span>Total</span>
                                 <span>₹{order.summary.cartTotal}</span>

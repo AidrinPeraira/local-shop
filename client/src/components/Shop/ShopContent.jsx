@@ -150,7 +150,6 @@ const ShopContent = () => {
       setTotalPages(totalPages);
       setCurrentPage(currentPage);
     } catch (error) {
-      console.log(error);
       toast({
         title: "Error fetching products",
         description: error.response.data.message,

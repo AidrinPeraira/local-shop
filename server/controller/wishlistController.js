@@ -44,7 +44,6 @@ export const addToWishlist = asyncHandler(async (req, res) => {
 
 export const removeFromWishlist = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  console.log(req.body)
   const { productId } = req.params;
 
   if (!productId) {

@@ -180,7 +180,7 @@ export const getCartItems = asyncHandler(
         const totalQuantity = processedItems.reduce((sum, item) => sum + item.totalQuantity, 0);
         const subtotalBeforeDiscount = processedItems.reduce((sum, item) => sum + item.productSubtotal, 0);
         const totalDiscount = processedItems.reduce((sum, item) => sum + item.productDiscount, 0);
-        const shippingCharge = totalQuantity < 50 ? 500 : 0;
+        const shippingCharge = subtotalBeforeDiscount <= 5000 ? 500 : 0;
         const platformFee = 1000;
 
         const cartTotal = subtotalBeforeDiscount - totalDiscount + shippingCharge + platformFee;
@@ -429,7 +429,7 @@ export const processCartItems = asyncHandler(
         const totalDiscount = processedItems.reduce((sum, item) => 
             sum + item.productDiscount, 0
         );
-        const shippingCharge = totalQuantity < 50 ? 500 : 0;
+        const shippingCharge = productSubtotal <= 5000 ? 500 : 0;
         const platformFee = 1000; // Changed to match getCartItems
 
         const cartTotal = subtotalBeforeDiscount - totalDiscount + shippingCharge + platformFee;

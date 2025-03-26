@@ -51,7 +51,6 @@ export default function Categories() {
       const response = await getAllCategoriesAPI();
       setAllCategories(response.data);
     } catch (error) {
-      console.log("FetchingCategories: ",error);
       toast({
         title: "Error!",
         description: "Error fetching Categories!",

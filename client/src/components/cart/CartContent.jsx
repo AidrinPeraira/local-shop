@@ -161,7 +161,7 @@ const CartContent = () => {
 
       // Update shipping charge based on total amount
       newData.summary.shippingCharge = 
-        newData.summary.subtotalAfterDiscount >= 5000 ? 0 : 500;
+        newData.summary.subtotalBeforeDiscount >= 5000 ? 0 : 500;
 
       newData.summary.cartTotal =
         newData.summary.subtotalAfterDiscount +
@@ -348,7 +348,7 @@ const CartContent = () => {
       (sum, item) => sum + item.productDiscount, 0
     );
     const subtotalAfterDiscount = subtotalBeforeDiscount - totalDiscount;
-    const shippingCharge = subtotalAfterDiscount >= 5000 ? 0 : 500;
+    const shippingCharge = subtotalBeforeDiscount >= 5000 ? 0 : 500;
     const platformFee = 1000;
     const cartTotal = subtotalAfterDiscount + shippingCharge + platformFee;
 

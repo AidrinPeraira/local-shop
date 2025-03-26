@@ -108,7 +108,6 @@ export default function SellerOrders() {
       });
       fetchOrders();
     } catch (error) {
-      console.log("status update erroe", error);
       toast({
         title: "Error",
         description: "Failed to update order status",

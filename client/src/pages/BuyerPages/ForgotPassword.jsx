@@ -165,7 +165,6 @@ const ForgotPassword = () => {
     try {
       // Mock API call to verify OTP
       const response = await verifyOTP({ email, otpRecieved: otp });
-      console.log(response);
 
       // Move to new password step
       setResetStep("new-password");
@@ -174,7 +173,6 @@ const ForgotPassword = () => {
         description: "Please set your new password",
       });
     } catch (error) {
-      console.log(error);
       toast({
         title: "Error",
         description: `${error.response.data.message}`,

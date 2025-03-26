@@ -147,7 +147,6 @@ export default () => {
           });
       }
     } catch (error) {
-      console.log(error);
       toast({
         title: "Google Auth Error!",
         description: error.response?.data?.message || "Authentication failed",

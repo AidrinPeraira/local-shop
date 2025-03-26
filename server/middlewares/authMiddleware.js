@@ -94,7 +94,6 @@ export const authenticateSeller = asyncHandler(
             next();
         } catch (error) {
             res.status(HTTP_CODES.UNAUTHORIZED);
-            console.log("Not authorized as admin",error)
             throw new Error('Not authorized, token failed');
         }
     }

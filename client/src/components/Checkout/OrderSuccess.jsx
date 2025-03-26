@@ -37,7 +37,7 @@ const OrderSuccess = ({ orderId }) => {
             Your order ID: <span className="font-semibold">{orderId}</span>
           </p>
           <p className="text-sm text-gray-500">
-            Redirecting to home page in {countdown} seconds...
+            Redirecting to orders page in {countdown} seconds...
           </p>
         </CardContent>
       </Card>

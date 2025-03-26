@@ -33,7 +33,6 @@ export const AdminLogin = () => {
         navigate("/admin");
       })
       .catch((error) => {
-        console.log("Admin Login: ", error);
         toast({
           title: "Registration Error!",
           description: error,
