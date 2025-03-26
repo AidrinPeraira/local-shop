@@ -520,7 +520,7 @@ export const getSellerOrders = asyncHandler(async (req, res) => {
     // Build base query for seller's orders
 
     const query = {};
-    if (req.user.role == "seller") {
+    if (req.user.role === "seller") {
       query['items.seller'] = sellerId;
     }
 
@@ -559,9 +559,10 @@ export const getSellerOrders = asyncHandler(async (req, res) => {
       },
       createdAt: order.createdAt,
       orderStatus: order.orderStatus,
-      items: order.items.filter(
-        (item) => item.seller.toString() === sellerId.toString()
-      ),
+      // Only filter items for sellers, show all items for admin
+      items: req.user.role === "seller" 
+        ? order.items.filter(item => item.seller.toString() === sellerId.toString())
+        : order.items,
       summary: {
         subtotalBeforeDiscount: order.summary.subtotalBeforeDiscount,
         totalDiscount: order.summary.totalDiscount,

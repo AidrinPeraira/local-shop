@@ -343,10 +343,9 @@ const CheckoutContent = () => {
         setOrderSuccess(true);
       }
     } catch (error) {
-      console.error("Error placing order:", error);
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to place order",
+        description: "Failed to place order please try again later",
         variant: "destructive",
       });
     }

@@ -1,13 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
-import { Container } from '../../components/ui/container';
-import { Card } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { useToast } from '../../components/hooks/use-toast';
-import { getOrderByIdApi, cancelOrderApi, returnOrderApi } from '../../api/orderApi';
-import { Package, Truck, CheckCircle, XCircle, Clock, RefreshCcw } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import { Container } from "../../components/ui/container";
+import { Card } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { useToast } from "../../components/hooks/use-toast";
+import jsPDF from 'jspdf';
+import {
+  getOrderByIdApi,
+  cancelOrderApi,
+  returnOrderApi,
+} from "../../api/orderApi";
+import {
+  Package,
+  Truck,
+  CheckCircle,
+  XCircle,
+  Clock,
+  RefreshCcw,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +36,7 @@ const OrderDetails = () => {
   const [returnReason, setReturnReason] = useState("");
   const { id } = useParams();
   const { toast } = useToast();
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   const fetchOrder = async () => {
     try {
@@ -41,7 +54,8 @@ const OrderDetails = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to fetch order details",
+        description:
+          error.response?.data?.message || "Failed to fetch order details",
         variant: "destructive",
       });
     } finally {
@@ -52,6 +66,24 @@ const OrderDetails = () => {
   useEffect(() => {
     fetchOrder();
   }, [id]);
+
+  const handleCancelConfirm = async () => {
+    try {
+      await cancelOrderApi(id);
+      toast({
+        title: "Success",
+        description: "Order cancelled successfully",
+      });
+      setCancelDialogOpen(false);
+      fetchOrder();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to cancel order",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleCancel = async () => {
     try {
@@ -83,7 +115,8 @@ const OrderDetails = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to submit return request",
+        description:
+          error.response?.data?.message || "Failed to submit return request",
         variant: "destructive",
       });
     }
@@ -99,14 +132,100 @@ const OrderDetails = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "PENDING": return <Clock className="h-5 w-5" />;
-      case "PROCESSING": return <RefreshCcw className="h-5 w-5" />;
-      case "SHIPPED": return <Truck className="h-5 w-5" />;
-      case "DELIVERED": return <CheckCircle className="h-5 w-5" />;
-      case "CANCELLED": return <XCircle className="h-5 w-5" />;
-      default: return <Package className="h-5 w-5" />;
+      case "PENDING":
+        return <Clock className="h-5 w-5" />;
+      case "PROCESSING":
+        return <RefreshCcw className="h-5 w-5" />;
+      case "SHIPPED":
+        return <Truck className="h-5 w-5" />;
+      case "DELIVERED":
+        return <CheckCircle className="h-5 w-5" />;
+      case "CANCELLED":
+        return <XCircle className="h-5 w-5" />;
+      default:
+        return <Package className="h-5 w-5" />;
     }
   };
+
+  const generateInvoice = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Set up colors
+    const primaryColor = '#000000'; // Black for main text
+    const accentColor = '#808080'; // Gray for secondary text
+    
+    // Background and border
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.rect(10, 10, pageWidth - 20, 277, 'S');
+    
+    // Header
+    doc.setFontSize(18);
+    doc.setTextColor(primaryColor);
+    doc.text('INVOICE', pageWidth/2, 30, { align: 'center' });
+    
+    // Invoice Details
+    doc.setFontSize(10);
+    doc.setTextColor(accentColor);
+    doc.text(`Order #${order.orderId}`, pageWidth - 30, 40, { align: 'right' });
+    doc.text(`Date: ${formatDate(order.createdAt)}`, pageWidth - 30, 45, { align: 'right' });
+    
+    // Shipping Address Section
+    doc.setTextColor(primaryColor);
+    doc.setFontSize(12);
+    doc.text('SHIPPING ADDRESS:', 20, 60);
+    
+    doc.setFontSize(10);
+    doc.text(order.shippingAddress.street, 20, 70);
+    doc.text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`, 20, 75);
+    doc.text(`PIN: ${order.shippingAddress.pincode}`, 20, 80);
+    doc.text(`Phone: ${order.shippingAddress.phone}`, 20, 85);
+    
+    // Payment Method
+    doc.text(`Payment Method: ${order.payment.method}`, pageWidth - 80, 60);
+    
+    // Table Header
+    doc.setFillColor(240, 240, 240);
+    doc.rect(20, 110, pageWidth - 40, 10, 'F');
+    
+    doc.setTextColor(primaryColor);
+    doc.setFontSize(10);
+    doc.text('PRODUCT', 30, 117);
+    doc.text('VARIANT', pageWidth - 200, 117);
+    doc.text('QTY', pageWidth - 120, 117, { align: 'right' });
+    doc.text('TOTAL', pageWidth - 30, 117, { align: 'right' });
+    
+    // Table Content
+    let yPos = 127;
+    order.items.forEach((item) => {
+        doc.setFontSize(10);
+        doc.text(item.productName, 30, yPos);
+        
+        item.variants.forEach((variant) => {
+            doc.text(`${variant.attributes}`, pageWidth - 200, yPos);
+            doc.text(`${variant.quantity}`, pageWidth - 120, yPos, { align: 'right' });
+            doc.text(`₹${item.productTotal}`, pageWidth - 30, yPos, { align: 'right' });
+            yPos += 7;
+        });
+        
+        yPos += 10;
+    });
+    
+    // Total Section
+    doc.setFontSize(12);
+    doc.setTextColor(primaryColor);
+    doc.text('TOTAL AMOUNT:', pageWidth - 120, yPos + 10, { align: 'right' });
+    doc.text(`₹${order.summary.cartTotal}`, pageWidth - 30, yPos + 10, { align: 'right' });
+    
+    // Signature Line
+    doc.setFontSize(10);
+    doc.text('Signature', 20, 250);
+    
+    // Save the PDF
+    doc.save(`invoice-${order.orderId}.pdf`);
+};
+  
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -120,10 +239,16 @@ const OrderDetails = () => {
                 <h1 className="text-2xl font-bold">Order #{order.orderId}</h1>
                 <div className="flex items-center gap-2">
                   {getStatusIcon(order.orderStatus)}
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium
-                    ${order.orderStatus === "DELIVERED" ? "bg-green-100 text-green-800" :
-                    order.orderStatus === "CANCELLED" ? "bg-red-100 text-red-800" :
-                    "bg-blue-100 text-blue-800"}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium
+                    ${
+                      order.orderStatus === "DELIVERED"
+                        ? "bg-green-100 text-green-800"
+                        : order.orderStatus === "CANCELLED"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
                     {order.orderStatus}
                   </span>
                 </div>
@@ -133,11 +258,15 @@ const OrderDetails = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Order Date</span>
-                    <span className="font-medium">{formatDate(order.createdAt)}</span>
+                    <span className="font-medium">
+                      {formatDate(order.createdAt)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Total Amount</span>
-                    <span className="font-medium">₹{order.summary.cartTotal}</span>
+                    <span className="font-medium">
+                      ₹{order.summary.cartTotal}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Payment Method</span>
@@ -159,7 +288,10 @@ const OrderDetails = () => {
                       <div className="flex-1">
                         <h3 className="font-medium">{item.productName}</h3>
                         {item.variants.map((variant) => (
-                          <p key={variant.variantId} className="text-sm text-gray-600">
+                          <p
+                            key={variant.variantId}
+                            className="text-sm text-gray-600"
+                          >
                             {variant.attributes} - Qty: {variant.quantity}
                           </p>
                         ))}
@@ -176,20 +308,35 @@ const OrderDetails = () => {
                 <h2 className="text-lg font-semibold mb-4">Shipping Address</h2>
                 <div className="text-sm">
                   <p>{order.shippingAddress.street}</p>
-                  <p>{order.shippingAddress.city}, {order.shippingAddress.state}</p>
+                  <p>
+                    {order.shippingAddress.city}, {order.shippingAddress.state}
+                  </p>
                   <p>PIN: {order.shippingAddress.pincode}</p>
                   <p>Phone: {order.shippingAddress.phone}</p>
                 </div>
               </Card>
 
               <div className="flex gap-4">
-                {(order.orderStatus === "PENDING" || order.orderStatus === "PROCESSING") && (
-                  <Button variant="destructive" onClick={handleCancel}>
+              <Button
+                  variant="outline"
+                  onClick={generateInvoice}
+                >
+                  Download Invoice
+                </Button>
+                {(order.orderStatus === "PENDING" ||
+                  order.orderStatus === "PROCESSING") && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => setCancelDialogOpen(true)}
+                  >
                     Cancel Order
                   </Button>
                 )}
                 {order.orderStatus === "DELIVERED" && (
-                  <Button variant="secondary" onClick={() => setReturnDialogOpen(true)}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setReturnDialogOpen(true)}
+                  >
                     Return Order
                   </Button>
                 )}
@@ -201,6 +348,33 @@ const OrderDetails = () => {
         </Container>
       </main>
 
+      {/* cancel confirm dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Order</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p>
+              Are you sure you want to cancel this order? This action cannot be
+              undone.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCancelDialogOpen(false)}
+            >
+              No, Keep Order
+            </Button>
+            <Button variant="destructive" onClick={handleCancelConfirm}>
+              Yes, Cancel Order
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* return reason dialog */}
       <Dialog open={returnDialogOpen} onOpenChange={setReturnDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -227,10 +401,7 @@ const OrderDetails = () => {
             >
               Cancel
             </Button>
-            <Button
-              onClick={handleReturn}
-              disabled={!returnReason.trim()}
-            >
+            <Button onClick={handleReturn} disabled={!returnReason.trim()}>
               Submit Return Request
             </Button>
           </DialogFooter>

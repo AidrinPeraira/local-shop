@@ -16,7 +16,7 @@ const OrderSuccess = ({ orderId }) => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          navigate("/");
+          navigate("/profile/orders");
           dispatch(clearCart())
           return 0;
         }

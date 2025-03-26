@@ -50,6 +50,7 @@
     - cart
     - summmary
 ☐ want to make the seller specify shipping prices
+☐ need to make the invoice more aesthetic and detailed
 
 Assigned Pendings:
     ✔ Proper homepage for regular customers @done (3/15/2025, 11:16:31 AM)
@@ -237,19 +238,19 @@ Week 3 Project:
 
     User side :
         ✔ Integrate online payment method(Razorpay or Paypal). The integration of multiple payment gateways will be an add-on.. @done (3/25/2025, 8:35:11 PM)
-        ☐ After a successful payment, redirect the user to the order success page. 
-            ☐ The page should contain a thank-you or success statement, 
-            ☐ an illustration, and
-            ☐ buttons to redirect the user to the order details page and the continue shopping page
-        ☐ After a payment failure, redirect the user to the order 
-            ☐ transaction failure or order failure page. 
+        ✔ After a successful payment, redirect the user to the order success page. @done (3/26/2025, 11:49:12 AM)
+            ✔ The page should contain a thank-you or success statement, @done (3/26/2025, 11:49:13 AM)
+            ✔ an illustration, and @done (3/26/2025, 11:49:13 AM)
+            ✔ buttons to redirect the user to the order details page and the continue shopping page @done (3/26/2025, 11:49:14 AM)
+        ✔ After a payment failure, redirect the user to the order @done (3/26/2025, 11:53:43 AM)
+            ✔ transaction failure or order failure page. @done (3/26/2025, 11:53:47 AM)
             ☐ The page should contain an illustration, a statement, a button to retry the payment, 
-            ☐ and a button to redirect to the order details page.
-            ☐ Once the order is successfully placed, redirect the user to the successful page.
+            ✔ and a button to redirect to the order details page. @done (3/26/2025, 11:53:58 AM)
+            ✔ Once the order is successfully placed, redirect the user to the successful page. @done (3/26/2025, 11:54:02 AM)
         ☐ Provide an option to cancel the entire order or specific products. 
-            ☐ Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
-            ☐ when canceling an order should ask for reason(optional) .
-            ☐ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory).
+            ✔ Upon cancellation, ensure that the stock of the respective products is incremented in the inventory. @done (3/26/2025, 11:54:06 AM)
+            ✔ when canceling an order should ask for reason(optional) . @done (3/26/2025, 11:51:52 AM)
+            ✔ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory). @done (3/26/2025, 11:51:55 AM)
         
 
     //transaction amount and use case differnt for coupons
@@ -272,7 +273,7 @@ Week 3 Project:
         
     Admin side : 
 
-        ☐ Offer module(Product offer, Category offer, Referral offer).
+        ✔ Offer module(Product offer, Category offer, Referral offer). @done (3/26/2025, 11:54:46 AM)
             ✔ Implement Product offer @done (3/25/2025, 11:50:38 AM)
             ✔ This offer can be only applied to specific products @done (3/25/2025, 11:50:39 AM)
             ✘ Implement Category offer @cancelled (3/25/2025, 11:50:52 AM)
@@ -310,6 +311,14 @@ Week 3 Project:
         
         ☐ Report download (Pdf, Excel)
         ☐ Ensure that the sales report download adheres to the selected filters.
+
         
         
-    
+        
+OTHER TASKS:
+    ☐ need a payout option for seller payout
+
+MAJOR TODO:
+    ☐ add neft transactions
+    ☐ add razorpayx for payouts
+    ☐ handle order cancel delte by preveetning one order with multiple sellers

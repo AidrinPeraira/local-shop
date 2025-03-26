@@ -15,9 +15,11 @@ import {
   ChevronLeft,
   Search,
   MapPin,
+  ArrowDown,
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
 import { getSellerOrdersApi, updateOrderStatusApi } from "../../api/orderApi";
+
 
 const orderStatuses = [
   "ALL",
@@ -28,6 +30,7 @@ const orderStatuses = [
   "CANCELLED",
   "RETURNED",
   "RETURN-REQUESTED",
+  "RETURN-PROCESSING"
 ];
 
 export default function SellerOrders() {
@@ -257,7 +260,15 @@ export default function SellerOrders() {
                     <td className="p-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={[
+                              "DELIVERED",
+                              "CANCELLED",
+                              "RETURNED",
+                            ].includes(order.orderStatus)}
+                          >
                             Update Status
                             <ChevronDown className="ml-2 h-4 w-4" />
                           </Button>
@@ -265,16 +276,29 @@ export default function SellerOrders() {
                         <DropdownMenuContent align="end">
                           {orderStatuses
                             .filter((status) => status !== "ALL")
-                            .map((status) => (
-                              <DropdownMenuItem
-                                key={status}
-                                onClick={() =>
-                                  handleStatusUpdate(order._id, status)
-                                }
-                              >
-                                {status}
-                              </DropdownMenuItem>
-                            ))}
+                            .map((status) => {
+                              const isDisabled = [
+                                "DELIVERED",
+                                "CANCELLED",
+                                "RETURNED",
+                              ].includes(order.orderStatus);
+                              return (
+                                <DropdownMenuItem
+                                  key={status}
+                                  onClick={() =>
+                                    !isDisabled &&
+                                    handleStatusUpdate(order._id, status)
+                                  }
+                                  className={`${
+                                    isDisabled
+                                      ? "opacity-50 cursor-not-allowed"
+                                      : ""
+                                  }`}
+                                >
+                                  {status}
+                                </DropdownMenuItem>
+                              );
+                            })}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
@@ -302,6 +326,46 @@ export default function SellerOrders() {
                               Phone: {order.shippingAddress.phone}
                             </p>
                           </div>
+                          
+
+                          {/* retunr reason */}
+                          {[
+                            "RETURN-REQUESTED",
+                            "RETURN-PROCESSING",
+                            "RETURNED",
+                          ].includes(order.orderStatus) && (
+                            <div className="bg-white p-4 rounded-lg shadow-sm">
+                              <h3 className="font-medium text-sm mb-2 flex items-center">
+                                <ArrowDown className="h-4 w-4 mr-2" />
+                                Return Details
+                              </h3>
+                              <div className="text-sm">
+                                {order.trackingDetails
+                                  .filter((detail) =>
+                                    [
+                                      "RETURN-REQUESTED",
+                                      "RETURN-PROCESSING",
+                                      "RETURNED",
+                                    ].includes(detail.status)
+                                  )
+                                  .map((detail, index) => (
+                                    <div key={index} className="mb-2">
+                                      <p className="text-gray-600">
+                                        {new Date(
+                                          detail.timestamp
+                                        ).toLocaleDateString()}{" "}
+                                        - {detail.status}
+                                      </p>
+                                      <p className="mt-1">
+                                        {detail.description}
+                                      </p>
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
+
+                          
 
                           {/* Order Items */}
                           <div>
