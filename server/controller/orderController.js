@@ -263,6 +263,77 @@ export const getUserOrders = asyncHandler(async (req, res) => {
   }
 });
 
+export const getOrderById = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findOne({
+      _id: orderId,
+      user: userId
+    })
+    .populate("items.productId", "images productName")
+    .populate("items.seller", "sellerName")
+    .lean();
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found"
+      });
+    }
+
+    // Format order for frontend
+    const formattedOrder = {
+      _id: order._id,
+      orderId: order.orderId,
+      createdAt: order.createdAt,
+      orderStatus: order.orderStatus,
+      items: order.items.map((item) => ({
+        _id: item._id,
+        productName: item.productName,
+        image: item.image,
+        variants: item.variants.map((variant) => ({
+          variantId: variant.variantId,
+          attributes: variant.attributes,
+          quantity: variant.quantity,
+          basePrice: variant.basePrice,
+          variantTotal: variant.variantTotal,
+        })),
+        productTotal: item.productTotal,
+        seller: {
+          _id: item.seller._id,
+          name: item.seller.sellerName
+        }
+      })),
+      summary: {
+        subtotalBeforeDiscount: order.summary.subtotalBeforeDiscount,
+        totalDiscount: order.summary.totalDiscount,
+        subtotalAfterDiscount: order.summary.subtotalAfterDiscount,
+        shippingCharge: order.summary.shippingCharge,
+        platformFee: order.summary.platformFee,
+        couponDiscount: order.summary.couponDiscount,
+        cartTotal: order.summary.cartTotal,
+      },
+      shippingAddress: order.shippingAddress,
+      payment: order.payment,
+      trackingDetails: order.trackingDetails,
+    };
+
+    res.status(200).json({
+      success: true,
+      order: formattedOrder
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching order details",
+      error: error.message
+    });
+  }
+});
+
 export const cancelUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { orderId } = req.params;

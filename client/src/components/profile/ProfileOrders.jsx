@@ -33,6 +33,7 @@ import {
   Search,
   RefreshCcw,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const OrderTimeline = ({ status, trackingDetails }) => {
   const statusSteps = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
@@ -76,10 +77,8 @@ const ProfileOrders = () => {
   const [sort, setSort] = useState("desc");
   const [search, setSearch] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const [returnDialogOpen, setReturnDialogOpen] = useState(false);
-  const [returnReason, setReturnReason] = useState("");
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   const fetchOrders = async () => {
     try {
@@ -100,49 +99,12 @@ const ProfileOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [page, sort, search]);
+  }, [page, sort, search]);1
 
-  const handleCancel = async (orderId) => {
-    try {
-      await cancelOrderApi(orderId);
-      toast({
-        title: "Success",
-        description: "Order cancelled successfully",
-      });
-      fetchOrders();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.response?.data?.message || "Failed to cancel order",
-        variant: "destructive",
-      });
-    }
-  };
+  
 
-  const handleReturn = async (orderId) => {
-    try {
-      await returnOrderApi(orderId, returnReason);
-      toast({
-        title: "Success",
-        description: "Return request submitted successfully",
-      });
-      setReturnDialogOpen(false);
-      setReturnReason("");
-      setSelectedOrderId(null);
-      fetchOrders();
-    } catch (error) {
-      console.log("retunr error", error)
-      toast({
-        title: "Error",
-        description: error.response?.data?.message || "Failed to submit return request",
-        variant: "destructive",
-      });
-    }
-  };
-  const openReturnDialog = (orderId) => {
-    setSelectedOrderId(orderId);
-    setReturnDialogOpen(true);
-  };
+ 
+  
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -253,25 +215,13 @@ const ProfileOrders = () => {
                     </div>
                   ))}
                 </div>
-                {(order.orderStatus === "PENDING" ||
-                  order.orderStatus === "PROCESSING") && (
-                  <Button
-                    variant="destructive"
-                    className="mt-4"
-                    onClick={() => handleCancel(order._id)}
-                  >
-                    Cancel Order
-                  </Button>
-                )}
-                {order.orderStatus === "DELIVERED" && (
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   className="mt-4"
-                  onClick={() => openReturnDialog(order._id)}
+                  onClick={() => navigate(`/profile/orders/${order._id}`)}
                 >
-                  Return Order
+                  View Details
                 </Button>
-                )}
               </AccordionContent>
             </AccordionItem>
           ))}
@@ -299,43 +249,6 @@ const ProfileOrders = () => {
           </Button>
         </div>
       )}
-
-      <Dialog open={returnDialogOpen} onOpenChange={setReturnDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Return Order</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <label className="text-sm font-medium mb-2 block">
-              Please provide a reason for return
-            </label>
-            <Textarea
-              placeholder="Enter return reason..."
-              value={returnReason}
-              onChange={(e) => setReturnReason(e.target.value)}
-              className="min-h-[100px]"
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setReturnDialogOpen(false);
-                setReturnReason("");
-                setSelectedOrderId(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => handleReturn(selectedOrderId)}
-              disabled={!returnReason.trim()}
-            >
-              Submit Return Request
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import React, { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoutes";
 import { PageLoading } from "../components/ui/PageLoading";
+import OrderDetails from "../pages/BuyerPages/OrderDetails.jsx";
 
 const Home = lazy(() => import("../pages/BuyerPages/Home"));
 const Login = lazy(() => import("../pages/BuyerPages/Login"));
@@ -14,6 +15,14 @@ const Profile = lazy(() => import("../pages/BuyerPages/Profile"));
 const Checkout = lazy(() => import("../pages/BuyerPages/Checkout"));
 const Cart = lazy(() => import("../pages/BuyerPages/Cart"));
 const SavedList = lazy(() => import("../pages/BuyerPages/SavedList.jsx"));
+const ProfileInfo = lazy(() => import("../components/profile/ProfileInfo"));
+const ProfileOrders = lazy(() => import("../components/profile/ProfileOrders"));
+const ProfileAddress = lazy(() =>
+  import("../components/profile/ProfileAddress")
+);
+const ProfilePassword = lazy(() =>
+  import("../components/profile/ProfilePassword")
+);
 
 const MainRoutes = () => {
   return (
@@ -69,7 +78,6 @@ const MainRoutes = () => {
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute allowedRoles={["buyer"]} />}>
-      
         <Route
           path="/profile"
           element={
@@ -78,6 +86,7 @@ const MainRoutes = () => {
             </Suspense>
           }
         />
+       
         <Route
           path="/cart"
           element={
@@ -102,6 +111,18 @@ const MainRoutes = () => {
             </Suspense>
           }
         />
+        <Route path="/profile" element={<Profile />}>
+          <Route index element={<Navigate to="/profile/info" replace />} />
+          <Route path="info" element={<ProfileInfo />} />
+          <Route path="orders" element={<ProfileOrders />} />
+          <Route path="orders/:id" element={
+            <Suspense fallback={<PageLoading />}>
+              <OrderDetails />
+            </Suspense>
+          } />
+          <Route path="addresses" element={<ProfileAddress />} />
+          <Route path="security" element={<ProfilePassword />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFound />} />

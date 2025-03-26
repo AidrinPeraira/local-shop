@@ -1,57 +1,30 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { 
   User, 
-  Settings, 
-  Bell, 
   ShoppingBag, 
   Heart,
-  CreditCard,
   Lock,
   MapPin,
   ShoppingCart
 } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useNavigate } from "react-router-dom";
-import ProfileInfo from "./ProfileInfo";
-import ProfileOrders from "./ProfileOrders";
-import ProfileAddress from "./ProfileAddress";
-import ProfilePassword from "./ProfilePassword";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
 const ProfileContent = () => {
-  const [activeTab, setActiveTab] = useState("profile");
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname.split('/').pop();
 
   const navigation = [
-    { id: "profile", label: "Profile Information", icon: User },
-    { id: "orders", label: "My Orders", icon: ShoppingBag },
-    { id: "cart", label: "My Cart", icon: ShoppingCart },
-    { id: "saved", label: "Saved Items", icon: Heart },
-    { id: "addresses", label: "Addresses", icon: MapPin },
-    { id: "security", label: "Change Password", icon: Lock },
+    { id: "info", label: "Profile Information", icon: User, path: "/profile/info" },
+    { id: "orders", label: "My Orders", icon: ShoppingBag, path: "/profile/orders" },
+    { id: "cart", label: "My Cart", icon: ShoppingCart, path: "/cart" },
+    { id: "saved", label: "Saved Items", icon: Heart, path: "/saved-list" },
+    { id: "addresses", label: "Addresses", icon: MapPin, path: "/profile/addresses" },
+    { id: "security", label: "Change Password", icon: Lock, path: "/profile/security" },
   ];
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case "profile":
-        return <ProfileInfo onManageAddresses={() => setActiveTab("addresses")}/>;
-      case "orders":
-        return <ProfileOrders/>;
-      case "cart":
-        navigate("/cart");
-        return null;
-      case "saved":
-        navigate("/saved-list");
-        return null;
-      case "addresses":
-        return <ProfileAddress/>;
-      case "security":
-        return <ProfilePassword/>;
-      default:
-        return <ProfileInfo/>;
-    }
-  };
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -72,11 +45,11 @@ const ProfileContent = () => {
                     variant="ghost"
                     className={cn(
                       "w-full justify-start gap-2 text-sm font-medium",
-                      activeTab === item.id
+                      currentPath === item.id
                         ? "bg-accent text-primary"
                         : "text-gray-700 hover:bg-gray-100"
                     )}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => navigate(item.path)}
                   >
                     <item.icon className="h-4 w-4" />
                     {item.label}
@@ -91,7 +64,7 @@ const ProfileContent = () => {
         <div className="md:col-span-3">
           <Card>
             <CardContent className="p-6">
-              {renderContent()}
+              <Outlet />
             </CardContent>
           </Card>
         </div>
