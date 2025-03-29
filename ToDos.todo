@@ -45,11 +45,11 @@
 ☐ returning order with items from multiple sellers?
 ☐ buy now feature not updating the discounts
 ☐ need to show units wherever necessary
-    - orders
-    - products
-    - cart
-    - summmary
-☐ want to make the seller specify shipping prices
+    ☐ - orders
+    ✔ - products @done (3/26/2025, 10:44:01 PM)
+    ☐ - cart
+    ☐ - summmary
+✘ want to make the seller specify shipping prices @cancelled (3/26/2025, 10:44:15 PM)
 ☐ need to make the invoice more aesthetic and detailed
 
 Assigned Pendings:
@@ -73,15 +73,35 @@ Assigned Pendings:
     ☐ Seller signup validation - recheck
     ☐ Same cat can be added multiple times in signup
     ✔ Blocking users and sellers @done (3/25/2025, 8:34:24 PM)
-    ☐ Add category not working
+    ✔ Add category not working @done (3/26/2025, 10:45:29 PM)
     ✔ Pagination handle in backend @done (3/25/2025, 8:34:30 PM)
     ☐ Add to cart not working - add error message like login to add product to cart
     ✔ Give option to add addres from checkout @done (3/25/2025, 8:34:52 PM)
-    ☐ Order details need more info
-    ☐ Order return handle by diff sellers
+    ✔ Order details need more info @done (3/26/2025, 10:44:53 PM)
+    ✔ Order return handle by diff sellers @done (3/26/2025, 10:44:50 PM)
     ✔ Search cap letters are not taking @done (3/25/2025, 8:34:57 PM)
-    ☐ Admin order list shows error
+    ✔ Admin order list shows error @done (3/26/2025, 10:44:45 PM)
     ✔ Listing of order in admin side not done @done (3/25/2025, 8:35:01 PM)
+
+    ☐ paginations for category listing
+    ☐ don't give the update cart button
+    ☐ price breakdown in order details
+    ☐ don't restore the stock for order return
+    ☐ Seller signup validation - recheck
+    ☐ Same cat can be added multiple times in signup
+    ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
+    ☐ After a payment failure, redirect the user to the order transaction failure or order failure page. The page should contain an illustration, a statement, a button to retry the payment, and a button to redirect to the order details page.Once the order is successfully placed, redirect the user to the successful page.
+    
+    Wallet Management
+    ☐ Implement a wallet system for canceled and returned orders.
+    ☐ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin.
+    ☐ In case of canceled orders, refund the amount directly.
+    ☐ referral offers
+    ☐ Report download (Pdf, Excel)
+    ☐ Ensure that the sales report download adheres to the selected filters.
+    ☐ add proce validation for the coupon. don't allow discount more than price
+    ☐ coupon deactivat estatus not showing
+    ☐ buy now error
 
 Admin side :
 ✔ Admin sign in @done (3/10/2025, 4:02:41 PM)
@@ -147,7 +167,7 @@ Product Details Page:
             //no discount coupons. discounted price is shown based on the quantity of itmes
         ☐ Reviews
         ✔ Stock @done (3/14/2025, 9:35:13 AM)
-    ☐ Proper error handles Sold out / unavailable  and  out of stock EXAMPLE
+    ✔ Proper error handles Sold out / unavailable  and  out of stock EXAMPLE @done (3/26/2025, 10:46:45 PM)
     ✔ Highlights / specs of product @done (3/14/2025, 2:29:47 PM)
     ✔ Related product recommendations @done (3/14/2025, 2:29:49 PM)
     ☐ Redirect users to product listing page,  if 
@@ -191,7 +211,7 @@ User side:
         ✔ list products in cart, @done (3/18/2025, 6:59:06 PM)
         ✔ remove products from cart @done (3/18/2025, 6:59:07 PM)
 
-    ☐ Checkout page
+    ✔ Checkout page @done (3/26/2025, 10:46:25 PM)
         ✔ Display user-added addresses. @done (3/20/2025, 5:50:04 PM)
         ✔ Provide an option to add a new address and edit existing addresses. @done (3/20/2025, 5:50:06 PM)
         ✔ Ensure one address is selected as the default. @done (3/20/2025, 5:50:08 PM)
@@ -208,18 +228,18 @@ User side:
         ✔ Order successful page with thanking statement and illustration and should contain buttons to redirect user to order detail page and continue shopping page. @done (3/20/2025, 10:18:24 PM)
     
     
-    ☐ Order Management
+    ✔ Order Management @done (3/26/2025, 10:46:23 PM)
         ✔ Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS). @done (3/20/2025, 6:01:40 PM)
         ✔ Show basic details in the listing, such as status, order date, etc. @done (3/20/2025, 6:01:42 PM)
-        ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
+        ✔ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory. @done (3/26/2025, 10:46:19 PM)
         ✔ when canceling an order should ask for reason(optional) . @done (3/21/2025, 12:20:20 AM)
         ✔ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory). @done (3/21/2025, 12:20:23 AM)
         ✔ Include a detail page for each respective order. @done (3/21/2025, 12:20:31 AM)
-        ☐ Provide the option to download the invoice for each order.(pdf)
+        ✔ Provide the option to download the invoice for each order.(pdf) @done (3/26/2025, 10:46:22 PM)
         ✔ Implement search to find specific order @done (3/21/2025, 12:20:36 AM)
     
 Admin side : 
-    ☐ Order Management
+    ✔ Order Management @done (3/26/2025, 10:46:16 PM)
         ✔ List order in desc order by order date @done (3/20/2025, 10:18:30 PM)
         ✔ Show basic details like @done (3/20/2025, 10:18:31 PM)
             ✔ orderID,date,, @done (3/20/2025, 10:18:32 PM)
@@ -301,13 +321,13 @@ Week 3 Project:
             ✔ Implement functionality to create new coupon with proper validations. @done (3/25/2025, 8:35:23 PM)
         ☐ Sales report(Daily, Weekly, Yearly, Custom date)
             ☐ Generate sales report
-            ☐ Should be able to filter based on
+            ✔ Should be able to filter based on @done (3/26/2025, 10:43:23 PM)
                 ☐ Custom date range
-                ☐ 1 Day / week / month
-            ☐ Show discount and coupons deduction in sales report
-            ☐ Overall sales count
-            ☐ Overall order amount
-            ☐ Overall discount
+                ✔ 1 Day / week / month @done (3/26/2025, 10:43:18 PM)
+            ✔ Show discount and coupons deduction in sales report @done (3/26/2025, 10:43:15 PM)
+            ✔ Overall sales count @done (3/26/2025, 10:43:11 PM)
+            ✔ Overall order amount @done (3/26/2025, 10:43:10 PM)
+            ✔ Overall discount @done (3/26/2025, 10:43:09 PM)
         
         ☐ Report download (Pdf, Excel)
         ☐ Ensure that the sales report download adheres to the selected filters.
@@ -316,7 +336,9 @@ Week 3 Project:
         
         
 OTHER TASKS:
-    ☐ need a payout option for seller payout
+    ✔ need a payout option for seller payout @done (3/26/2025, 10:46:09 PM)
+
+    ☐ don't update return stock. might be bad items
 
 MAJOR TODO:
     ☐ add neft transactions

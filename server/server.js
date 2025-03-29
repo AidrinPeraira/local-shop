@@ -25,6 +25,7 @@ import couponRouter from './routes/couponRoutes.js'
 import transactionRouter from './routes/transactionRoutes.js'
 import { checkUserBlocked } from './middlewares/authRestrictionMiddleware.js';
 import payoutRouter from './routes/payoutRoutes.js';
+import dashboardRouter from './routes/dashboardRoutes.js';
 
 
 dotenv.config() //load dot env data into 'process.env' by default
@@ -115,6 +116,7 @@ app.use('/api/orders', orderRouter)
 app.use('/api/coupons', couponRouter)
 app.use('/api/transactions', transactionRouter)
 app.use('/api/transactions', payoutRouter)
+app.use('/api/admin', dashboardRouter);
 
 
 
