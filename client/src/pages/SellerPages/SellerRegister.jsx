@@ -21,7 +21,7 @@ const steps = [
 
 export default () => {
   useRedirectIfAuthenticated();
-  const [currentStep, setCurrentStep] = useState(2);
+  const [currentStep, setCurrentStep] = useState(1);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -66,14 +66,19 @@ export default () => {
 
   const handleCategorySelect = (index, categoryId, categoryPath) => {
     const categories = watch("productCategories").map((cat) => cat.id);
-    if (categories.includes(categoryId)) {
+    const existingIndex = categories.indexOf(categoryId);
+
+    if (existingIndex !== -1) {
+      // Remove the existing category
+      remove(existingIndex);
       toast({
-        title: "Category Already Selected",
-        description: "You have already selected this category",
+        title: "Category Removed",
+        description: "Duplicate entries not allowed",
         variant: "destructive",
       });
-      return;
     }
+
+    // Set the new category
     setValue(`productCategories.${index}.id`, categoryId);
     setValue(`productCategories.${index}.path`, categoryPath);
   };
@@ -95,8 +100,21 @@ export default () => {
     }
   };
 
+  const hasValidCategories = () => {
+    const categories = watch("productCategories");
+    return categories.some((cat) => cat.id !== "");
+  };
+
   const onSubmit = async (data) => {
     if (currentStep < steps.length) {
+      if (currentStep === 2 && !hasValidCategories()) {
+        toast({
+          title: "Categories Required",
+          description: "Please select at least one category",
+          variant: "destructive",
+        });
+        return;
+      }
       setCurrentStep((prev) => prev + 1);
     } else {
       const sellerData = {
@@ -340,6 +358,7 @@ export default () => {
                               categoryPath
                             )
                           }
+                          selectedPath={item.path} // Add this prop to maintain selected state
                         />
                         {errors?.categories?.[index]?.id && (
                           <p className="text-red-500 text-xs mt-1">
@@ -511,7 +530,7 @@ export default () => {
               <button
                 type="submit"
                 className="btn-primary ml-auto py-2 px-4 bg-primary text-white rounded-md flex items-center"
-                disabled={currentStep === 2 && fields.length === 0}
+                disabled={currentStep === 2 && !hasValidCategories()}
               >
                 {currentStep === steps.length ? "Complete" : "Next"}
                 {currentStep < steps.length && (

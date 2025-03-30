@@ -11,12 +11,7 @@ const Checkout = () => {
   const cart = useSelector((state) => state.cart.cart);
   const {toast} = useToast()
   
-  if(!cart){
-    toast({
-      title: "Cart is empty",
-      description: "Please add some items to your cart",
-      variant : "destructive"
-    })
+  if(!cart){    
     return <Navigate to="/" />
   }
 

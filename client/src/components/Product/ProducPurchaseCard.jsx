@@ -26,7 +26,7 @@ import {
 } from "../../components/ui/tooltip";
 import { addToCartAPI, processCartItemsAPI } from "../../api/cartApi";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCart } from "../../redux/features/cartSlice";
 
 const ProductPurchaseCard = ({ product }) => {
@@ -39,6 +39,7 @@ const ProductPurchaseCard = ({ product }) => {
   const cardRef = useRef(null);
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const user = useSelector((state) => state.user.user)
 
   // Find matching variant for price and stock count
   const findMatchingVariant = () => {
@@ -99,6 +100,14 @@ const ProductPurchaseCard = ({ product }) => {
 
   const handleAddToCart = async () => {
     // Get selected variants with quantities
+    if(user !== 'buyer'){
+      toast({
+        title: "You are not logged in",
+        description: "Please login as a buyer to add products to cart",
+        variant: "destructive", 
+      })
+      return
+    }
     const selectedVariants = Object.entries(variantQuantities)
       .filter(([_, qty]) => qty > 0)
       .map(([variantId, qty]) => {
@@ -140,6 +149,15 @@ const ProductPurchaseCard = ({ product }) => {
   };
 
   const handleBuyNow =async () => {
+
+    if(user !== 'buyer'){
+      toast({
+        title: "You are not logged in",
+        description: "Please login as a buyer to add products to buy",
+        variant: "destructive", 
+      })
+      return
+    }
     // Get selected variants with quantities
     const selectedVariants = Object.entries(variantQuantities)
       .filter(([_, qty]) => qty > 0)
@@ -172,6 +190,7 @@ const ProductPurchaseCard = ({ product }) => {
       
       
     } catch (error) {
+      console.log("buy now error", error)
       toast({
         title: "Error",
         description: `Error adding products to cart`,

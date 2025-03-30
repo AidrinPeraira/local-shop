@@ -39,7 +39,7 @@
 ✔ varaints are not showing when trying to edit product @done (3/23/2025, 11:29:03 AM)
 ✔ need to add unit for existing products @done (3/23/2025, 11:23:47 AM)
 ✔ the otp keeps being sent when the user enters incorrecct data. button is deactivated @done (3/23/2025, 7:54:45 PM)
-☐ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store
+✔ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store @done (3/29/2025, 11:41:26 AM)
 ☐ platform fee collected from user should be deducted before showing the seller the order details.
 ☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
 ☐ returning order with items from multiple sellers?
@@ -75,13 +75,15 @@ Assigned Pendings:
     ✔ Blocking users and sellers @done (3/25/2025, 8:34:24 PM)
     ✔ Add category not working @done (3/26/2025, 10:45:29 PM)
     ✔ Pagination handle in backend @done (3/25/2025, 8:34:30 PM)
-    ☐ Add to cart not working - add error message like login to add product to cart
+    ✔ Add to cart not working - add error message like login to add product to cart @done (3/29/2025, 12:21:06 PM)
     ✔ Give option to add addres from checkout @done (3/25/2025, 8:34:52 PM)
     ✔ Order details need more info @done (3/26/2025, 10:44:53 PM)
     ✔ Order return handle by diff sellers @done (3/26/2025, 10:44:50 PM)
     ✔ Search cap letters are not taking @done (3/25/2025, 8:34:57 PM)
     ✔ Admin order list shows error @done (3/26/2025, 10:44:45 PM)
     ✔ Listing of order in admin side not done @done (3/25/2025, 8:35:01 PM)
+
+    ☐ sort filter not working properly in shop page
 
     ☐ paginations for category listing
     ☐ don't give the update cart button

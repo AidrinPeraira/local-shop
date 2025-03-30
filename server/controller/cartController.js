@@ -394,6 +394,8 @@ export const processCartItems = asyncHandler(
                     (sum, variant) => sum + variant.variantTotal, 
                     0
                 );
+
+                console.log("Product Subtotal:", productSubtotal);
                 
                 const productDiscount = processedVariants.reduce(
                     (sum, variant) => sum + variant.variantDiscount,
@@ -429,7 +431,7 @@ export const processCartItems = asyncHandler(
         const totalDiscount = processedItems.reduce((sum, item) => 
             sum + item.productDiscount, 0
         );
-        const shippingCharge = productSubtotal <= 5000 ? 500 : 0;
+        const shippingCharge = processedItems.productSubtotal <= 5000 ? 500 : 0;
         const platformFee = 1000; // Changed to match getCartItems
 
         const cartTotal = subtotalBeforeDiscount - totalDiscount + shippingCharge + platformFee;
