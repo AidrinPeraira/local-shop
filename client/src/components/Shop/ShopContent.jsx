@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Star, ChevronRight , Heart} from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Star,
+  ChevronRight,
+  Heart,
+} from "lucide-react";
 import { Button } from "../../components/ui/button.jsx";
 import { Slider } from "../../components/ui/slider.jsx";
 import { Checkbox } from "../../components/ui/checkbox.jsx";
@@ -29,7 +35,11 @@ import {
   SheetTrigger,
 } from "../../components/ui/sheet";
 import ProductPurchaseCard from "../Product/ProducPurchaseCard";
-import { addToWishlistApi, removeFromWishlistApi, getWishlistApi } from "../../api/wishlistApi";
+import {
+  addToWishlistApi,
+  removeFromWishlistApi,
+  getWishlistApi,
+} from "../../api/wishlistApi";
 
 const ShopContent = () => {
   const [products, setProducts] = useState([]);
@@ -44,6 +54,11 @@ const ShopContent = () => {
   const [sortOption, setSortOption] = useState("latest");
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [expanded, setExpanded] = useState({
+    price: false,
+    rating: false,
+  });
+  const [tempRating, setTempRating] = useState(null);
 
   const [wishlistedItems, setWishlistedItems] = useState(new Set());
 
@@ -57,11 +72,28 @@ const ShopContent = () => {
   const [endIndex, setEndIndex] = useState(12);
   const [currentProducts, setCurrentProducts] = useState([]);
 
-  //setting the expanded state
-  const [expanded, setExpanded] = useState({
-    price: true,
-    rating: true,
-  });
+  //useeffect to handle side bar collapse
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setExpanded((prev) => ({
+          price: prev.price,
+          rating: prev.rating,
+        }));
+      } else {
+        setExpanded({
+          price: false,
+          rating: false,
+        });
+      }
+    };
+
+    // Call it once on mount
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // create useEffect to handle rinitial params
   useEffect(() => {
@@ -177,14 +209,7 @@ const ShopContent = () => {
 
   //handle rating selection
   const handleRatingChange = (checked, rating) => {
-    setSelectedRating(checked ? rating.toString() : null);
-    const newParams = new URLSearchParams(searchParams);
-    if (checked) {
-      newParams.set("rating", rating.toString());
-    } else {
-      newParams.delete("rating");
-    }
-    setSearchParams(newParams);
+    setTempRating(checked ? rating.toString() : null);
   };
   //get category path or breadcrumbs
   const findCategoryPath = (categoryId) => {
@@ -257,32 +282,29 @@ const ShopContent = () => {
   const handleApplyFilters = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set("priceRange", priceRange.join(","));
-    if (selectedRating) {
-      newParams.set("rating", selectedRating);
+    if (tempRating) {
+      newParams.set("rating", tempRating);
     } else {
       newParams.delete("rating");
     }
+    setSelectedRating(tempRating);
     setSearchParams(newParams);
   };
 
   const handleResetFilters = () => {
-    if (initialParams) {
-      setPriceRange(initialParams.priceRange);
-      setSelectedRating(initialParams.rating);
-      setSortOption(initialParams.sort);
-      setCurrentPage(1);
-
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set("priceRange", initialParams.priceRange.join(","));
-      newParams.set("sort", initialParams.sort);
-      newParams.set("page", "1");
-      if (initialParams.rating) {
-        newParams.set("rating", initialParams.rating);
-      } else {
-        newParams.delete("rating");
-      }
-      setSearchParams(newParams);
-    }
+    // Reset to default values
+    setPriceRange([0, 10000]);
+    setTempRating(null);
+    setSelectedRating(null);
+    setSortOption("latest");
+    setCurrentPage(1);
+  
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("priceRange", "0,3000");
+    newParams.set("sort", "latest");
+    newParams.set("page", "1");
+    newParams.delete("rating"); // Always remove rating parameter on reset
+    setSearchParams(newParams);
   };
 
   return (
@@ -341,21 +363,22 @@ const ShopContent = () => {
             onOpenChange={(isOpen) =>
               setExpanded((prev) => ({ ...prev, price: isOpen }))
             }
-            className="mb-6"
+            className="mb-6 space-y-2"
           >
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-lg">Price Range</h3>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-0 h-auto">
-                  {expanded.price ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full flex items-center justify-between p-0 h-auto"
+              >
+                <h3 className="font-semibold text-lg">Price Range</h3>
+                {expanded.price ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2">
               <div className="px-2 pt-4">
                 <div className="flex items-center gap-4 mb-2">
                   <input
@@ -387,7 +410,7 @@ const ShopContent = () => {
                   />
                 </div>
                 <Slider
-                  defaultValue={[0, 3000]}
+                  defaultValue={[0, 10000]}
                   min={0}
                   max={10000}
                   step={100}
@@ -412,21 +435,22 @@ const ShopContent = () => {
             onOpenChange={(isOpen) =>
               setExpanded((prev) => ({ ...prev, rating: isOpen }))
             }
-            className="mb-6"
+            className="mb-6 space-y-2"
           >
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-lg">Rating</h3>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-0 h-auto">
-                  {expanded.rating ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full flex items-center justify-between p-0 h-auto"
+              >
+                <h3 className="font-semibold text-lg">Ratings</h3>
+                {expanded.rating ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2">
               <div className="space-y-2">
                 {[5, 4, 3, 2, 1].map((rating) => (
                   <label
@@ -434,7 +458,7 @@ const ShopContent = () => {
                     className="flex items-center space-x-2 cursor-pointer"
                   >
                     <Checkbox
-                      checked={selectedRating === rating.toString()}
+                      checked={tempRating === rating.toString()}
                       onCheckedChange={(checked) =>
                         handleRatingChange(checked, rating)
                       }
