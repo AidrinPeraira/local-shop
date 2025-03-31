@@ -83,27 +83,8 @@ Assigned Pendings:
     ✔ Admin order list shows error @done (3/26/2025, 10:44:45 PM)
     ✔ Listing of order in admin side not done @done (3/25/2025, 8:35:01 PM)
 
-    ☐ sort filter not working properly in shop page
+    ✔ sort filter not working properly in shop page @done (3/30/2025, 2:59:54 PM)
 
-    ☐ paginations for category listing
-    ☐ don't give the update cart button
-    ☐ price breakdown in order details
-    ☐ don't restore the stock for order return
-    ☐ Seller signup validation - recheck
-    ☐ Same cat can be added multiple times in signup
-    ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
-    ☐ After a payment failure, redirect the user to the order transaction failure or order failure page. The page should contain an illustration, a statement, a button to retry the payment, and a button to redirect to the order details page.Once the order is successfully placed, redirect the user to the successful page.
-    
-    Wallet Management
-    ☐ Implement a wallet system for canceled and returned orders.
-    ☐ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin.
-    ☐ In case of canceled orders, refund the amount directly.
-    ☐ referral offers
-    ☐ Report download (Pdf, Excel)
-    ☐ Ensure that the sales report download adheres to the selected filters.
-    ☐ add proce validation for the coupon. don't allow discount more than price
-    ☐ coupon deactivat estatus not showing
-    ☐ buy now error
 
 Admin side :
 ✔ Admin sign in @done (3/10/2025, 4:02:41 PM)
@@ -276,9 +257,9 @@ Week 3 Project:
         
 
     //transaction amount and use case differnt for coupons
-        ✘ Coupon Management (Apply Coupon, Remove Coupon) @cancelled (3/24/2025, 5:05:09 PM)
-            ✘ Implement an option to apply and remove a coupon on the checkout page. @cancelled (3/24/2025, 5:05:11 PM)
-            ✘ Ensure that a coupon cannot be applied multiple times and that the breakdown of the grand total price, including the coupon discount, is properly displayed on the checkout page. @cancelled (3/24/2025, 5:05:12 PM)
+        ✔ Coupon Management (Apply Coupon, Remove Coupon) @done (3/30/2025, 3:01:37 PM)
+            ✔ Implement an option to apply and remove a coupon on the checkout page. @done (3/30/2025, 3:01:39 PM)
+            ✔ Ensure that a coupon cannot be applied multiple times and that the breakdown of the grand total price, including the coupon discount, is properly displayed on the checkout page. @done (3/30/2025, 3:01:41 PM)
         
         ✔ Search, @done (3/24/2025, 5:05:43 PM)
         ✔ Category filtering @done (3/24/2025, 5:05:44 PM)
@@ -335,7 +316,27 @@ Week 3 Project:
         ☐ Ensure that the sales report download adheres to the selected filters.
 
         
-        
+Pendings:
+    
+    ☐ paginations for category listing
+    ☐ don't give the update cart button
+    ☐ price breakdown in order details
+    ☐ don't restore the stock for order return
+    ☐ Seller signup validation - recheck
+    ☐ Same cat can be added multiple times in signup
+    ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
+    ☐ After a payment failure, redirect the user to the order transaction failure or order failure page. The page should contain an illustration, a statement, a button to retry the payment, and a button to redirect to the order details page.Once the order is successfully placed, redirect the user to the successful page.
+    
+    Wallet Management
+    ☐ Implement a wallet system for canceled and returned orders.
+    ☐ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin.
+    ☐ In case of canceled orders, refund the amount directly.
+    ☐ referral offers
+    ☐ Report download (Pdf, Excel)
+    ☐ Ensure that the sales report download adheres to the selected filters.
+    ☐ add proce validation for the coupon. don't allow discount more than price
+    ☐ coupon deactivat estatus not showing
+    ☐ buy now error
         
 OTHER TASKS:
     ✔ need a payout option for seller payout @done (3/26/2025, 10:46:09 PM)

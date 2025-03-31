@@ -9,6 +9,7 @@ import ProductRecommendations from './ProductRecomendations';
 import { getProductDetailsApi } from '../../api/productApi';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { addToWishlistApi, removeFromWishlistApi, getWishlistApi } from '../../api/wishlistApi';
+import { useSelector } from 'react-redux';
 
 const ProductDetailContent = () => {
   const [product, setProduct] = useState(null);
@@ -16,6 +17,7 @@ const ProductDetailContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchParams] = useSearchParams();
+  const user = useSelector(state => state.user.user)
 
   const id = searchParams.get('id');
   const { slug } = useParams();
@@ -68,6 +70,15 @@ const ProductDetailContent = () => {
 
   const handleWishlist = async () => {
     if (!product) return;
+
+    if(user.role !== 'buyer'){
+      toast({
+        title: "You are not logged in",
+        description: "Please login as a buyer to save products",
+        variant: "destructive", 
+      })
+      return
+    }
     
     try {
       if (isWishlisted) {

@@ -62,6 +62,8 @@ const ShopContent = () => {
 
   const [wishlistedItems, setWishlistedItems] = useState(new Set());
 
+  const user = useSelector(state => state.user.user)
+
   //SETTING THE pagination values
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -138,6 +140,14 @@ const ShopContent = () => {
 
   const handleWishlist = async (e, productId) => {
     e.preventDefault(); // Prevent navigation
+    if(user.role !== 'buyer'){
+      toast({
+        title: "You are not logged in",
+        description: "Please login as a buyer to save products",
+        variant: "destructive", 
+      })
+      return
+    }
     try {
       if (wishlistedItems.has(productId)) {
         await removeFromWishlistApi(productId);

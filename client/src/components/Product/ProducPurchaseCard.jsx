@@ -100,7 +100,7 @@ const ProductPurchaseCard = ({ product }) => {
 
   const handleAddToCart = async () => {
     // Get selected variants with quantities
-    if(user !== 'buyer'){
+    if(user.role !== 'buyer'){
       toast({
         title: "You are not logged in",
         description: "Please login as a buyer to add products to cart",
@@ -150,14 +150,7 @@ const ProductPurchaseCard = ({ product }) => {
 
   const handleBuyNow =async () => {
 
-    if(user !== 'buyer'){
-      toast({
-        title: "You are not logged in",
-        description: "Please login as a buyer to add products to buy",
-        variant: "destructive", 
-      })
-      return
-    }
+    
     // Get selected variants with quantities
     const selectedVariants = Object.entries(variantQuantities)
       .filter(([_, qty]) => qty > 0)
