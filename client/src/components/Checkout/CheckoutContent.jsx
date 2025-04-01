@@ -41,6 +41,7 @@ import {
 } from "../../components/ui/dialog";
 import { loadScript } from "../../utils/loadScript";
 import { razorPayKey } from "../../configuration";
+import OrderFailed from "./OrderFailed";
 
 const CheckoutContent = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -53,7 +54,7 @@ const CheckoutContent = () => {
   const [availableCoupons, setAvailableCoupons] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(null);
   const [orderId, setOrderId] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -225,7 +226,8 @@ const CheckoutContent = () => {
                   : selectedCoupon.discountValue,
                 selectedCoupon.maxDiscount
               )
-            : 0) ;
+            : 0);
+
         // Create Razorpay order
         const orderResponse = await createRazorpayOrderApi({
           amount: amount,
@@ -243,80 +245,74 @@ const CheckoutContent = () => {
             email: userProfile?.email,
             contact: userProfile?.phone,
           },
-          config: {
-            display: {
-              blocks: {
-                banks: {
-                  name: "Pay via Bank Transfer",
-                  instruments: [
-                    {
-                      method: "netbanking"
-                    }
-                  ]
-                },
-                upis: {
-                  name: "Pay via UPI",
-                  instruments: [
-                    {
-                      method: "upi"
-                    }
-                  ]
-                },
-                cards: {
-                  name: "Pay via Card",
-                  instruments: [
-                    {
-                      method: "card"
-                    }
-                  ]
-                }
-              },
-              sequence: ["block.upis", "block.cards", "block.banks"],
-              preferences: {
-                show_default_blocks: false
-              }
-            }
-          },
-          handler: async (response) => {
-            try {
-              // Verify payment
-              await verifyRazorpayPaymentApi({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              });
-
-              // Create order after payment verification
+          modal: {
+            ondismiss: function () {
+              // Create order with failed payment status when modal is dismissed
               const orderData = {
                 cart,
                 selectedAddressId,
-                paymentMethod,
+                paymentMethod: "ONLINE",
+                userProfile,
+                couponId: selectedCoupon?._id,
+                razorpay_order_id: orderResponse.data.order.id,
+                paymentStatus: "FAILED",
+              };
+
+              createOrderApi(orderData)
+                .then((response) => {
+                  setOrderId(response.data.order.orderId);
+                  setOrderSuccess("failed");
+                })
+                .catch((error) => {
+                  toast({
+                    title: "Error",
+                    description: "Failed to create order",
+                    variant: "destructive",
+                  });
+                });
+            },
+          },
+          handler: async (response) => {
+            try {
+              const orderData = {
+                cart,
+                selectedAddressId,
+                paymentMethod: "ONLINE",
                 userProfile,
                 couponId: selectedCoupon?._id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
               };
 
-              const orderResponse = await createOrderApi(orderData);
-              setOrderId(orderResponse.data.order.orderId);
-              setOrderSuccess(true);
+              try {
+                // Verify payment
+                await verifyRazorpayPaymentApi({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                });
+
+                // Payment successful
+                orderData.paymentStatus = "COMPLETED";
+                const orderResponse = await createOrderApi(orderData);
+                setOrderId(orderResponse.data.order.orderId);
+                setOrderSuccess("success");
+              } catch (error) {
+                // Payment verification failed
+                orderData.paymentStatus = "FAILED";
+                const orderResponse = await createOrderApi(orderData);
+                setOrderId(orderResponse.data.order.orderId);
+                setOrderSuccess("failed");
+              }
             } catch (error) {
               toast({
                 title: "Error",
                 description:
-                  error.response?.data?.message ||
-                  "Payment verification failed",
+                  error.response?.data?.message || "Failed to create order",
                 variant: "destructive",
               });
             }
-          },
-          prefill: {
-            name: userProfile?.username,
-            email: userProfile?.email,
-            contact: userProfile?.phone,
-          },
-          theme: {
-            color: "#000000",
           },
         };
 
@@ -340,7 +336,7 @@ const CheckoutContent = () => {
         });
 
         setOrderId(response.data.order.orderId);
-        setOrderSuccess(true);
+        setOrderSuccess("success");
       }
     } catch (error) {
       toast({
@@ -607,14 +603,18 @@ const CheckoutContent = () => {
                   className="grid gap-4"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem 
-                      value="COD" 
-                      id="cash" 
+                    <RadioGroupItem
+                      value="COD"
+                      id="cash"
                       disabled={cart.summary.cartTotal > 10000}
                     />
-                    <Label 
-                      htmlFor="cash" 
-                      className={`flex items-center gap-2 ${cart.summary.cartTotal > 10000 ? 'text-gray-400 cursor-not-allowed' : ''}`}
+                    <Label
+                      htmlFor="cash"
+                      className={`flex items-center gap-2 ${
+                        cart.summary.cartTotal > 10000
+                          ? "text-gray-400 cursor-not-allowed"
+                          : ""
+                      }`}
                     >
                       <CreditCard className="h-4 w-4" />
                       Cash On Delivery
@@ -882,7 +882,8 @@ const CheckoutContent = () => {
         </div>
       </form>
 
-      {orderSuccess && <OrderSuccess orderId={orderId} />}
+      {orderSuccess == "success" && <OrderSuccess orderId={orderId} />}
+      {orderSuccess == "failed" && <OrderFailed orderId={orderId} />}
     </div>
   );
 };

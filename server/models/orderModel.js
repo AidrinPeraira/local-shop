@@ -79,6 +79,24 @@ const orderItemSchema = new mongoose.Schema({
     ref: "Seller",
     required: true,
   },
+  returnStatus: {
+    status: {
+      type: String,
+      enum: ["RETURN_REQUESTED", "RETURN_APPROVED", "RETURN_REJECTED", "RETURN_SHIPPED", "RETURN_COMPLETED"],
+    },
+    reason: {
+      type: String,
+    },
+    requestDate: {
+      type: Date,
+    },
+    approvalDate: {
+      type: Date,
+    },
+    completionDate: {
+      type: Date,
+    }
+  }
 });
 
 const shippingAddressSchema = new mongoose.Schema({

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import { Container } from "../../components/ui/container";
@@ -37,6 +37,8 @@ const OrderDetails = () => {
   const { id } = useParams();
   const { toast } = useToast();
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const navigate = useNavigate();
 
   const fetchOrder = async () => {
     try {
@@ -104,13 +106,14 @@ const OrderDetails = () => {
 
   const handleReturn = async () => {
     try {
-      await returnOrderApi(id, returnReason);
+      await returnOrderApi(id, selectedItemId, returnReason);
       toast({
         title: "Success",
         description: "Return request submitted successfully",
       });
       setReturnDialogOpen(false);
       setReturnReason("");
+      setSelectedItemId(null);
       fetchOrder();
     } catch (error) {
       toast({
@@ -246,6 +249,17 @@ const OrderDetails = () => {
             <div className="text-center py-10">Loading...</div>
           ) : order ? (
             <div className="space-y-6">
+              <div className="flex items-center mb-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/profile/orders")}
+                  className="mr-4"
+                >
+                  ← Back to Orders
+                </Button>
+              </div>
+
               <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Order #{order.orderId}</h1>
                 <div className="flex items-center gap-2">
@@ -306,6 +320,19 @@ const OrderDetails = () => {
                             {variant.attributes} - Qty: {variant.quantity}
                           </p>
                         ))}
+                        {order.orderStatus === "DELIVERED" && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="mt-2"
+                            onClick={() => {
+                              setSelectedItemId(item._id);
+                              setReturnDialogOpen(true);
+                            }}
+                          >
+                            Return Item
+                          </Button>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="font-medium">₹{item.productTotal}</p>
@@ -388,14 +415,6 @@ const OrderDetails = () => {
                     onClick={() => setCancelDialogOpen(true)}
                   >
                     Cancel Order
-                  </Button>
-                )}
-                {order.orderStatus === "DELIVERED" && (
-                  <Button
-                    variant="secondary"
-                    onClick={() => setReturnDialogOpen(true)}
-                  >
-                    Return Order
                   </Button>
                 )}
               </div>

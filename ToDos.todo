@@ -214,7 +214,7 @@ User side:
     ✔ Order Management @done (3/26/2025, 10:46:23 PM)
         ✔ Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS). @done (3/20/2025, 6:01:40 PM)
         ✔ Show basic details in the listing, such as status, order date, etc. @done (3/20/2025, 6:01:42 PM)
-        ✔ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory. @done (3/26/2025, 10:46:19 PM)
+        ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
         ✔ when canceling an order should ask for reason(optional) . @done (3/21/2025, 12:20:20 AM)
         ✔ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory). @done (3/21/2025, 12:20:23 AM)
         ✔ Include a detail page for each respective order. @done (3/21/2025, 12:20:31 AM)
@@ -230,7 +230,7 @@ Admin side :
             ✔ view button to show detailed view of order etc.. @done (3/20/2025, 10:18:36 PM)
         ✔ Implement functionality to change order Status(pending,shipped,out for delivery,delivered,cancelled) @done (3/20/2025, 10:18:38 PM)
         ✔ Implement a functionality to verify the  return request of product @done (3/21/2025, 12:20:51 AM)
-        ✘ If the verification is accepted ,then return the previously paid amount by the consumer or user to the wallet. @cancelled (3/25/2025, 11:15:22 AM)
+        ☐ If the verification is accepted ,then return the previously paid amount by the consumer or user to the wallet.
         ✔ Implement search,sort and filter along with clear search functionality. @done (3/20/2025, 10:18:44 PM)
         ✔ Implement Pagination @done (3/20/2025, 10:18:45 PM)
 
@@ -251,9 +251,9 @@ Week 3 Project:
             ✔ and a button to redirect to the order details page. @done (3/26/2025, 11:53:58 AM)
             ✔ Once the order is successfully placed, redirect the user to the successful page. @done (3/26/2025, 11:54:02 AM)
         ☐ Provide an option to cancel the entire order or specific products. 
-            ✔ Upon cancellation, ensure that the stock of the respective products is incremented in the inventory. @done (3/26/2025, 11:54:06 AM)
-            ✔ when canceling an order should ask for reason(optional) . @done (3/26/2025, 11:51:52 AM)
-            ✔ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory). @done (3/26/2025, 11:51:55 AM)
+            ☐ Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
+            ☐ when canceling an order should ask for reason(optional) .
+            ☐ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory).
         
 
     //transaction amount and use case differnt for coupons
@@ -269,10 +269,10 @@ Week 3 Project:
             ✔ When a product is moved to cart from wishlist, ensure that the product is not present in the wishlist anymore. @done (3/25/2025, 11:14:56 AM)
             ✔ Add to wishlist buttons should be present both on product listing pages and product detail pages. @done (3/25/2025, 11:14:53 AM)
       
-        ✘ Wallet Management @cancelled (3/24/2025, 5:06:01 PM)
-        ✘ Implement a wallet system for canceled and returned orders. @cancelled (3/24/2025, 5:06:03 PM)
-        ✘ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin. @cancelled (3/25/2025, 11:14:21 AM)
-        ✘ In case of canceled orders, refund the amount directly. @cancelled (3/25/2025, 11:14:23 AM)
+        ☐ Wallet Management
+        ☐ Implement a wallet system for canceled and returned orders.
+        ☐ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin.
+        ☐ In case of canceled orders, refund the amount directly.
         
     Admin side : 
 
@@ -342,6 +342,7 @@ OTHER TASKS:
     ✔ need a payout option for seller payout @done (3/26/2025, 10:46:09 PM)
 
     ☐ don't update return stock. might be bad items
+    ☐ duplicate cart addition
 
 MAJOR TODO:
     ☐ add neft transactions

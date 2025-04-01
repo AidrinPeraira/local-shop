@@ -34,8 +34,6 @@ const CartContent = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [currentSeller, setCurrentSeller] = useState(null);
 
   useEffect(() => {
     dispatch(clearCart());
@@ -48,29 +46,6 @@ const CartContent = () => {
     }
   }, [cartData]);
 
-  useEffect(() => {
-    // Clear selections when cart data changes
-    setSelectedItems([]);
-    setCurrentSeller(null);
-  }, [cartData]);
-
-  const handleItemSelection = (productId, sellerId) => {
-    if (!currentSeller || currentSeller === sellerId) {
-      setCurrentSeller(sellerId);
-      setSelectedItems(prev => {
-        const newSelection = prev.includes(productId)
-          ? prev.filter(id => id !== productId)
-          : [...prev, productId];
-        
-        // Clear current seller if no items are selected
-        if (newSelection.length === 0) {
-          setCurrentSeller(null);
-        }
-        
-        return newSelection;
-      });
-    }
-  };
 
   const fetchCartData = async () => {
     try {
@@ -91,6 +66,8 @@ const CartContent = () => {
       setLoading(false);
     }
   };
+
+
 
   const updateLocalQuantity = (productId, variantId, newQuantity) => {
     if (newQuantity < 1) return;
@@ -192,10 +169,6 @@ const CartContent = () => {
           dispatch(setCart(freshCartData.data.cart));
           setLocalCartData(JSON.parse(JSON.stringify(freshCartData.data.cart))); // Ensure exact copy
         }
-        toast({
-          title: "Success",
-          description: "Cart updated successfully",
-        });
       } else {
         throw new Error(response.data.message || "Failed to update cart");
       }
@@ -207,6 +180,12 @@ const CartContent = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if(hasUnsavedChanges()){
+      updateCart();
+    }
+  }, [localCartData])
 
   const removeVariant = (productId, variantId) => {
     setLocalCartData((prevData) => {
@@ -336,9 +315,7 @@ const CartContent = () => {
   };
 
   const handleCheckout = async () => {
-    const selectedProducts = localCartData.items.filter(
-      item => selectedItems.includes(item.productId)
-    );
+    const selectedProducts = localCartData.items
 
     // Calculate totals for selected items only
     const subtotalBeforeDiscount = selectedProducts.reduce(
@@ -469,20 +446,7 @@ const CartContent = () => {
                 >
                   <CardContent className="p-4">
 
-                  <div className="flex items-center gap-2 mb-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item.productId)}
-                        onChange={() => handleItemSelection(item.productId, item.seller._id)}
-                        disabled={currentSeller && currentSeller !== item.seller._id}
-                        className="w-4 h-4 rounded border-gray-300"
-                      />
-                      {currentSeller && currentSeller !== item.seller._id && (
-                        <span className="text-sm text-orange-600">
-                          Select items from the same seller
-                        </span>
-                      )}
-                    </div>
+                  
 
                     {/* Add warning message if product is invalid */}
                     {(isInvalid || hasOutOfStock) && (
@@ -728,29 +692,19 @@ const CartContent = () => {
               </CardContent>
 
               <CardFooter className="p-6 pt-0 flex flex-col gap-2">
-                {hasUnsavedChanges() && (
-                  <Button
-                    className="w-full flex items-center bg-accent text-black justify-center gap-2 hover:bg-accent/80"
-                    onClick={updateCart}
-                  >
-                    Update Cart
-                  </Button>
-                )}
+                
                <Button
                   className="w-full flex items-center justify-center gap-2"
                   onClick={handleCheckout}
                   disabled={
                     hasUnsavedChanges() || 
-                    getInvalidProducts().length > 0 || 
-                    selectedItems.length === 0
+                    getInvalidProducts().length > 0 
                   }
                 >
                   {hasUnsavedChanges()
-                    ? "Save changes before checkout"
+                    ? "Updating Cart"
                     : getInvalidProducts().length > 0
                     ? "Remove invalid items to proceed"
-                    : selectedItems.length === 0
-                    ? "Select items to checkout"
                     : "Checkout"}{" "}
                   <ArrowRight className="h-4 w-4" />
                 </Button>

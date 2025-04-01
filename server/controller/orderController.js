@@ -11,7 +11,17 @@ import Transaction from "../models/adminTransactionModel.js";
 
 export const createUserOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { cart, selectedAddressId, paymentMethod, userProfile, couponId } = req.body;
+  const { 
+    cart, 
+    selectedAddressId, 
+    paymentMethod, 
+    userProfile, 
+    couponId,
+    razorpay_order_id,
+    razorpay_payment_id,
+    paymentStatus 
+  } = req.body;
+
 
   try {
     // 1. Generate custom order ID
@@ -112,6 +122,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
     // Update cart total with coupon discount
     const finalCartTotal = cart.summary.cartTotal - couponDiscount;
 
+
     // Create new order with coupon details
     const order = new Order({
       orderId: customOrderId,
@@ -122,7 +133,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         city: shippingAddress.city,
         state: shippingAddress.state,
         pincode: shippingAddress.pincode,
-        phone: shippingAddress.phone || userProfile?.phone || req.body.phone,
+        phone: shippingAddress.phone || userProfile?.phone,
       },
       summary: {
         subtotalBeforeDiscount: cart.summary.subtotalBeforeDiscount,
@@ -136,14 +147,22 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       },
       payment: {
         method: paymentMethod === "card" ? "ONLINE" : "COD",
-        status: paymentMethod === "card" ? "PENDING" : "COMPLETED",
+        status: paymentMethod === "card" ? paymentStatus : "COMPLETED",
+        razorpay_order_id,
+        razorpay_payment_id
       },
-      orderStatus: "PENDING",
+      orderStatus: paymentMethod === "card" 
+        ? (paymentStatus === "COMPLETED" ? "PENDING" : "FAILED")
+        : "PENDING",
       trackingDetails: [
         {
-          status: "Order Placed",
+          status: paymentMethod === "card" 
+            ? (paymentStatus === "COMPLETED" ? "Order Placed" : "Payment Failed")
+            : "Order Placed",
           timestamp: new Date(),
-          description: "Your order has been placed successfully",
+          description: paymentMethod === "card"
+            ? (paymentStatus === "COMPLETED" ? "Your order has been placed successfully" : "Payment failed for your order")
+            : "Your order has been placed successfully with Cash on Delivery",
         },
       ],
     });
@@ -251,29 +270,14 @@ export const getUserOrders = asyncHandler(async (req, res) => {
       orderId: order.orderId,
       createdAt: order.createdAt,
       orderStatus: order.orderStatus,
+      paymentStatus: order.payment.status, // Add payment status
+      paymentMethod: order.payment.method, // Add payment method
+      razorpay_order_id: order.payment.razorpay_order_id, // Add Razorpay order ID for retry
       items: order.items.map((item) => ({
-        _id: item._id,
-        productName: item.productName,
-        image: item.image,
-        variants: item.variants.map((variant) => ({
-          variantId: variant.variantId,
-          attributes: variant.attributes,
-          quantity: variant.quantity,
-          basePrice: variant.basePrice,
-          variantTotal: variant.variantTotal,
-        })),
-        productTotal: item.variants.reduce(
-          (sum, variant) => sum + variant.variantTotal,
-          0
-        ),
+        // ... existing item mapping ...
       })),
       summary: {
-        subtotalBeforeDiscount: order.summary.subtotalBeforeDiscount,
-        totalDiscount: order.summary.totalDiscount,
-        subtotalAfterDiscount: order.summary.subtotalAfterDiscount,
-        shippingCharge: order.summary.shippingCharge,
-        platformFee: order.summary.platformFee,
-        cartTotal: order.summary.cartTotal,
+        // ... existing summary mapping ...
       },
       shippingAddress: order.shippingAddress,
       payment: order.payment,
