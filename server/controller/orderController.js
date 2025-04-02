@@ -23,6 +23,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
   } = req.body;
 
 
+
   try {
     // 1. Generate custom order ID
     const timestamp = new Date();
@@ -146,26 +147,33 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         cartTotal: finalCartTotal,
       },
       payment: {
-        method: paymentMethod === "card" ? "ONLINE" : "COD",
-        status: paymentMethod === "card" ? paymentStatus : "COMPLETED",
-        razorpay_order_id,
-        razorpay_payment_id
+        method: paymentMethod,
+        status: paymentStatus,
+        paymentProvider: paymentMethod === "ONLINE" ? "RAZORPAY" : null,
+        paymentDetails: {
+          orderId: razorpay_order_id || null,
+          paymentId: razorpay_payment_id || null,
+          timestamp: new Date(),
+          paymentMethod: paymentMethod
+        }
       },
-      orderStatus: paymentMethod === "card" 
+      orderStatus: paymentMethod === "ONLINE"
         ? (paymentStatus === "COMPLETED" ? "PENDING" : "FAILED")
         : "PENDING",
       trackingDetails: [
         {
-          status: paymentMethod === "card" 
+          status: paymentMethod === "ONLINE"
             ? (paymentStatus === "COMPLETED" ? "Order Placed" : "Payment Failed")
             : "Order Placed",
-          timestamp: new Date(),
-          description: paymentMethod === "card"
-            ? (paymentStatus === "COMPLETED" ? "Your order has been placed successfully" : "Payment failed for your order")
+          timestamp: new Date(),          description: paymentMethod === "ONLINE"
+            ? (paymentStatus === "COMPLETED" 
+                ? "Your order has been placed successfully" 
+                : "Payment failed for your order")
             : "Your order has been placed successfully with Cash on Delivery",
         },
       ],
     });
+
 
     // 4. Save the order
     await order.save();
@@ -180,8 +188,10 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         buyerFee: cart.summary.platformFee,
         sellerFee: 0
       },
-      status: paymentMethod === "card" ? "PENDING" : "COMPLETED",
-      paymentMethod: paymentMethod === "card" ? "ONLINE" : "COD",
+      status: paymentMethod === "ONLINE" 
+        ? (paymentStatus === "COMPLETED" ? "COMPLETED" : "FAILED")
+        : "PENDING",
+      paymentMethod: paymentMethod,
       from: {
         entity: userId,
         type: "BUYER"
@@ -191,7 +201,9 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         type: "ADMIN"
       },
       scheduledDate: new Date(),
-      processedDate: paymentMethod === "card" ? null : new Date()
+      processedDate: paymentMethod === "ONLINE" && paymentStatus === "COMPLETED" 
+        ? new Date() 
+        : null
     });
 
     await transaction.save();
@@ -218,6 +230,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         orderId: order._id,
         total: finalCartTotal,
         status: order.orderStatus,
+        paymentStatus: order.payment.status,
         couponDiscount: couponDiscount,
       },
     });
@@ -270,14 +283,34 @@ export const getUserOrders = asyncHandler(async (req, res) => {
       orderId: order.orderId,
       createdAt: order.createdAt,
       orderStatus: order.orderStatus,
-      paymentStatus: order.payment.status, // Add payment status
-      paymentMethod: order.payment.method, // Add payment method
-      razorpay_order_id: order.payment.razorpay_order_id, // Add Razorpay order ID for retry
+      paymentStatus: order.payment.status,
+      paymentMethod: order.payment.method,
+      razorpay_order_id: order.payment.razorpay_order_id,
       items: order.items.map((item) => ({
-        // ... existing item mapping ...
+        _id: item._id,
+        productName: item.productName || item.productId.productName,
+        image: item.image || (item.productId.images && item.productId.images[0]),
+        variants: item.variants.map((variant) => ({
+          variantId: variant.variantId,
+          attributes: variant.attributes,
+          quantity: variant.quantity,
+          basePrice: variant.basePrice,
+          variantTotal: variant.variantTotal,
+        })),
+        productTotal: item.productTotal,
+        seller: {
+          _id: item.seller._id,
+          name: item.seller.sellerName
+        }
       })),
       summary: {
-        // ... existing summary mapping ...
+        subtotalBeforeDiscount: order.summary.subtotalBeforeDiscount,
+        totalDiscount: order.summary.totalDiscount,
+        subtotalAfterDiscount: order.summary.subtotalAfterDiscount,
+        shippingCharge: order.summary.shippingCharge,
+        platformFee: order.summary.platformFee,
+        couponDiscount: order.summary.couponDiscount,
+        cartTotal: order.summary.cartTotal,
       },
       shippingAddress: order.shippingAddress,
       payment: order.payment,

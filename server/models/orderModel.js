@@ -178,11 +178,15 @@ const orderSchema = new mongoose.Schema(
       },
       status: {
         type: String,
-        enum: ["PENDING", "COMPLETED", "FAILED", "REFUNDED"],
+        enum: ["PENDING", "COMPLETED", "FAILED"],
         default: "PENDING",
       },
       transactionId: String,
-      paymentProvider: String,
+      paymentProvider: {
+        type: String,
+        enum: ["RAZORPAY", null],
+        default: null
+      },
       paymentDetails: {
         orderId: String,
         signature: String,
@@ -196,6 +200,7 @@ const orderSchema = new mongoose.Schema(
     orderStatus: {
       type: String,
       enum: [
+        "FAILED",
         "PENDING",
         "PROCESSING",
         "SHIPPED",
@@ -204,6 +209,7 @@ const orderSchema = new mongoose.Schema(
         "RETURNED",
         "RETURN-REQUESTED",
         "RETURN-PROCESSING",
+        "RETURN-REJECTED",
         "RETURN-COMPLETED",
       ],
       default: "PENDING",

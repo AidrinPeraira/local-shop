@@ -50,6 +50,7 @@ app.use(morgan("dev")); // Logs requests in 'dev' format
 //csrf protection
 
 const tokens = new csrf();
+
 app.use((req, res, next) => {
   // Skip CSRF for GET requests
   if (req.method === 'GET') {

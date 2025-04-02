@@ -101,7 +101,23 @@ const ProfileOrders = () => {
     fetchOrders();
   }, [page, sort, search]);1
 
-  
+  const handleRetryPayment = async (order) => {
+    try {
+      navigate(`/checkout/payment`, {
+        state: {
+          orderId: order._id,
+          amount: order.summary.cartTotal,
+          isRetry: true
+        }
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to process payment retry",
+        variant: "destructive",
+      });
+    }
+  };
 
  
   
@@ -169,17 +185,24 @@ const ProfileOrders = () => {
                   <span className="text-sm font-medium">
                     ₹{order.summary.cartTotal}
                   </span>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      order.orderStatus === "DELIVERED"
-                        ? "bg-green-100 text-green-800"
-                        : order.orderStatus === "CANCELLED"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-blue-100 text-blue-800"
-                    }`}
-                  >
-                    {order.orderStatus}
-                  </span>
+                  <div className="flex gap-2">
+                    {order.payment.status === "FAILED" && (
+                      <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                        Payment Failed
+                      </span>
+                    )}
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        order.orderStatus === "DELIVERED"
+                          ? "bg-green-100 text-green-800"
+                          : order.orderStatus === "CANCELLED"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {order.orderStatus}
+                    </span>
+                  </div>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pt-4">
@@ -222,6 +245,14 @@ const ProfileOrders = () => {
                 >
                   View Details
                 </Button>
+                {order.payment.status === "FAILED" && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleRetryPayment(order)}
+                    >
+                      Retry Payment
+                    </Button>
+                  )}
               </AccordionContent>
             </AccordionItem>
           ))}

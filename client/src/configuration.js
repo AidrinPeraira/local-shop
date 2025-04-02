@@ -14,6 +14,6 @@ const googleConfig = {
   },
 };
 
-const razorPayKey = import.meta.env.VITE_RAZORPAY_KEY;
+const razorPayKey = import.meta.env.VITE_PUBLIC_RAZORPAY_KEY_ID;
 
 export { configuration, googleConfig, razorPayKey };
