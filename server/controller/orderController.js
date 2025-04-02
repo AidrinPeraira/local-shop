@@ -374,7 +374,14 @@ export const getOrderById = asyncHandler(async (req, res) => {
         seller: {
           _id: item.seller._id,
           name: item.seller.sellerName
-        }
+        },
+        returnStatus: item.returnStatus ? {
+          status: item.returnStatus.status,
+          reason: item.returnStatus.reason,
+          requestDate: item.returnStatus.requestDate,
+          approvalDate: item.returnStatus.approvalDate,
+          completionDate: item.returnStatus.completionDate
+        } : null
       })),
       summary: {
         subtotalBeforeDiscount: order.summary.subtotalBeforeDiscount,

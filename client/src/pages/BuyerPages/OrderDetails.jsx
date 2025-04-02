@@ -28,6 +28,7 @@ import {
   DialogFooter,
 } from "../../components/ui/dialog";
 import { Textarea } from "../../components/ui/textarea";
+import { requestReturnApi } from "../../api/returnApi";
 
 const OrderDetails = () => {
   const [order, setOrder] = useState(null);
@@ -106,7 +107,17 @@ const OrderDetails = () => {
 
   const handleReturn = async () => {
     try {
-      await returnOrderApi(id, selectedItemId, returnReason);
+      if (!returnReason.trim()) {
+        toast({
+          title: "Error",
+          description: "Please provide a return reason",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      await requestReturnApi(id, selectedItemId, returnReason);
+
       toast({
         title: "Success",
         description: "Return request submitted successfully",
@@ -114,7 +125,7 @@ const OrderDetails = () => {
       setReturnDialogOpen(false);
       setReturnReason("");
       setSelectedItemId(null);
-      fetchOrder();
+      fetchOrder(); // Refresh order details
     } catch (error) {
       toast({
         title: "Error",
@@ -241,6 +252,28 @@ const OrderDetails = () => {
     doc.save(`invoice-${order.orderId}.pdf`);
   };
 
+  const getReturnStatusBadge = (returnStatus) => {
+    if (!returnStatus) return null;
+
+    const statusColors = {
+      RETURN_REQUESTED: "bg-yellow-100 text-yellow-800",
+      RETURN_APPROVED: "bg-blue-100 text-blue-800",
+      RETURN_REJECTED: "bg-red-100 text-red-800",
+      RETURN_SHIPPED: "bg-purple-100 text-purple-800",
+      RETURN_COMPLETED: "bg-green-100 text-green-800",
+    };
+
+    return (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          statusColors[returnStatus.status]
+        }`}
+      >
+        {returnStatus.status.replace("_", " ")}
+      </span>
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow py-10">
@@ -311,7 +344,11 @@ const OrderDetails = () => {
                         className="w-20 h-20 object-cover rounded"
                       />
                       <div className="flex-1">
-                        <h3 className="font-medium">{item.productName}</h3>
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium">{item.productName}</h3>
+                          {item.returnStatus &&
+                            getReturnStatusBadge(item.returnStatus)}
+                        </div>
                         {item.variants.map((variant) => (
                           <p
                             key={variant.variantId}
@@ -320,19 +357,20 @@ const OrderDetails = () => {
                             {variant.attributes} - Qty: {variant.quantity}
                           </p>
                         ))}
-                        {order.orderStatus === "DELIVERED" && (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="mt-2"
-                            onClick={() => {
-                              setSelectedItemId(item._id);
-                              setReturnDialogOpen(true);
-                            }}
-                          >
-                            Return Item
-                          </Button>
-                        )}
+                        {order.orderStatus === "DELIVERED" &&
+                          !item.returnStatus && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="mt-2"
+                              onClick={() => {
+                                setSelectedItemId(item._id);
+                                setReturnDialogOpen(true);
+                              }}
+                            >
+                              Return Item
+                            </Button>
+                          )}
                       </div>
                       <div className="text-right">
                         <p className="font-medium">₹{item.productTotal}</p>
@@ -345,7 +383,7 @@ const OrderDetails = () => {
               <Card className="p-6">
                 <h2 className="text-lg font-semibold mb-4">Price Details</h2>
                 <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm"> 
                     <span className="text-gray-600">
                       Subtotal before discount
                     </span>

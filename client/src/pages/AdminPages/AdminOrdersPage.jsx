@@ -27,10 +27,7 @@ const orderStatuses = [
   "PROCESSING",
   "SHIPPED",
   "DELIVERED",
-  "CANCELLED",
-  "RETURNED",
-  "RETURN-REQUESTED",
-  "RETURN-PROCESSING"
+  "CANCELLED"
 ];
 
 export default function SellerOrders() {
@@ -266,6 +263,7 @@ export default function SellerOrders() {
                               "DELIVERED",
                               "CANCELLED",
                               "RETURNED",
+                              "FAILED"
                             ].includes(order.orderStatus)}
                           >
                             Update Status
