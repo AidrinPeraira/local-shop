@@ -319,13 +319,13 @@ Week 3 Project:
 Pendings:
     
     ☐ paginations for category listing
-    ☐ don't give the update cart button
+    ✔ don't give the update cart button @done (4/2/2025, 6:30:39 PM)
     ☐ price breakdown in order details
     ☐ don't restore the stock for order return
-    ☐ Seller signup validation - recheck
-    ☐ Same cat can be added multiple times in signup
-    ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
-    ☐ After a payment failure, redirect the user to the order transaction failure or order failure page. The page should contain an illustration, a statement, a button to retry the payment, and a button to redirect to the order details page.Once the order is successfully placed, redirect the user to the successful page.
+    ✔ Seller signup validation - recheck @done (4/2/2025, 6:30:47 PM)
+    ✔ Same cat can be added multiple times in signup @done (4/2/2025, 6:30:49 PM)
+    ✔ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory. @done (4/2/2025, 6:30:51 PM)
+    ✔ After a payment failure, redirect the user to the order transaction failure or order failure page. The page should contain an illustration, a statement, a button to retry the payment, and a button to redirect to the order details page.Once the order is successfully placed, redirect the user to the successful page. @done (4/2/2025, 6:30:53 PM)
     
     Wallet Management
     ☐ Implement a wallet system for canceled and returned orders.

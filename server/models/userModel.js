@@ -39,6 +39,17 @@ const userSchema = mongoose.Schema({
         type : String,
         required : true,
         default : 'buyer'
+    },
+    referralCode: {
+        type: String,
+        unique: true,
+        sparse: true,
+        index: true
+    },
+    referredBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        sparse: true
     }
 }, {timestamps : true})
 

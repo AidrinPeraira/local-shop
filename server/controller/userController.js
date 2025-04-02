@@ -6,13 +6,14 @@ import { HTTP_CODES } from "../utils/responseCodes.js";
 import bcrypt from "bcryptjs";
 import { validateUserData } from "../utils/validateData.js";
 import { oauth2Client } from "../utils/googleConfig.js";
+import Wallet from "../models/walletModel.js";
 import axios from "axios";
 
 
 
 //user signup sign in actions
 export const createUser = asyncHandler(async (req, res) => {
-  const { username, email, password, phone } = req.body;
+  const { username, email, password, phone, referralCode } = req.body;
 
   //add some validation before putting it into DB
   if (!username || !email || !password || !phone) {
@@ -53,6 +54,69 @@ export const createUser = asyncHandler(async (req, res) => {
   try {
     await newUser.save();
 
+    // Generate referral promo code
+    const userReferralCode = `REF${username.substring(0, 3).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+
+    newUser.referralCode = userReferralCode;
+    
+    // Create wallet for new user
+    const wallet = new Wallet({
+      user: newUser._id,
+      balance: 0,
+      isActive: true,
+      referralCode: userReferralCode // Add this line
+    });
+    if (referralCode) {
+      const referringUser = await User.findOne({ referralCode });
+      if (referringUser) {
+        // Set referredBy in new user's document
+        newUser.referredBy = referringUser._id;
+
+        // Generate transaction ID for new user's bonus
+        const timestamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0].replace("T", "");
+        const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const newUserTransactionId = `WAL${timestamp}${randomStr}`;
+
+        // Add referral bonus to new user's wallet
+        wallet.balance = 1000;
+        wallet.transactions.push({
+          transactionId: newUserTransactionId,
+          type: "REFERRAL_REWARD",
+          amount: 1000,
+          description: "Sign up referral bonus",
+          status: "COMPLETED",
+          balance: 1000,
+          referralCode
+        });
+
+        // Add bonus to referring user's wallet
+        const referringUserWallet = await Wallet.findOne({ user: referringUser._id });
+        if (referringUserWallet) {
+          const newBalance = referringUserWallet.balance + 500;
+          
+          // Generate transaction ID for referring user's bonus
+          const refTimestamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0].replace("T", "");
+          const refRandomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+          const refTransactionId = `WAL${refTimestamp}${refRandomStr}`;
+
+          referringUserWallet.balance = newBalance;
+          referringUserWallet.transactions.push({
+            transactionId: refTransactionId,
+            type: "REFERRAL_REWARD",
+            amount: 500,
+            description: `Referral bonus for referring ${username}`,
+            status: "COMPLETED",
+            balance: newBalance,
+            referralCode: userReferralCode
+          });
+          await referringUserWallet.save();
+        }
+      }
+    }
+
+    await wallet.save();
+    await newUser.save();
+
     //call a utility function to create a jwt token and store it in a cookie
     generateToken(res, newUser._id);
 
@@ -62,8 +126,10 @@ export const createUser = asyncHandler(async (req, res) => {
       email: newUser.email,
       phone: newUser.phone,
       role: "buyer",
+      referralCode: userReferralCode
     });
   } catch (error) {
+    console.error("Error creating user:", error);
     res.status(HTTP_CODES.BAD_REQUEST);
     throw new Error("Invalid user data");
   }
@@ -95,6 +161,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         username: existingUser.username,
         email: existingUser.email,
         role: existingUser.role,
+        referralCode: existingUser.referralCode,
         joinedOn: existingUser.createdAt,
       });
 

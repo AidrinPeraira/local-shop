@@ -17,6 +17,7 @@ const Cart = lazy(() => import("../pages/BuyerPages/Cart"));
 const SavedList = lazy(() => import("../pages/BuyerPages/SavedList.jsx"));
 const ProfileInfo = lazy(() => import("../components/profile/ProfileInfo"));
 const ProfileOrders = lazy(() => import("../components/profile/ProfileOrders"));
+const ProfileWallet = lazy(() => import("../components/profile/ProfileWallet"));
 const ProfileAddress = lazy(() =>
   import("../components/profile/ProfileAddress")
 );
@@ -114,6 +115,7 @@ const MainRoutes = () => {
         <Route path="/profile" element={<Profile />}>
           <Route index element={<Navigate to="/profile/info" replace />} />
           <Route path="info" element={<ProfileInfo />} />
+          <Route path="wallet" element={<ProfileWallet />} />
           <Route path="orders" element={<ProfileOrders />} />
           <Route path="orders/:id" element={
             <Suspense fallback={<PageLoading />}>

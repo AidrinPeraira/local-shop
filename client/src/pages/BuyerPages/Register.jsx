@@ -22,6 +22,7 @@ export default () => {
     email: "",
     password: "",
     phone: "",
+    referralCode: "",
   });
   const [showPopup, setShowPopup] = useState(false); //pop up for email otp
   const [userOTP, setUserOTP] = useState(null);
@@ -303,6 +304,22 @@ export default () => {
                       <Eye className="h-5 w-5 text-gray-400" />
                     )}
                   </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="referralCode">Referral Code (Optional)</Label>
+                <div className="relative">
+                  <Input
+                    id="referralCode"
+                    type="text"
+                    placeholder="Enter referral code if you have one"
+                    value={formData.referralCode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, referralCode: e.target.value.toUpperCase() })
+                    }
+                    className="pl-3"
+                  />
                 </div>
               </div>
 

@@ -7,7 +7,8 @@ import {
   Heart,
   Lock,
   MapPin,
-  ShoppingCart
+  ShoppingCart,
+  Wallet
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
@@ -22,6 +23,7 @@ const ProfileContent = () => {
     { id: "orders", label: "My Orders", icon: ShoppingBag, path: "/profile/orders" },
     { id: "cart", label: "My Cart", icon: ShoppingCart, path: "/cart" },
     { id: "saved", label: "Saved Items", icon: Heart, path: "/saved-list" },
+    { id: "wallet", label: "Wallet", icon: Wallet, path: "/profile/wallet" },
     { id: "addresses", label: "Addresses", icon: MapPin, path: "/profile/addresses" },
     { id: "security", label: "Change Password", icon: Lock, path: "/profile/security" },
   ];
