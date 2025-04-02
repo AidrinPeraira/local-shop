@@ -27,10 +27,7 @@ const orderStatuses = [
   "PROCESSING",
   "SHIPPED",
   "DELIVERED",
-  "CANCELLED",
-  "RETURNED",
-  "RETURN-REQUESTED",
-  "RETURN-PROCESSING"
+  "CANCELLED"
 ];
 
 export default function SellerOrders() {

@@ -82,7 +82,16 @@ const orderItemSchema = new mongoose.Schema({
   returnStatus: {
     status: {
       type: String,
-      enum: ["RETURN_REQUESTED", "RETURN_APPROVED", "RETURN_REJECTED", "RETURN_SHIPPED", "RETURN_COMPLETED"],
+      enum: [
+        "RETURN_REQUESTED",
+        "RETURN_APPROVED",
+        "RETURN_REJECTED",
+        "RETURN_SHIPPED",
+        "RETURN_RECEIVED",
+        "REFUND_INITIATED",
+        "REFUND_COMPLETED",
+        "CANCELLED",
+      ],
     },
     reason: {
       type: String,
@@ -95,8 +104,8 @@ const orderItemSchema = new mongoose.Schema({
     },
     completionDate: {
       type: Date,
-    }
-  }
+    },
+  },
 });
 
 const shippingAddressSchema = new mongoose.Schema({
@@ -185,7 +194,7 @@ const orderSchema = new mongoose.Schema(
       paymentProvider: {
         type: String,
         enum: ["RAZORPAY", null],
-        default: null
+        default: null,
       },
       paymentDetails: {
         orderId: String,

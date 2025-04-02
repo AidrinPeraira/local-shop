@@ -6,13 +6,8 @@ import DashboardHeader from "../dashboard/DashboardHeader";
 import {
   BarChart3,
   Package,
-  ShoppingBag,
-  DollarSign,
-  Star,
-  Truck,
-  AlertCircle,
-  RefreshCcw,
-  Store,
+  ShoppingBag, 
+  ArrowLeftFromLine
 } from "lucide-react";
 import { logoutSeller } from "../../redux/features/userSlice";
 import { useDispatch } from "react-redux";
@@ -29,6 +24,7 @@ export function SellerLayout() {
     { name: "Dashboard", icon: BarChart3, href: "/seller" },
     { name: "Products", icon: Package, href: "/seller/products" },
     { name: "Orders", icon: ShoppingBag, href: "/seller/orders" },
+    { name: "Returns", icon: ArrowLeftFromLine, href: "/seller/returns" },
   ];
 
 

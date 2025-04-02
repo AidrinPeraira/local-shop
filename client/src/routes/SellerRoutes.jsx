@@ -17,6 +17,7 @@ const SellerRegister = LazyComponent(lazy(() => import("../pages/SellerPages/Sel
 const SellerDashboard = LazyComponent(lazy(() => import("../pages/SellerPages/SellerDashboard")));
 const SellerProducts = LazyComponent(lazy(() => import("../pages/SellerPages/SellerProducts")));
 const SellerOrders = LazyComponent(lazy(() => import("../pages/SellerPages/SellerOrders")));
+const SellerReturns = LazyComponent(lazy(() => import("../pages/SellerPages/SellerReturns")));
 const SellerNotFound = LazyComponent(lazy(() => import("../pages/SellerPages/SellerNotFound")));
 
 const SellerRoutes = () => {
@@ -31,6 +32,7 @@ const SellerRoutes = () => {
           <Route index element={<SellerDashboard />} />
           <Route path="products" element={<SellerProducts />} />
           <Route path="orders" element={<SellerOrders />} />
+          <Route path="returns" element={<SellerReturns />} />
           <Route path="*" element={<SellerNotFound />} />
         </Route>
       </Route>
