@@ -34,3 +34,5 @@ export const updateOrderStatusApi = (orderId, status) => API.patch(`/orders/stat
 //order api for razor pay
 export const createRazorpayOrderApi = (data) => API.post("/orders/create-razorpay-order", data);
 export const verifyRazorpayPaymentApi =  (data) => API.post("/orders/verify-payment", data);
+
+export const updateOrderPaymentStatusApi = (orderId, paymentData) => API.patch(`/orders/payment-status/${orderId}`, paymentData);

@@ -34,6 +34,9 @@ import {
   RefreshCcw,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { loadScript } from "../../utils/loadScript";
+import { razorPayKey } from "../../configuration";
+import { createRazorpayOrderApi, verifyRazorpayPaymentApi, updateOrderPaymentStatusApi } from "../../api/orderApi";
 
 const OrderTimeline = ({ status, trackingDetails }) => {
   const statusSteps = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
@@ -103,13 +106,72 @@ const ProfileOrders = () => {
 
   const handleRetryPayment = async (order) => {
     try {
-      navigate(`/checkout/payment`, {
-        state: {
-          orderId: order._id,
-          amount: order.summary.cartTotal,
-          isRetry: true
-        }
+      // Initialize Razorpay
+      const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      if (!res) {
+        toast({
+          title: "Error",
+          description: "Razorpay SDK failed to load",
+          variant: "destructive",
+        });
+        return;
+      }
+  
+      // Create new Razorpay order
+      const orderResponse = await createRazorpayOrderApi({
+        amount: order.summary.cartTotal,
       });
+  
+      const options = {
+        key: razorPayKey,
+        amount: orderResponse.data.order.amount,
+        currency: "INR",
+        name: "Local Shop",
+        description: "Payment retry for order " + order.orderId,
+        order_id: orderResponse.data.order.id,
+        handler: async (response) => {
+          try {
+            // Verify payment
+            await verifyRazorpayPaymentApi({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+  
+            // Update order payment status
+            await updateOrderPaymentStatusApi(order._id, {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+  
+            toast({
+              title: "Success",
+              description: "Payment completed successfully",
+            });
+  
+            // Refresh orders list
+            fetchOrders();
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: "Payment verification failed",
+              variant: "destructive",
+            });
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            toast({
+              title: "Info",
+              description: "Payment cancelled",
+            });
+          },
+        },
+      };
+  
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
     } catch (error) {
       toast({
         title: "Error",
@@ -118,7 +180,6 @@ const ProfileOrders = () => {
       });
     }
   };
-
  
   
 
