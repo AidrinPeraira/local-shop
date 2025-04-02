@@ -63,6 +63,53 @@ const CouponForm = ({ onSubmit, initialData = {}, couponForm, setCouponForm }) =
       });
       return false;
     }
+    
+    if (couponForm.discountType === 'fixed' && 
+      Number(couponForm.discountValue) > Number(couponForm.minPurchase)) {
+    toast({
+      title: "Invalid Discount",
+      description: "Discount amount cannot be greater than minimum purchase amount",
+      variant: "destructive",
+    });
+    return false;
+  }
+
+  if (couponForm.maxDiscount <= 0) {
+    toast({
+      title: "Invalid Amount",
+      description: "Maximum discount must be greater than 0",
+      variant: "destructive",
+    });
+    return false;
+  }
+
+  if (couponForm.minPurchase <= 0) {
+    toast({
+      title: "Invalid Amount",
+      description: "Minimum purchase amount must be greater than 0",
+      variant: "destructive",
+    });
+    return false;
+  }
+    
+  if (Number(couponForm.maxDiscount) > Number(couponForm.minPurchase)) {
+    toast({
+      title: "Invalid Amount",
+      description: "Maximum discount cannot be greater than minimum purchase amount",
+      variant: "destructive",
+    });
+    return false;
+  }
+
+  if (couponForm.discountType === 'fixed' && 
+    Number(couponForm.discountValue) > Number(couponForm.minPurchase)) {
+    toast({
+      title: "Invalid Discount",
+      description: "Discount amount cannot be greater than minimum purchase amount",
+      variant: "destructive",
+    });
+    return false;
+  }
 
     const today = new Date();
     const validFrom = new Date(couponForm.validFrom);
@@ -181,6 +228,7 @@ const CouponForm = ({ onSubmit, initialData = {}, couponForm, setCouponForm }) =
             onChange={(e) => setCouponForm({ ...couponForm, maxDiscount: e.target.value })}
             required
             min={0}
+            max={couponForm.minPurchase}
           />
         </div>
         <div className="space-y-2">

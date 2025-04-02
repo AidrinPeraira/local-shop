@@ -331,7 +331,7 @@ Pendings:
     ☐ Implement a wallet system for canceled and returned orders.
     ☐ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin.
     ☐ In case of canceled orders, refund the amount directly.
-    ☐ referral offers
+    ✔ referral offers @done (4/2/2025, 8:19:55 PM)
     ☐ Report download (Pdf, Excel)
     ☐ Ensure that the sales report download adheres to the selected filters.
     ☐ add proce validation for the coupon. don't allow discount more than price
