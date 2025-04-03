@@ -8,7 +8,8 @@ import {
   TrendingDown, 
   Package, 
   RefreshCcw,
-  Percent 
+  Percent ,
+  Download
 } from "lucide-react";
 import { 
   ResponsiveContainer, 
@@ -24,8 +25,12 @@ import {
   Cell
 } from "recharts";
 import { getDashboardStatsApi } from "../../api/dashboardApi";
+import {jsPDF} from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function AdminDashboard() {
+  const doc = new jsPDF();
+  doc.autoTable = autoTable;
   const [stats, setStats] = useState({
     totalOrders: 0,
     totalSales: 0,
@@ -58,6 +63,69 @@ export default function AdminDashboard() {
     }
   };
 
+  const generateSalesReport = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Sales Report', 14, 22);
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+    doc.text(`Time Period: ${timeRange}`, 14, 36);
+  
+    // Add summary statistics
+    doc.setFontSize(12);
+    doc.text('Summary', 14, 45);
+    const summaryData = [
+      ['Total Orders', stats.totalOrders],
+      ['Total Sales', `Rs. ${stats.totalSales.toLocaleString()}`],
+      ['Total Customers', stats.totalCustomers],
+      ['Returns', stats.returns],
+      ['Cancellations', stats.cancellations],
+      ['Total Discounts', `Rs. ${stats.totalDiscounts.toLocaleString()}`],
+    ];
+    
+    // Use the imported autoTable directly
+    autoTable(doc, {
+      startY: 50,
+      head: [['Metric', 'Value']],
+      body: summaryData,
+      theme: 'grid',
+    });
+  
+    // Add top products table
+    doc.text('Top Products', 14, doc.lastAutoTable.finalY + 15);
+    const productData = stats.topProducts.map((product, index) => [
+      index + 1,
+      product.name,
+      product.soldCount,
+    ]);
+  
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 20,
+      head: [['#', 'Product Name', 'Units Sold']],
+      body: productData,
+      theme: 'grid',
+    });
+  
+    // Add revenue data
+    doc.text('Revenue Trend', 14, doc.lastAutoTable.finalY + 15);
+    const revenueData = stats.revenueData.map(item => [
+      item.date,
+      `Rs. ${item.revenue.toLocaleString()}`,
+    ]);
+  
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 20,
+      head: [['Date', 'Revenue']],
+      body: revenueData,
+      theme: 'grid',
+    });
+  
+    // Save the PDF
+    doc.save(`sales-report-${timeRange}-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   return (
@@ -75,6 +143,28 @@ export default function AdminDashboard() {
           <option value="year">This Year</option>
         </select>
       </div>
+
+      <div className="flex justify-between items-center">
+  <h1 className="text-2xl font-bold">Dashboard Overview</h1>
+  <div className="flex items-center gap-4">
+    <select 
+      value={timeRange} 
+      onChange={(e) => setTimeRange(e.target.value)}
+      className="border rounded p-2"
+    >
+      <option value="week">Last 7 Days</option>
+      <option value="month">Last 30 Days</option>
+      <option value="year">This Year</option>
+    </select>
+    <button
+      onClick={generateSalesReport}
+      className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+    >
+      <Download className="h-4 w-4" />
+      Download Report
+    </button>
+  </div>
+</div>
 
       {/* Metrics row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
