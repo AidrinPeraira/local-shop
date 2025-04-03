@@ -177,7 +177,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
     });
     
     if (paymentMethod === "WALLET") {
-      orderData.payment.wallet = {
+      order.payment.wallet = {
         transactionId: transactionId
       };
     }
