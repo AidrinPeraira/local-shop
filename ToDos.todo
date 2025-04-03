@@ -40,17 +40,7 @@
 ✔ need to add unit for existing products @done (3/23/2025, 11:23:47 AM)
 ✔ the otp keeps being sent when the user enters incorrecct data. button is deactivated @done (3/23/2025, 7:54:45 PM)
 ✔ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store @done (3/29/2025, 11:41:26 AM)
-☐ platform fee collected from user should be deducted before showing the seller the order details.
-☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
-☐ returning order with items from multiple sellers?
-☐ buy now feature not updating the discounts
-☐ need to show units wherever necessary
-    ☐ - orders
-    ✔ - products @done (3/26/2025, 10:44:01 PM)
-    ☐ - cart
-    ☐ - summmary
-✘ want to make the seller specify shipping prices @cancelled (3/26/2025, 10:44:15 PM)
-☐ need to make the invoice more aesthetic and detailed
+
 
 Assigned Pendings:
     ✔ Proper homepage for regular customers @done (3/15/2025, 11:16:31 AM)
@@ -337,8 +327,62 @@ Pendings:
     ✔ add proce validation for the coupon. don't allow discount more than price @done (4/3/2025, 11:22:18 AM)
     ✔ coupon deactivat estatus not showing @done (4/3/2025, 12:16:16 PM)
     ✔ buy now error @done (4/3/2025, 11:23:02 AM)
+
+    ☐ Invoice amount mismatch
+    ☐ Order success/failere not redirecting to the order details page
+    ☐ Coupon validation - if it's expired coupon update the expired with new values
+    ☐ In case of canceled orders, refund the amount directly.
+    ☐ Sales report(Daily, Weekly, Yearly, Custom date)
+    ☐ Generate sales report
+    ☐ Should be able to filter based on
+    ☐ Custom date range
+    ☐ 1 Day / week / month
+    ☐ Show discount and coupons deduction in sales report
+    ☐ Overall sales count
+    ☐ Overall order amount
+    ☐ Overall discount
+    ☐ Learn about cron jobs (suggestion)
+
+    ☐ platform fee collected from user should be deducted before showing the seller the order details.
+    ☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
+    ☐ returning order with items from multiple sellers?
+    ☐ buy now feature not updating the discounts
+    ☐ need to show units wherever necessary
+        ☐ - orders
+        ✔ - products @done (3/26/2025, 10:44:01 PM)
+        ☐ - cart
+        ☐ - summmary
+    ✘ want to make the seller specify shipping prices @cancelled (3/26/2025, 10:44:15 PM)
+    ☐ need to make the invoice more aesthetic and detailed
     
-    
+Week 4:
+
+    User side :
+        ☐ Order above Rs 1000 should not be allowed for COD.
+        ☐ Delivery charge can be applied according to location / fixed charges (optional)
+    Admin side :
+        ☐ Wallet Management.
+        ☐ Implement wallet management
+            ☐ Transaction ID
+            ☐ Transaction Date
+            ☐ User
+            ☐ Transaction Type
+            ☐ Amount
+        ☐ Provide a detailed view for each transaction with the following information
+            ☐ User Details
+            ☐ Transaction ID
+            ☐ Transaction Date
+            ☐ Transaction Type
+        Source of the Transaction:
+            If the transaction is due to a returned or canceled product, include a button to navigate to the specific order detail page.
+        
+        
+        ☐ Admin Dashboard - Chart with filter(yearly,monthly etc.)
+        ☐ Best selling product (top 10)
+        ☐ Best selling category (top 10)
+        ☐ Best selling brands (top 10)
+        ☐ Generate ledger book (optional)
+        
 
 
 
@@ -352,9 +396,11 @@ MY TASKS:
     ☐ deactivate coupon id error
     ☐ wallet payment logic
     ☐ show product details for returns
-    ☐  getting returns data needs aggregation pipeline. to show product being returned.
+    ☐ getting returns data needs aggregation pipeline. to show product being returned.
     ☐ order success and fail navigation error
     ☐ need to update logic for purchaseing using wallet balance
+    ☐ invoice values not correct
+    ☐ activate exzpired
 
 MAJOR TODO:
     ☐ add neft transactions

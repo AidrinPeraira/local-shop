@@ -6,6 +6,8 @@ import cors from 'cors'
 import helmet from "helmet";
 import morgan from 'morgan'
 import csrf from 'csrf';
+import { initializeCronJobs } from './utils/cronJobs.js';
+
 
 
 
@@ -52,6 +54,8 @@ app.use(morgan("dev")); // Logs requests in 'dev' format
 //csrf protection
 
 const tokens = new csrf();
+initializeCronJobs();
+
 
 app.use((req, res, next) => {
   // Skip CSRF for GET requests

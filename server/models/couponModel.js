@@ -32,10 +32,12 @@ const couponSchema = new mongoose.Schema(
     validFrom: {
       type: Date,
       required: true,
+      index : true
     },
     validUntil: {
       type: Date,
       required: true,
+      index : true
     },
     isActive: {
       type: Boolean,
@@ -60,6 +62,19 @@ const couponSchema = new mongoose.Schema(
   }
 );
 
+couponSchema.statics.invalidateExpiredCoupons = async function() {
+  const currentDate = new Date();
+  const result = await this.updateMany(
+    {
+      validUntil: { $lt: currentDate },
+      isActive: true
+    },
+    {
+      $set: { isActive: false }
+    }
+  );
+  return result;
+};
 
 const Coupon = mongoose.model("Coupon", couponSchema);
 

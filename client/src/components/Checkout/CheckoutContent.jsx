@@ -996,8 +996,8 @@ const CheckoutContent = () => {
         </div>
       </form>
 
-      {orderSuccess == "success" && <OrderSuccess orderId={orderId} />}
-      {orderSuccess == "failed" && <OrderFailed orderId={orderId} />}
+      {orderSuccess === "success" && <OrderSuccess orderId={orderId} />}
+      {orderSuccess === "failed" && <OrderFailed orderId={orderId} />}
     </div>
   );
 };
