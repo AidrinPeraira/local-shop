@@ -236,6 +236,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       message: "Order created successfully",
       order: {
         orderId: order._id,
+        customOrderId : customOrderId, 
         total: finalAmount,
         status: order.orderStatus,
         paymentStatus: order.payment.status,
@@ -483,6 +484,7 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
       });
     }
 
+    
     // Create wallet transaction
     const walletTransaction = {
       transactionId: `WREF${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
@@ -493,7 +495,7 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
       status: "COMPLETED",
       balance: wallet.balance + order.summary.cartTotal
     };
-
+    
     // Update wallet balance and add transaction
     wallet.balance += order.summary.cartTotal;
     wallet.transactions.push(walletTransaction);

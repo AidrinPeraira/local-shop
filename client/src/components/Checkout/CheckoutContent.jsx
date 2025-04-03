@@ -370,27 +370,37 @@ const CheckoutContent = () => {
           return;
         }
 
-        // Process wallet payment
+        const orderData = {
+          cart,
+          selectedAddressId,
+          paymentMethod: "WALLET",
+          userProfile,
+          couponId: selectedCoupon?._id,
+          paymentStatus: "PENDING",
+        };
+        
+        const orderResponse = await createOrderApi(orderData);
+        const orderId = orderResponse.data.order.orderId;
+        
+        // Then process wallet payment with orderId
         const walletPaymentResponse = await processWalletPaymentApi({
+          orderId,
+          customOrderId :  orderResponse.data.order.customOrderId,
           amount: amount,
         });
-
+        
         if (walletPaymentResponse.data.success) {
-          // Create order with wallet payment
-          const orderData = {
-            cart,
-            selectedAddressId,
-            paymentMethod: "WALLET",
-            userProfile,
-            couponId: selectedCoupon?._id,
+          // Update order status to completed
+          const updateOrderData = {
+            ...orderData,
             paymentStatus: "COMPLETED",
             transactionId: walletPaymentResponse.data.transactionId,
           };
-
-          const response = await createOrderApi(orderData);
+        
+          const response = await createOrderApi(updateOrderData);
           setOrderId(response.data.order.orderId);
           setOrderSuccess("success");
-
+        
           // Update wallet balance
           setWalletBalance(walletPaymentResponse.data.remainingBalance);
         }

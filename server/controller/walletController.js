@@ -39,7 +39,7 @@ export const getWalletBalance = asyncHandler(async (req, res) => {
 
 // Process order payment using wallet
 export const processWalletPayment = asyncHandler(async (req, res) => {
-  const { orderId, amount } = req.body;
+  const { orderId, amount, customOrderId } = req.body;
   const userId = req.user._id;
 
   const wallet = await Wallet.findOne({ user: userId });
@@ -68,11 +68,13 @@ export const processWalletPayment = asyncHandler(async (req, res) => {
     transactionId,
     type: "ORDER_PAYMENT",
     amount: -amount,
+    customOrderId : customOrderId,
     orderId: orderId || null, // Make orderId optional
-    description: `Payment for order ${orderId || 'pending'}`,
+    description: `Payment for order ${customOrderId || 'pending'}`,
     status: "COMPLETED",
     balance: wallet.balance,
   });
+
 
   await wallet.save();
 
