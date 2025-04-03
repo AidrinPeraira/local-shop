@@ -214,7 +214,7 @@ User side:
     ✔ Order Management @done (3/26/2025, 10:46:23 PM)
         ✔ Implement an order listing page where each order has a unique, consistent orderID (not _id in DBS). @done (3/20/2025, 6:01:40 PM)
         ✔ Show basic details in the listing, such as status, order date, etc. @done (3/20/2025, 6:01:42 PM)
-        ☐ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
+        ✔ Provide an option to cancel the entire order or specific products. Upon cancellation, ensure that the stock of the respective products is incremented in the inventory. @done (4/3/2025, 12:17:09 PM)
         ✔ when canceling an order should ask for reason(optional) . @done (3/21/2025, 12:20:20 AM)
         ✔ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory). @done (3/21/2025, 12:20:23 AM)
         ✔ Include a detail page for each respective order. @done (3/21/2025, 12:20:31 AM)
@@ -230,7 +230,7 @@ Admin side :
             ✔ view button to show detailed view of order etc.. @done (3/20/2025, 10:18:36 PM)
         ✔ Implement functionality to change order Status(pending,shipped,out for delivery,delivered,cancelled) @done (3/20/2025, 10:18:38 PM)
         ✔ Implement a functionality to verify the  return request of product @done (3/21/2025, 12:20:51 AM)
-        ☐ If the verification is accepted ,then return the previously paid amount by the consumer or user to the wallet.
+        ✔ If the verification is accepted ,then return the previously paid amount by the consumer or user to the wallet. @done (4/3/2025, 12:17:07 PM)
         ✔ Implement search,sort and filter along with clear search functionality. @done (3/20/2025, 10:18:44 PM)
         ✔ Implement Pagination @done (3/20/2025, 10:18:45 PM)
 
@@ -247,13 +247,13 @@ Week 3 Project:
             ✔ buttons to redirect the user to the order details page and the continue shopping page @done (3/26/2025, 11:49:14 AM)
         ✔ After a payment failure, redirect the user to the order @done (3/26/2025, 11:53:43 AM)
             ✔ transaction failure or order failure page. @done (3/26/2025, 11:53:47 AM)
-            ☐ The page should contain an illustration, a statement, a button to retry the payment, 
+            ✔ The page should contain an illustration, a statement, a button to retry the payment, @done (4/3/2025, 12:17:01 PM)
             ✔ and a button to redirect to the order details page. @done (3/26/2025, 11:53:58 AM)
             ✔ Once the order is successfully placed, redirect the user to the successful page. @done (3/26/2025, 11:54:02 AM)
-        ☐ Provide an option to cancel the entire order or specific products. 
-            ☐ Upon cancellation, ensure that the stock of the respective products is incremented in the inventory.
-            ☐ when canceling an order should ask for reason(optional) .
-            ☐ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory).
+        ✔ Provide an option to cancel the entire order or specific products. @done (4/3/2025, 12:16:50 PM)
+            ✔ Upon cancellation, ensure that the stock of the respective products is incremented in the inventory. @done (4/3/2025, 12:16:52 PM)
+            ✔ when canceling an order should ask for reason(optional) . @done (4/3/2025, 12:16:55 PM)
+            ✔ Provide an option to return order when the order is delivered,should ask for reason for return (mandatory). @done (4/3/2025, 12:16:58 PM)
         
 
     //transaction amount and use case differnt for coupons
@@ -269,10 +269,10 @@ Week 3 Project:
             ✔ When a product is moved to cart from wishlist, ensure that the product is not present in the wishlist anymore. @done (3/25/2025, 11:14:56 AM)
             ✔ Add to wishlist buttons should be present both on product listing pages and product detail pages. @done (3/25/2025, 11:14:53 AM)
       
-        ☐ Wallet Management
-        ☐ Implement a wallet system for canceled and returned orders.
-        ☐ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin.
-        ☐ In case of canceled orders, refund the amount directly.
+        ✔ Wallet Management @done (4/3/2025, 12:16:46 PM)
+        ✔ Implement a wallet system for canceled and returned orders. @done (4/3/2025, 12:16:43 PM)
+        ✔ In case of a return, refund the paid amount to the user's wallet only after confirmation from the admin. @done (4/3/2025, 12:16:43 PM)
+        ✔ In case of canceled orders, refund the amount directly. @done (4/3/2025, 12:16:44 PM)
         
     Admin side : 
 
@@ -302,8 +302,8 @@ Week 3 Project:
         
         ✔ Coupon Management (Create, Delete) @done (3/25/2025, 8:35:22 PM)
             ✔ Implement functionality to create new coupon with proper validations. @done (3/25/2025, 8:35:23 PM)
-        ☐ Sales report(Daily, Weekly, Yearly, Custom date)
-            ☐ Generate sales report
+        ✔ Sales report(Daily, Weekly, Yearly, Custom date) @done (4/3/2025, 12:16:23 PM)
+            ✔ Generate sales report @done (4/3/2025, 12:16:23 PM)
             ✔ Should be able to filter based on @done (3/26/2025, 10:43:23 PM)
                 ☐ Custom date range
                 ✔ 1 Day / week / month @done (3/26/2025, 10:43:18 PM)
@@ -312,8 +312,8 @@ Week 3 Project:
             ✔ Overall order amount @done (3/26/2025, 10:43:10 PM)
             ✔ Overall discount @done (3/26/2025, 10:43:09 PM)
         
-        ☐ Report download (Pdf, Excel)
-        ☐ Ensure that the sales report download adheres to the selected filters.
+        ✔ Report download (Pdf, Excel) @done (4/3/2025, 12:16:32 PM)
+        ✔ Ensure that the sales report download adheres to the selected filters. @done (4/3/2025, 12:16:32 PM)
 
         
 Pendings:
@@ -335,16 +335,25 @@ Pendings:
     ✔ Report download (Pdf, Excel) @done (4/3/2025, 11:36:25 AM)
     ✔ Ensure that the sales report download adheres to the selected filters. @done (4/3/2025, 11:36:29 AM)
     ✔ add proce validation for the coupon. don't allow discount more than price @done (4/3/2025, 11:22:18 AM)
-    ☐ coupon deactivat estatus not showing
+    ✔ coupon deactivat estatus not showing @done (4/3/2025, 12:16:16 PM)
     ✔ buy now error @done (4/3/2025, 11:23:02 AM)
-        
-OTHER TASKS:
-    ✔ need a payout option for seller payout @done (3/26/2025, 10:46:09 PM)
+    
+    
 
+
+
+
+    
+MY TASKS:
+    ✔ need a payout option for seller payout @done (3/26/2025, 10:46:09 PM)
     ✔ don't update return stock. might be bad items @done (4/3/2025, 11:23:06 AM)
     ✔ duplicate cart addition @done (4/2/2025, 8:45:53 PM)
+    ☐ blocked user log out logic implentation
+    ☐ deactivate coupon id error
+    ☐ wallet payment logic
+    ☐ show product details for returns
 
 MAJOR TODO:
     ☐ add neft transactions
     ☐ add razorpayx for payouts
-    ☐ handle order cancel delte by preveetning one order with multiple sellers
+    ✔ handle order cancel delte by preveetning one order with multiple sellers @done (4/3/2025, 12:18:31 PM)

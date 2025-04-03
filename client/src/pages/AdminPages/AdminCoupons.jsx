@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Search, Plus, ChevronDown, Edit, Trash2 } from "lucide-react";
+import {
+  Search,
+  Plus,
+  ChevronDown,
+  Edit,
+  Trash2,
+  TicketCheck,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -80,7 +87,7 @@ const AdminCoupons = () => {
         limit: ITEMS_PER_PAGE,
         status: appliedStatus,
         sort: appliedSort,
-        search: appliedSearch
+        search: appliedSearch,
       };
 
       const response = await adminGetCouponsApi(params);
@@ -189,6 +196,7 @@ const AdminCoupons = () => {
         fetchCoupons();
       }
     } catch (error) {
+      console.error("Error deleting coupon:", error); // Log the error for debugging purpo
       toast({
         title: "Error",
         description: error.response?.data?.message || "Failed to delete coupon",
@@ -335,12 +343,15 @@ const AdminCoupons = () => {
                   <td className="p-3">
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
+                        coupon.isActive &&
                         new Date(coupon.validUntil) > new Date()
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {new Date(coupon.validUntil) > new Date()
+                      {!coupon.isActive
+                        ? "Inactive"
+                        : new Date(coupon.validUntil) > new Date()
                         ? "Active"
                         : "Expired"}
                     </span>
@@ -378,17 +389,31 @@ const AdminCoupons = () => {
                       </DialogContent>
                     </Dialog>
 
-                    <Button
+                    {!coupon.isActive ? (
+                      <Button
                       variant="outline"
                       size="sm"
-                      className="text-red-600 hover:text-red-700"
+                      className="bg-green-100 hover:bg-green-200 text-green-700"
                       onClick={() => {
                         setSelectedCoupon(coupon);
-                        setIsDeleteDialogOpen(true);
+                        handleDeleteCoupon()
                       }}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <TicketCheck className="h-4 w-4" />
                     </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700"
+                        onClick={() => {
+                          setSelectedCoupon(coupon);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}

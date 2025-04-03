@@ -110,27 +110,47 @@ export const adminDeleteCoupon = asyncHandler(
     const { id } = req.params;
 
     const coupon = await Coupon.findById(id);
-    if (!coupon) {
-      return res.status(HTTP_CODES.NOT_FOUND).json({
-        success: false,
-        message: "Coupon not found",
-      });
+    if(coupon.isActive){
+      if (!coupon) {
+        return res.status(HTTP_CODES.NOT_FOUND).json({
+          success: false,
+          message: "Coupon not found",
+        });
+      }
+  
+      // Check if coupon has been used
+      if (coupon.usedCount > 0) {
+        // Instead of deleting, deactivate the coupon
+        coupon.isActive = false;
+        await coupon.save();
+  
+        return res.status(HTTP_CODES.OK).json({
+          success: true,
+          message: "Coupon has been deactivated as it was already in use",
+        });
+      }
+  
+      // If never used, delete completely
+      await Coupon.findByIdAndDelete(id); 
+    } else {
+      if (!coupon) {
+        return res.status(HTTP_CODES.NOT_FOUND).json({
+          success: false,
+          message: "Coupon not found",
+        });
+      }
+  
+      // Check if coupon has been used
+      
+        coupon.isActive = true;
+        await coupon.save();
+  
+        return res.status(HTTP_CODES.OK).json({
+          success: true,
+          message: "Coupon has been Activated",
+        });     
+  
     }
-
-    // Check if coupon has been used
-    if (coupon.usedCount > 0) {
-      // Instead of deleting, deactivate the coupon
-      coupon.isActive = false;
-      await coupon.save();
-
-      return res.status(HTTP_CODES.OK).json({
-        success: true,
-        message: "Coupon has been deactivated as it was already in use",
-      });
-    }
-
-    // If never used, delete completely
-    await Coupon.findByIdAndDelete(id);
 
     res.status(HTTP_CODES.OK).json({
       success: true,
