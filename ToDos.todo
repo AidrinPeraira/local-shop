@@ -352,6 +352,8 @@ MY TASKS:
     ☐ deactivate coupon id error
     ☐ wallet payment logic
     ☐ show product details for returns
+    ☐  getting returns data needs aggregation pipeline. to show product being returned.
+    ☐ order success and fail navigation error
 
 MAJOR TODO:
     ☐ add neft transactions

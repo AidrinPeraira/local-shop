@@ -75,9 +75,13 @@ export const getAllReturnRequests = asyncHandler(async (req, res) => {
   const sellerId = req.user._id;
   const { page = 1, limit = 10, status } = req.query;
 
-  const query = { sellerId };
+  const query = {  };
   if (status) {
     query.status = status;
+  }
+
+  if(req.user.role == "SELLER"){
+    query = { sellerId };
   }
 
   const returns = await Return.find(query)
