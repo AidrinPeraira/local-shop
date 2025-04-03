@@ -15,7 +15,7 @@ const OrderFailed = ({ orderId }) => {
   
     if (countdown === 0) {
       dispatch(clearCart());
-      navigate("/profile/orders");
+      navigate("/profile/orders", { replace: true });
     } else {
       timeoutId = setTimeout(() => {
         setCountdown((prev) => prev - 1);
