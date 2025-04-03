@@ -19,7 +19,8 @@ export const createUserOrder = asyncHandler(async (req, res) => {
     couponId,
     razorpay_order_id,
     razorpay_payment_id,
-    paymentStatus 
+    paymentStatus,
+    transactionId
   } = req.body;
 
 
@@ -121,7 +122,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
     }
 
     // Update cart total with coupon discount
-    const finalCartTotal = cart.summary.cartTotal - couponDiscount;
+    const finalAmount = cart.summary.cartTotal - couponDiscount
 
 
     // Create new order with coupon details
@@ -173,6 +174,12 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         },
       ],
     });
+    
+    if (paymentMethod === "WALLET") {
+      orderData.payment.wallet = {
+        transactionId: transactionId
+      };
+    }
 
 
     // 4. Save the order

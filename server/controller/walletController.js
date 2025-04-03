@@ -59,13 +59,17 @@ export const processWalletPayment = asyncHandler(async (req, res) => {
     throw new Error("Insufficient wallet balance");
   }
 
+  // Generate transaction ID
+  const transactionId = `WLT${Date.now()}${Math.random().toString(36).substr(2, 4)}`.toUpperCase();
+
   // Create transaction and update balance
   wallet.balance -= amount;
   wallet.transactions.push({
+    transactionId,
     type: "ORDER_PAYMENT",
     amount: -amount,
-    orderId,
-    description: `Payment for order ${orderId}`,
+    orderId: orderId || null, // Make orderId optional
+    description: `Payment for order ${orderId || 'pending'}`,
     status: "COMPLETED",
     balance: wallet.balance,
   });
@@ -76,6 +80,7 @@ export const processWalletPayment = asyncHandler(async (req, res) => {
     success: true,
     message: "Payment processed successfully",
     remainingBalance: wallet.balance,
+    transactionId
   });
 });
 

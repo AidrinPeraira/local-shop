@@ -42,6 +42,11 @@ import {
 import { loadScript } from "../../utils/loadScript";
 import { razorPayKey } from "../../configuration";
 import OrderFailed from "./OrderFailed";
+import {
+  getWalletBalanceApi,
+  processWalletPaymentApi,
+} from "../../api/walletApi";
+import { Wallet } from "lucide-react";
 
 const CheckoutContent = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -66,6 +71,28 @@ const CheckoutContent = () => {
     pincode: "",
     isDefault: false,
   });
+
+  const [walletBalance, setWalletBalance] = useState(0);
+
+  // getwakket balance
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      try {
+        const response = await getWalletBalanceApi();
+        if (response.data.success) {
+          setWalletBalance(response.data.balance);
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch wallet balance",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchWalletBalance();
+  }, []);
 
   // fetch user profile
   useEffect(() => {
@@ -318,6 +345,55 @@ const CheckoutContent = () => {
 
         const paymentObject = new window.Razorpay(options);
         paymentObject.open();
+      } else if (paymentMethod === "wallet") {
+        // Calculate final amount
+        let amount =
+          cart.summary.cartTotal -
+          (selectedCoupon
+            ? Math.min(
+                selectedCoupon.discountType === "percentage"
+                  ? (cart.summary.subtotalBeforeDiscount *
+                      selectedCoupon.discountValue) /
+                      100
+                  : selectedCoupon.discountValue,
+                selectedCoupon.maxDiscount
+              )
+            : 0);
+
+        // Check if wallet has sufficient balance
+        if (walletBalance < amount) {
+          toast({
+            title: "Error",
+            description: "Insufficient wallet balance",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Process wallet payment
+        const walletPaymentResponse = await processWalletPaymentApi({
+          amount: amount,
+        });
+
+        if (walletPaymentResponse.data.success) {
+          // Create order with wallet payment
+          const orderData = {
+            cart,
+            selectedAddressId,
+            paymentMethod: "WALLET",
+            userProfile,
+            couponId: selectedCoupon?._id,
+            paymentStatus: "COMPLETED",
+            transactionId: walletPaymentResponse.data.transactionId,
+          };
+
+          const response = await createOrderApi(orderData);
+          setOrderId(response.data.order.orderId);
+          setOrderSuccess("success");
+
+          // Update wallet balance
+          setWalletBalance(walletPaymentResponse.data.remainingBalance);
+        }
       } else {
         //for cod
         const orderData = {
@@ -633,6 +709,34 @@ const CheckoutContent = () => {
                       Pay Online
                     </Label>
                   </div>
+
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem
+                      value="wallet"
+                      id="wallet"
+                      disabled={walletBalance < cart.summary.cartTotal}
+                    />
+                    <Label
+                      htmlFor="wallet"
+                      className={`flex items-center gap-2 ${
+                        walletBalance < cart.summary.cartTotal
+                          ? "text-gray-400 cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      <Wallet className="h-4 w-4" />
+                      Pay with Wallet
+                      <span className="text-sm text-gray-500 ml-2">
+                        (Balance: ₹{formatPrice(walletBalance)})
+                      </span>
+                      {walletBalance < cart.summary.cartTotal && (
+                        <span className="text-xs text-red-500 ml-2">
+                          (Insufficient balance)
+                        </span>
+                      )}
+                    </Label>
+                  </div>
+                  
                 </RadioGroup>
               </CardContent>
             </Card>
