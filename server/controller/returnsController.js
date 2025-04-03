@@ -1,6 +1,7 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Return from "../models/returnsModel.js";
 import Order from "../models/orderModel.js";
+import Wallet from "../models/walletModel.js";
 
 export const createUserReturnRequest = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -124,15 +125,60 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
     timestamp: new Date()
   });
 
+  if (status === "REFUND_COMPLETED") {
+    // Find user's wallet
+    let wallet = await Wallet.findOne({ user: returnRequest.userId });
+    
+    if (!wallet) {
+      wallet = await Wallet.create({
+        user: returnRequest.userId,
+        balance: 0
+      });
+    }
+
+    // Generate transaction ID for refund
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .split(".")[0]
+      .replace("T", "");
+    const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const transactionId = `REF${timestamp}${randomStr}`;
+
+    // Create refund transaction with transactionId
+    const refundTransaction = {
+      transactionId,
+      type: "REFUND",
+      amount: returnRequest.returnAmount,
+      orderId: returnRequest.orderId,
+      description: `Refund for return request #${returnRequest._id}`,
+      status: "COMPLETED",
+      balance: wallet.balance + returnRequest.returnAmount
+    };
+
+    // Add transaction and update wallet balance
+    wallet.transactions.push(refundTransaction);
+    wallet.balance += returnRequest.returnAmount;
+    await wallet.save();
+  }
   // Update order status if return is approved/rejected
   const order = await Order.findById(returnRequest.orderId);
   if (order) {
-    if (status === "RETURN_APPROVED") {
-      order.orderStatus = "RETURN-PROCESSING";
-    } else if (status === "RETURN_REJECTED") {
-      order.orderStatus = "DELIVERED";
-    }
-    await order.save();
+    const orderItem = order.items.find(
+      item => item._id.toString() === returnRequest.items[0].productId.toString()
+    );
+
+    if (orderItem) {
+      // Update the return status of the specific item
+      orderItem.returnStatus = {
+        status: status === "RETURN_APPROVED" ? "RETURN_APPROVED" : "RETURN_REJECTED",
+        reason: returnRequest.items[0].returnReason,
+        requestDate: returnRequest.createdAt,
+        approvalDate: new Date(),
+      };
+      
+      await order.save();
+  }
   }
 
   await returnRequest.save();

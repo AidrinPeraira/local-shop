@@ -69,7 +69,7 @@ const CheckoutContent = () => {
     city: "",
     state: "",
     pincode: "",
-    isDefault: false,
+  isDefault: false,
   });
 
   const [walletBalance, setWalletBalance] = useState(0);
@@ -736,7 +736,7 @@ const CheckoutContent = () => {
                       )}
                     </Label>
                   </div>
-                  
+
                 </RadioGroup>
               </CardContent>
             </Card>

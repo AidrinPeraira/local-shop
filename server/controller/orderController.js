@@ -145,7 +145,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         platformFee: cart.summary.platformFee,
         couponDiscount: couponDiscount,
         coupon: couponId,
-        cartTotal: finalCartTotal,
+        cartTotal: finalAmount,
       },
       payment: {
         method: paymentMethod,
@@ -190,7 +190,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       orderId: order._id,
       transactionId: `TXN${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
       type: "ORDER_PAYMENT",
-      amount: finalCartTotal,
+      amount: finalAmount,
       platformFee: {
         buyerFee: cart.summary.platformFee,
         sellerFee: 0
@@ -235,7 +235,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       message: "Order created successfully",
       order: {
         orderId: order._id,
-        total: finalCartTotal,
+        total: finalAmount,
         status: order.orderStatus,
         paymentStatus: order.payment.status,
         couponDiscount: couponDiscount,
@@ -662,9 +662,12 @@ export const getSellerOrders = asyncHandler(async (req, res) => {
     const formattedOrders = orders.map((order) => ({
       _id: order._id,
       orderId: order.orderId,
-      user: {
-        name: order.user.username,
-        email: order.user.email,
+      user: order.user ? {
+        name: order.user.username || 'Deleted User',
+        email: order.user.email || 'No Email'
+      } : {
+        name: 'Unknown User',
+        email: 'No Email'
       },
       createdAt: order.createdAt,
       orderStatus: order.orderStatus,
