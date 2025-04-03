@@ -4,6 +4,7 @@ import Product from "../models/productModel.js";
 import Address from "../models/userAddresssModel.js";
 import Cart from "../models/cartModel.js";
 import Coupon from "../models/couponModel.js";
+import Wallet from "../models/walletModel.js";
 import { razorpay } from "../utils/razorpay.js";
 import crypto from 'crypto';
 import Transaction from "../models/adminTransactionModel.js";
@@ -446,6 +447,8 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
       description: "Order cancelled by user"
     });
 
+    
+
     const refundTransaction = new Transaction({
       orderId: order._id,
       transactionId: `REF${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
@@ -455,7 +458,7 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
         buyerFee: -order.summary.platformFee, // Negative to indicate refund
         sellerFee: 0
       },
-      status: "PROCESSING",
+      status: "COMPLETED",
       paymentMethod: order.payment.method,
       from: {
         entity: "localShop Pvt Ltd",
@@ -468,6 +471,34 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
       scheduledDate: new Date(),
       processedDate: null
     });
+
+    if ((order.payment.method === "ONLINE" || order.payment.method === "WALLET") 
+      && order.payment.status === "COMPLETED") {
+    // Find or create user wallet
+    let wallet = await Wallet.findOne({ user: userId });
+    if (!wallet) {
+      wallet = await Wallet.create({
+        user: userId,
+        balance: 0
+      });
+    }
+
+    // Create wallet transaction
+    const walletTransaction = {
+      transactionId: `WREF${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+      type: "REFUND",
+      amount: order.summary.cartTotal,
+      orderId: order._id,
+      description: `Refund for cancelled order #${order.orderId}`,
+      status: "COMPLETED",
+      balance: wallet.balance + order.summary.cartTotal
+    };
+
+    // Update wallet balance and add transaction
+    wallet.balance += order.summary.cartTotal;
+    wallet.transactions.push(walletTransaction);
+    await wallet.save();
+  }
 
     await refundTransaction.save();
 
