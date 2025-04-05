@@ -182,9 +182,79 @@ export const deleteCategory = asyncHandler(async (req, res) => {
 //controller to get active and inactive categories
 //need to add pagination
 export const getAllCategories = asyncHandler(async (req, res) => {
-  const categories = await Category.aggregate([
-    { $match: { level: 1 } }, // Get only top-level categories (Level 1)
 
+  const { 
+    page = 1, 
+    limit = 5, 
+    search = '', 
+    sortBy = 'az', 
+    activeFilter = 'all',
+    parentCategory = 'All Categories' 
+  } = req.query;
+
+  // Base pipeline. SImilar to making the base querry
+  const pipeline = [];
+
+  // Match top-level categories
+  pipeline.push({ $match: { level: 1 } });
+
+  // Search filter
+  if (search) {
+    pipeline.push({
+      $match: {
+        name: { $regex: search, $options: 'i' }
+      }
+    });
+  }
+
+  // Active/Inactive filter
+  if (activeFilter !== 'all') {
+    pipeline.push({
+      $match: {
+        isActive: activeFilter === 'active'
+      }
+    });
+  }
+
+  // Parent category filter
+  if (parentCategory !== 'All Categories') {
+    pipeline.push({
+      $match: {
+        name: parentCategory
+      }
+    });
+  }
+
+  // Sort
+  const sortStage = {};
+  switch (sortBy) {
+    case 'az':
+      sortStage.$sort = { name: 1 };
+      break;
+    case 'za':
+      sortStage.$sort = { name: -1 };
+      break;
+    case 'latest':
+      sortStage.$sort = { createdAt: -1 };
+      break;
+    default:
+      sortStage.$sort = { name: 1 };
+  }
+  pipeline.push(sortStage);
+
+  // Get total count before pagination
+  const countPipeline = [...pipeline];
+  countPipeline.push({ $count: 'total' });
+  const [countResult] = await Category.aggregate(countPipeline);
+  const total = countResult ? countResult.total : 0;
+
+  // Add pagination
+  pipeline.push(
+    { $skip: (Number(page) - 1) * Number(limit) },
+    { $limit: Number(limit) }
+  );
+
+  pipeline.push(
     // Lookup for level 2
     {
       $lookup: {
@@ -261,9 +331,100 @@ export const getAllCategories = asyncHandler(async (req, res) => {
         allSubSubCategories: 0
       }
     }
-  ]);
+  )
 
-  res.status(200).json(categories);
+  const categories = await Category.aggregate(pipeline);
+
+  // const categories = await Category.aggregate([
+  //   { $match: { level: 1 } }, // Get only top-level categories (Level 1)
+
+  //   // Lookup for level 2
+  //   {
+  //     $lookup: {
+  //       from: "categories",
+  //       localField: "_id",
+  //       foreignField: "parentCategory",
+  //       as: "subCategories",
+  //     },
+  //   },
+
+  //   // Add a new field that will process each subcategory
+  //   {
+  //     $addFields: {
+  //       subCategories: {
+  //         $map: {
+  //           input: "$subCategories",
+  //           as: "subCat",
+  //           in: {
+  //             $mergeObjects: [
+  //               "$$subCat",
+  //               { subSubCategories: [] } // Initialize with empty array
+  //             ]
+  //           }
+  //         }
+  //       }
+  //     }
+  //   },
+
+  //   // For each subcategory, lookup its subcategories (level 3)
+  //   {
+  //     $lookup: {
+  //       from: "categories",
+  //       let: { subCategoryIds: "$subCategories._id" },
+  //       pipeline: [
+  //         { 
+  //           $match: { 
+  //             $expr: { $in: ["$parentCategory", "$$subCategoryIds"] } 
+  //           } 
+  //         }
+  //       ],
+  //       as: "allSubSubCategories"
+  //     }
+  //   },
+
+  //   // Properly nest level 3 categories under their respective level 2 parents
+  //   {
+  //     $addFields: {
+  //       subCategories: {
+  //         $map: {
+  //           input: "$subCategories",
+  //           as: "subCat",
+  //           in: {
+  //             $mergeObjects: [
+  //               "$$subCat",
+  //               {
+  //                 subSubCategories: {
+  //                   $filter: {
+  //                     input: "$allSubSubCategories",
+  //                     as: "subSubCat",
+  //                     cond: { $eq: ["$$subSubCat.parentCategory", "$$subCat._id"] }
+  //                   }
+  //                 }
+  //               }
+  //             ]
+  //           }
+  //         }
+  //       }
+  //     }
+  //   },
+
+  //   // Clean up the temporary field
+  //   {
+  //     $project: {
+  //       allSubSubCategories: 0
+  //     }
+  //   }
+  // ]);
+
+  res.status(200).json({
+    categories,
+    pagination: {
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total
+    }
+  });
 });
 
 

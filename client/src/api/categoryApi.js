@@ -1,7 +1,7 @@
 import API from "./apiConfig";
 
 //need apis for the following
-export const getAllCategoriesAPI = () => API.get("/category")
+export const getAllCategoriesAPI = (queryParams) => API.get(`/category?${queryParams}`)
 export const getActiveCategoriesAPI = () => API.get("/category/active")
 
 export const createNewCategoryAPI = (data) => API.post("/category/create", data)

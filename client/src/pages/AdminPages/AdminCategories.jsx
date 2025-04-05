@@ -33,7 +33,6 @@ import {
   editCurrentCategoryAPI,
   getAllCategoriesAPI,
 } from "../../api/categoryApi";
-// Enhanced mock data with three levels
 
 export default function Categories() {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -44,12 +43,27 @@ export default function Categories() {
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [selectedParentCategory, setSelectedParentCategory] =
     useState("All Categories");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    totalPages: 0,
+    hasMore: false,
+  });
 
   //get all categories form the sever
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await getAllCategoriesAPI();
-      setAllCategories(response.data);
+      const queryParams = new URLSearchParams({
+        page,
+        limit: 5,
+        search: searchQuery,
+        sortBy,
+        activeFilter,
+        parentCategory: selectedParentCategory,
+      });
+      const response = await getAllCategoriesAPI(queryParams);
+      setAllCategories(response.data.categories);
+      setPagination(response.data.pagination);
     } catch (error) {
       toast({
         title: "Error!",
@@ -57,10 +71,15 @@ export default function Categories() {
         variant: "destructive",
       });
     }
-  });
+  }, [page, searchQuery, sortBy, activeFilter, selectedParentCategory]);
+
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [page, searchQuery, sortBy, activeFilter, selectedParentCategory]);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   //to reset filters when all categoties are changed
   useEffect(() => {
@@ -306,219 +325,227 @@ export default function Categories() {
       {/* Categories Accordion */}
       <Card className="p-4">
         <Accordion type="single" collapsible className="space-y-4">
-          {filteredCategories
-            .slice()
-            // .sort((a, b) => a.name.localeCompare(b.name))
-            .map((category, index) => (
-              <AccordionItem
-                key={category._id}
-                value={category._id}
-                className="border rounded-lg px-4"
-              >
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full pr-4">
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm text-muted-foreground">
-                        #{index + 1}
-                      </span>
-                      <span className="font-medium">{category.name}</span>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          category.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {category.isActive ? "Active" : "Inactive"}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        Level {category.level}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {/* modal/ pop up to edit and dlete category this is the pen icon now*/}
-                        <CategoryDialog
-                          type="edit"
-                          category={{
-                            name: category.name,
-                            parentCategory: category.parentCategory || null,
-                            isActive: category.isActive,
-                            _id: category._id,
-                          }}
-                          allCategories={allCategories}
-                          submitAction={handleEdit}
-                        />
+          {allCategories.map((category, index) => (
+            <AccordionItem
+              key={category._id}
+              value={category._id}
+              className="border rounded-lg px-4"
+            >
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center justify-between w-full pr-4">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-muted-foreground">
+                      #{index + 1}
+                    </span>
+                    <span className="font-medium">{category.name}</span>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        category.isActive
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {category.isActive ? "Active" : "Inactive"}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      Level {category.level}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {/* modal/ pop up to edit and dlete category this is the pen icon now*/}
+                      <CategoryDialog
+                        type="edit"
+                        category={{
+                          name: category.name,
+                          parentCategory: category.parentCategory || null,
+                          isActive: category.isActive,
+                          _id: category._id,
+                        }}
+                        allCategories={allCategories}
+                        submitAction={handleEdit}
+                      />
 
-                        <DeleteCategoryDialog
-                          handleDelete={handleDelete}
-                          category={category}
-                        />
-                      </div>
+                      <DeleteCategoryDialog
+                        handleDelete={handleDelete}
+                        category={category}
+                      />
                     </div>
                   </div>
-                </AccordionTrigger>
+                </div>
+              </AccordionTrigger>
 
-                {/* accordion for sub categories */}
-                <AccordionContent>
-                  {category.subCategories.length > 0 ? (
-                    <Accordion type="single" collapsible className="space-y-2">
-                      {category.subCategories.map((subcategory, index) => (
-                        <AccordionItem
-                          key={subcategory._id}
-                          value={subcategory._id}
-                          className="border rounded-md px-4"
-                        >
-                          <AccordionTrigger className="hover:no-underline py-3 ">
-                            <div className="flex items-center justify-between w-full pr-4">
-                              <div className="flex items-center gap-4">
-                                {/* categoty number goes herer */}
-                                <span className="text-sm text-muted-foreground">
-                                  #{index + 1}
-                                </span>
-                                {/* category name goes here */}
-                                <span className="font-medium">
-                                  {subcategory.name}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-6">
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs ${
-                                    subcategory.isActive
-                                      ? "bg-green-100 text-green-700"
-                                      : "bg-red-100 text-red-700"
-                                  }`}
-                                >
-                                  {subcategory.isActive ? "Active" : "Inactive"}
-                                </span>
-                                <span className="text-sm text-muted-foreground">
-                                  Level {subcategory.level}
-                                </span>
-                                <div className="flex items-center gap-2">
-                                  <CategoryDialog
-                                    type="edit"
-                                    category={{
-                                      name: subcategory.name,
-                                      parentCategory:
-                                        subcategory.parentCategory,
-                                      parentCategoryName: category.name,
-                                      isActive: subcategory.isActive,
-                                      _id: subcategory._id,
-                                    }}
-                                    allCategories={allCategories}
-                                    submitAction={handleEdit}
-                                  />
+              {/* accordion for sub categories */}
+              <AccordionContent>
+                {category.subCategories.length > 0 ? (
+                  <Accordion type="single" collapsible className="space-y-2">
+                    {category.subCategories.map((subcategory, index) => (
+                      <AccordionItem
+                        key={subcategory._id}
+                        value={subcategory._id}
+                        className="border rounded-md px-4"
+                      >
+                        <AccordionTrigger className="hover:no-underline py-3 ">
+                          <div className="flex items-center justify-between w-full pr-4">
+                            <div className="flex items-center gap-4">
+                              {/* categoty number goes herer */}
+                              <span className="text-sm text-muted-foreground">
+                                #{index + 1}
+                              </span>
+                              {/* category name goes here */}
+                              <span className="font-medium">
+                                {subcategory.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-6">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  subcategory.isActive
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                                }`}
+                              >
+                                {subcategory.isActive ? "Active" : "Inactive"}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                Level {subcategory.level}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <CategoryDialog
+                                  type="edit"
+                                  category={{
+                                    name: subcategory.name,
+                                    parentCategory: subcategory.parentCategory,
+                                    parentCategoryName: category.name,
+                                    isActive: subcategory.isActive,
+                                    _id: subcategory._id,
+                                  }}
+                                  allCategories={allCategories}
+                                  submitAction={handleEdit}
+                                />
 
-                                  <DeleteCategoryDialog
-                                    handleDelete={handleDelete}
-                                    category={subcategory}
-                                  />
-                                </div>
+                                <DeleteCategoryDialog
+                                  handleDelete={handleDelete}
+                                  category={subcategory}
+                                />
                               </div>
                             </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            {subcategory.subSubCategories?.length > 0 ? (
-                              <div className="space-y-2 py-2">
-                                {subcategory.subSubCategories.map(
-                                  (subSubCategory, index) => (
-                                    <div
-                                      key={subSubCategory._id}
-                                      className="flex items-center justify-between p-3 rounded-md bg-muted/50"
-                                    >
-                                      <div className="flex items-center gap-4">
-                                        <span className="text-sm text-muted-foreground">
-                                          #{index + 1}
-                                        </span>
-                                        <span className="font-medium">
-                                          {subSubCategory.name}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center gap-6">
-                                        <span
-                                          className={`px-2 py-1 rounded-full text-xs ${
-                                            subSubCategory.isActive
-                                              ? "bg-green-100 text-green-700"
-                                              : "bg-red-100 text-red-700"
-                                          }`}
-                                        >
-                                          {subSubCategory.isActive
-                                            ? "Active"
-                                            : "Inactive"}
-                                        </span>
-                                        <span className="text-sm text-muted-foreground">
-                                          Level {subSubCategory.level}
-                                        </span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          {subcategory.subSubCategories?.length > 0 ? (
+                            <div className="space-y-2 py-2">
+                              {subcategory.subSubCategories.map(
+                                (subSubCategory, index) => (
+                                  <div
+                                    key={subSubCategory._id}
+                                    className="flex items-center justify-between p-3 rounded-md bg-muted/50"
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <span className="text-sm text-muted-foreground">
+                                        #{index + 1}
+                                      </span>
+                                      <span className="font-medium">
+                                        {subSubCategory.name}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-6">
+                                      <span
+                                        className={`px-2 py-1 rounded-full text-xs ${
+                                          subSubCategory.isActive
+                                            ? "bg-green-100 text-green-700"
+                                            : "bg-red-100 text-red-700"
+                                        }`}
+                                      >
+                                        {subSubCategory.isActive
+                                          ? "Active"
+                                          : "Inactive"}
+                                      </span>
+                                      <span className="text-sm text-muted-foreground">
+                                        Level {subSubCategory.level}
+                                      </span>
 
-                                        {/* editting and deleting sub sub categories */}
-                                        <div className="flex items-center gap-2">
-                                          <CategoryDialog
-                                            type="edit"
-                                            category={{
-                                              name: subSubCategory.name,
-                                              parentCategory:
-                                                subSubCategory.parentCategory,
-                                              parentCategoryName:
-                                                subcategory.name,
-                                              isActive: subSubCategory.isActive,
-                                              _id: subSubCategory._id,
-                                            }}
-                                            allCategories={allCategories}
-                                            submitAction={handleEdit}
-                                          />
+                                      {/* editting and deleting sub sub categories */}
+                                      <div className="flex items-center gap-2">
+                                        <CategoryDialog
+                                          type="edit"
+                                          category={{
+                                            name: subSubCategory.name,
+                                            parentCategory:
+                                              subSubCategory.parentCategory,
+                                            parentCategoryName:
+                                              subcategory.name,
+                                            isActive: subSubCategory.isActive,
+                                            _id: subSubCategory._id,
+                                          }}
+                                          allCategories={allCategories}
+                                          submitAction={handleEdit}
+                                        />
 
-                                          <DeleteCategoryDialog
-                                            handleDelete={handleDelete}
-                                            category={subSubCategory}
-                                          />
-                                        </div>
+                                        <DeleteCategoryDialog
+                                          handleDelete={handleDelete}
+                                          category={subSubCategory}
+                                        />
                                       </div>
                                     </div>
-                                  )
-                                )}
-                              </div>
-                            ) : (
-                              <p className="text-sm text-muted-foreground py-2">
-                                No sub-subcategories found
-                              </p>
-                            )}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  ) : (
-                    <p className="text-sm text-muted-foreground py-2">
-                      No subcategories found
-                    </p>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground py-2">
+                              No sub-subcategories found
+                            </p>
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-2">
+                    No subcategories found
+                  </p>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
         </Accordion>
       </Card>
 
       {/* Pagination to be added*/}
-      {/* <div className="flex items-center justify-center space-x-2">
-        <Button variant="outline" size="sm" disabled>
-          Previous
-        </Button>
+      <div className="flex items-center justify-center space-x-2">
         <Button
           variant="outline"
           size="sm"
-          className="bg-primary text-primary-foreground"
+          disabled={page === 1}
+          onClick={() => handlePageChange(page - 1)}
         >
-          1
+          Previous
         </Button>
-        <Button variant="outline" size="sm">
-          2
-        </Button>
-        <Button variant="outline" size="sm">
-          3
-        </Button>
-        <Button variant="outline" size="sm">
+
+        {Array.from({ length: pagination.totalPages }, (_, i) => (
+          <Button
+            key={i + 1}
+            variant="outline"
+            size="sm"
+            className={
+              page === i + 1 ? "bg-primary text-primary-foreground" : ""
+            }
+            onClick={() => handlePageChange(i + 1)}
+          >
+            {i + 1}
+          </Button>
+        ))}
+
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={!pagination.hasMore}
+          onClick={() => handlePageChange(page + 1)}
+        >
           Next
         </Button>
-      </div> */}
+      </div>
     </div>
   );
 }
