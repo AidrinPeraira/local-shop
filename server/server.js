@@ -6,7 +6,7 @@ import cors from 'cors'
 import helmet from "helmet";
 import morgan from 'morgan'
 import csrf from 'csrf';
-import { initializeCronJobs } from './utils/cronJobs.js';
+import { initializeCronJobs } from './utils/cronJob.js';
 
 
 

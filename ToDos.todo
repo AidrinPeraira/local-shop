@@ -341,7 +341,8 @@ Pendings:
     ☐ Overall sales count
     ☐ Overall order amount
     ☐ Overall discount
-    ☐ Learn about cron jobs (suggestion)
+    ✔ Learn about cron jobs (suggestion) @done (4/5/2025, 10:23:49 AM)
+        //added crone job for coupon deactivation in addition to the existing logic
 
     ☐ platform fee collected from user should be deducted before showing the seller the order details.
     ☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
