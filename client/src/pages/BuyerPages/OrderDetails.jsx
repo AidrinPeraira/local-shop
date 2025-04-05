@@ -6,7 +6,9 @@ import { Container } from "../../components/ui/container";
 import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { useToast } from "../../components/hooks/use-toast";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+
 import {
   getOrderByIdApi,
   cancelOrderApi,
@@ -45,11 +47,13 @@ const OrderDetails = () => {
     try {
       setLoading(true);
       const response = await getOrderByIdApi(id);
+      console.log(response.data);
+      // Check if the response contains the order data
       if (response.data.success) {
         setOrder(response.data.order);
       } else {
         toast({
-          title: "Error",
+          title: "Error", 
           description: "Order not found",
           variant: "destructive",
         });
@@ -163,92 +167,82 @@ const OrderDetails = () => {
 
   const generateInvoice = () => {
     const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    // Set up colors
-    const primaryColor = "#000000"; // Black for main text
-    const accentColor = "#808080"; // Gray for secondary text
-
-    // Background and border
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(0.5);
-    doc.rect(10, 10, pageWidth - 20, 277, "S");
-
-    // Header
-    doc.setFontSize(18);
-    doc.setTextColor(primaryColor);
-    doc.text("INVOICE", pageWidth / 2, 30, { align: "center" });
-
-    // Invoice Details
+    
+    // Add title and header info (unchanged)
+    doc.setFontSize(20);
+    doc.text("INVOICE", 14, 22);
     doc.setFontSize(10);
-    doc.setTextColor(accentColor);
-    doc.text(`Order #${order.orderId}`, pageWidth - 30, 40, { align: "right" });
-    doc.text(`Date: ${formatDate(order.createdAt)}`, pageWidth - 30, 45, {
-      align: "right",
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+    doc.text(`Order #${order.orderId}`, 14, 36);
+
+    // Customer details section (unchanged)
+    const customerData = [
+      ["Shipping Address", order.shippingAddress.street],
+      ["", `${order.shippingAddress.city}, ${order.shippingAddress.state}`],
+      ["", `PIN: ${order.shippingAddress.pincode}`],
+      ["", `Phone: ${order.shippingAddress.phone}`],
+      ["Payment Method", order.payment.method],
+      ["Order Date", formatDate(order.createdAt)],
+    ];
+
+    autoTable(doc, {
+      startY: 45,
+      head: [["Details", "Value"]],
+      body: customerData,
+      theme: "grid",
+      headStyles: { fillColor: [136, 132, 216] },
     });
 
-    // Shipping Address Section
-    doc.setTextColor(primaryColor);
-    doc.setFontSize(12);
-    doc.text("SHIPPING ADDRESS:", 20, 60);
-
-    doc.setFontSize(10);
-    doc.text(order.shippingAddress.street, 20, 70);
-    doc.text(
-      `${order.shippingAddress.city}, ${order.shippingAddress.state}`,
-      20,
-      75
-    );
-    doc.text(`PIN: ${order.shippingAddress.pincode}`, 20, 80);
-    doc.text(`Phone: ${order.shippingAddress.phone}`, 20, 85);
-
-    // Payment Method
-    doc.text(`Payment Method: ${order.payment.method}`, pageWidth - 80, 60);
-
-    // Table Header
-    doc.setFillColor(240, 240, 240);
-    doc.rect(20, 110, pageWidth - 40, 10, "F");
-
-    doc.setTextColor(primaryColor);
-    doc.setFontSize(10);
-    doc.text("PRODUCT", 30, 117);
-    doc.text("VARIANT", pageWidth - 200, 117);
-    doc.text("QTY", pageWidth - 120, 117, { align: "right" });
-    doc.text("TOTAL", pageWidth - 30, 117, { align: "right" });
-
-    // Table Content
-    let yPos = 127;
-    order.items.forEach((item) => {
-      doc.setFontSize(10);
-      doc.text(item.productName, 30, yPos);
-
-      item.variants.forEach((variant) => {
-        doc.text(`${variant.attributes}`, pageWidth - 200, yPos);
-        doc.text(`${variant.quantity}`, pageWidth - 120, yPos, {
-          align: "right",
-        });
-        doc.text(`₹${item.productTotal}`, pageWidth - 30, yPos, {
-          align: "right",
-        });
-        yPos += 7;
-      });
-
-      yPos += 10;
+    // Modified order items table with grouped variants
+    const orderItems = order.items.map(item => {
+      // Create variant details string
+      const variantDetails = item.variants
+        .map(v => `${v.attributes} (Qty: ${v.quantity})`)
+        .join('\n');
+      
+      return [
+        item.productName,
+        variantDetails,
+        item.variants.reduce((total, v) => total + v.quantity, 0), // Total quantity
+        `Rs. ${item.productTotal}` // Total price for all variants
+      ];
     });
 
-    // Total Section
-    doc.setFontSize(12);
-    doc.setTextColor(primaryColor);
-    doc.text("TOTAL AMOUNT:", pageWidth - 120, yPos + 10, { align: "right" });
-    doc.text(`₹${order.summary.cartTotal}`, pageWidth - 30, yPos + 10, {
-      align: "right",
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 15,
+      head: [["Product", "Variants", "Total Qty", "Total"]],
+      body: orderItems,
+      theme: "grid",
+      headStyles: { fillColor: [136, 132, 216] },
+      columnStyles: {
+        1: { cellWidth: 'auto', whiteSpace: 'pre-line' }, // Allow line breaks in variant details
+      },
     });
 
-    // Signature Line
-    doc.setFontSize(10);
-    doc.text("Signature", 20, 250);
+    // Rest of the code remains the same
+    const summaryData = [
+      ["Subtotal before discount", `Rs. ${order.summary.subtotalBeforeDiscount}`],
+      ["Product Discount", `- Rs. ${order.summary.totalDiscount}`],
+      ["Subtotal after discount", `Rs. ${order.summary.subtotalAfterDiscount}`],
+      ["Coupon Discount", `- Rs. ${order.summary.couponDiscount}`],
+      ["Shipping Charge", `Rs. ${order.summary.shippingCharge}`],
+      ["Platform Fee", `Rs. ${order.summary.platformFee}`],
+      ["Total Amount", `Rs. ${order.summary.cartTotal}`],
+    ];
 
-    // Save the PDF
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 15,
+      head: [["Summary", "Amount"]],
+      body: summaryData,
+      theme: "grid",
+      headStyles: { fillColor: [136, 132, 216] },
+    });
+
+    // Footer (unchanged)
+    doc.setFontSize(10);
+    doc.text("Authorized Signature", 14, doc.lastAutoTable.finalY + 30);
+    doc.text("Thank you for shopping with us!", doc.internal.pageSize.getWidth() / 2, doc.lastAutoTable.finalY + 30, { align: "center" });
+
     doc.save(`invoice-${order.orderId}.pdf`);
   };
 

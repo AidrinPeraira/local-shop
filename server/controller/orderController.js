@@ -81,6 +81,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         return {
           ...item,
           seller: product.seller,
+          bulkDiscount: product.bulkDiscount,
         };
       })
     );
@@ -384,6 +385,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
           _id: item.seller._id,
           name: item.seller.sellerName
         },
+        bulkDiscount: item.bulkDiscount,
         returnStatus: item.returnStatus ? {
           status: item.returnStatus.status,
           reason: item.returnStatus.reason,
