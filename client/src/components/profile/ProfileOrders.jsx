@@ -37,6 +37,8 @@ import { useNavigate } from "react-router-dom";
 import { loadScript } from "../../utils/loadScript";
 import { razorPayKey } from "../../configuration";
 import { createRazorpayOrderApi, verifyRazorpayPaymentApi, updateOrderPaymentStatusApi } from "../../api/orderApi";
+import { useDispatch } from "react-redux";
+import { clearCart } from "../../redux/features/cartSlice";
 
 const OrderTimeline = ({ status, trackingDetails }) => {
   const statusSteps = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
@@ -81,6 +83,7 @@ const ProfileOrders = () => {
   const [search, setSearch] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch = useDispatch(); 
 
 
   const fetchOrders = async () => {
@@ -99,6 +102,10 @@ const ProfileOrders = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    dispatch(clearCart())
+  }, []);
 
   useEffect(() => {
     fetchOrders();

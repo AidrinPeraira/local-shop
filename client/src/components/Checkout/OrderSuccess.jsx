@@ -15,7 +15,6 @@ const OrderSuccess = ({ orderId }) => {
     let timeoutId;
   
     if (countdown === 0) {
-      dispatch(clearCart());
       navigate("/profile/orders", { replace: true });
     } else {
       timeoutId = setTimeout(() => {

@@ -18,7 +18,7 @@ import {
   DropdownMenuSubContent,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const BottomNav = () => {
@@ -33,7 +33,6 @@ const BottomNav = () => {
     <div className="w-full bg-white shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14">
-
           {/* Categories Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -46,7 +45,9 @@ const BottomNav = () => {
             <DropdownMenuContent align="start" className="w-56">
               {categories.map((category) => (
                 <DropdownMenuSub key={category._id}>
-                  <DropdownMenuSubTrigger>{category.name}</DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger>
+                    {category.name}
+                  </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
                     {category.subCategories.map((subCategory) => (
                       <DropdownMenuSub key={subCategory._id}>
@@ -54,19 +55,21 @@ const BottomNav = () => {
                           {subCategory.name}
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
-                          {subCategory.subSubCategories.map((subSubCategory) => (
-                            <DropdownMenuItem
-                              key={subSubCategory._id}
-                              onClick={() =>
-                                handleCategorySelect(
-                                  subSubCategory._id,
-                                  subSubCategory.name
-                                )
-                              }
-                            >
-                              {subSubCategory.name}
-                            </DropdownMenuItem>
-                          ))}
+                          {subCategory.subSubCategories.map(
+                            (subSubCategory) => (
+                              <DropdownMenuItem
+                                key={subSubCategory._id}
+                                onClick={() =>
+                                  handleCategorySelect(
+                                    subSubCategory._id,
+                                    subSubCategory.name
+                                  )
+                                }
+                              >
+                                {subSubCategory.name}
+                              </DropdownMenuItem>
+                            )
+                          )}
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
                     ))}
@@ -78,15 +81,20 @@ const BottomNav = () => {
 
           {/* Quick Actions */}
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#" className="nav-item">
+            <Link to="/profile/orders" className="nav-item">
               <PackageSearch size={20} />
               Track Order
-            </a>
+            </Link>
             <a href="#" className="nav-item">
               <Headphones size={20} />
               Support
             </a>
-            <a href="#" className="nav-item">
+            <a 
+              href="https://wa.me/919400409843" 
+              className="nav-item" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
               <HelpCircle size={20} />
               Help
             </a>
