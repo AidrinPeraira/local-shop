@@ -20,9 +20,26 @@ export const adminCreateCoupon = asyncHandler(
     // Check if coupon code already exists
     const existingCoupon = await Coupon.findOne({ code });
     if (existingCoupon) {
-      return res.status(HTTP_CODES.CONFLICT).json({
-        success: false,
-        message: "Coupon code already exists",
+      // Update existing coupon instead of creating new one
+      const updatedCoupon = await Coupon.findByIdAndUpdate(
+        existingCoupon._id,
+        {
+          validFrom,
+          validUntil,
+          isActive: true,
+          $inc: { usageLimit: usageLimit || 100 }, // Increase usage limit
+          discountType,
+          discountValue,
+          minPurchase,
+          maxDiscount
+        },
+        { new: true, runValidators: true }
+      );
+
+      return res.status(HTTP_CODES.OK).json({
+        success: true,
+        message: "Coupon reactivated and updated successfully",
+        coupon: updatedCoupon,
       });
     }
 

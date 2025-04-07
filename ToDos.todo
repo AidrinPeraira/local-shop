@@ -330,7 +330,7 @@ Pendings:
 
     ✔ Invoice amount mismatch @done (4/7/2025, 9:54:52 AM)
     ✔ Order success/failere not redirecting to the order details page @done (4/7/2025, 4:39:16 PM)
-    ☐ Coupon validation - if it's expired coupon update the expired with new values
+    ✔ Coupon validation - if it's expired coupon update the expired with new values @done (4/7/2025, 4:46:06 PM)
     ☐ In case of canceled orders, refund the amount directly.
     ☐ Sales report(Daily, Weekly, Yearly, Custom date)
     ☐ Generate sales report
