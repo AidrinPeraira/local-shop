@@ -195,6 +195,20 @@ const OrderDetails = () => {
 
     // Modified order items table with grouped variants
     const orderItems = order.items.map(item => {
+      // Calculate applicable bulk discount
+      const totalQuantity = item.variants.reduce((total, v) => total + v.quantity, 0);
+      let discountPercentage = 0;
+      
+      if (item.bulkDiscount) {
+        const applicableDiscount = [...item.bulkDiscount]
+          .sort((a, b) => b.minQty - a.minQty)
+          .find(discount => totalQuantity >= discount.minQty);
+        
+        if (applicableDiscount) {
+          discountPercentage = applicableDiscount.priceDiscountPerUnit;
+        }
+      }
+
       // Create variant details string
       const variantDetails = item.variants
         .map(v => `${v.attributes} (Qty: ${v.quantity})`)
@@ -203,19 +217,22 @@ const OrderDetails = () => {
       return [
         item.productName,
         variantDetails,
-        item.variants.reduce((total, v) => total + v.quantity, 0), // Total quantity
-        `Rs. ${item.productTotal}` // Total price for all variants
+        totalQuantity,
+        discountPercentage > 0 ? `${discountPercentage}%` : '-',
+        `Rs. ${item.productTotal}`
       ];
     });
 
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 15,
-      head: [["Product", "Variants", "Total Qty", "Total"]],
+      head: [["Product", "Variants", "Total Qty", "Bulk Discount", "Total"]],
       body: orderItems,
       theme: "grid",
       headStyles: { fillColor: [136, 132, 216] },
       columnStyles: {
-        1: { cellWidth: 'auto', whiteSpace: 'pre-line' }, // Allow line breaks in variant details
+        1: { cellWidth: 'auto', whiteSpace: 'pre-line' },
+        3: { halign: 'center' },
+        4: { halign: 'right' }
       },
     });
 

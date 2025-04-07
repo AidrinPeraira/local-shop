@@ -51,11 +51,11 @@ app.use(cors({
 app.use(helmet()); // To protect against the xss seAllow sending cookiescurity threarts
 app.use(morgan("dev")); // Logs requests in 'dev' format
 
+initializeCronJobs();
+
 //csrf protection
 
 const tokens = new csrf();
-initializeCronJobs();
-
 
 app.use((req, res, next) => {
   // Skip CSRF for GET requests

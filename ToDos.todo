@@ -328,7 +328,7 @@ Pendings:
     ✔ coupon deactivat estatus not showing @done (4/3/2025, 12:16:16 PM)
     ✔ buy now error @done (4/3/2025, 11:23:02 AM)
 
-    ☐ Invoice amount mismatch
+    ✔ Invoice amount mismatch @done (4/7/2025, 9:54:52 AM)
     ☐ Order success/failere not redirecting to the order details page
     ☐ Coupon validation - if it's expired coupon update the expired with new values
     ☐ In case of canceled orders, refund the amount directly.
