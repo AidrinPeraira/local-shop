@@ -17,7 +17,7 @@ import {
   IndianRupee,
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
-import { getAllTransactionsApi, updateTransactionStatusApi } from "../../api/transactionApi";
+import { getAllTransactionsApi, getAdminBalanceApi } from "../../api/transactionApi";
 
 const transactionTypes = ["ALL", "ORDER_PAYMENT", "SELLER_PAYOUT", "REFUND"];
 const transactionStatuses = ["ALL", "PENDING", "PROCESSING", "COMPLETED", "FAILED"];
@@ -36,6 +36,8 @@ export default function AdminTransactions() {
   const [appliedStatus, setAppliedStatus] = useState("ALL");
   const [appliedSort, setAppliedSort] = useState("desc");
   const [appliedSearch, setAppliedSearch] = useState("");
+  const [balanceData, setBalanceData] = useState(null);
+  
 
   const fetchTransactions = async () => {
     try {
@@ -68,10 +70,29 @@ export default function AdminTransactions() {
     }
   };
 
+
+
+  const fetchBalance = async () => {
+    try {
+      const { data } = await getAdminBalanceApi();
+      if (data.success) {
+        setBalanceData(data.data);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch balance",
+        variant: "destructive",
+      });
+    }
+  };
+
+
   useEffect(() => {
     fetchTransactions();
+    fetchBalance();
   }, [currentPage, appliedType, appliedStatus, appliedSort, appliedSearch]);
-
+  
   const handleApplyFilters = () => {
     setCurrentPage(1);
     setAppliedType(selectedType);
@@ -123,33 +144,70 @@ export default function AdminTransactions() {
     );
   };
 
-  const handleUpdateStatus = async (transactionId, newStatus) => {
-    try {
-      const { data } = await updateTransactionStatusApi(transactionId, newStatus);
-      
-      if (data.success) {
-        toast({
-          title: "Success",
-          description: "Transaction status updated successfully",
-        });
-        fetchTransactions();
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update transaction status",
-        variant: "destructive",
-      });
-    }
-  };
+ 
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Transactions</h1>
       </div>
+
+      {/* blanace card info */}
+      <Card className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-gray-500">Current Balance</h3>
+            <div className="flex items-center text-2xl font-bold text-green-600">
+              <IndianRupee className="h-6 w-6 mr-1" />
+              {balanceData?.currentBalance || 0}
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-gray-500">Platform Fees</h3>
+            <div className="flex items-center text-2xl font-bold text-blue-600">
+              <IndianRupee className="h-6 w-6 mr-1" />
+              {balanceData?.totalPlatformFees || 0}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-gray-500">Total Payouts</h3>
+            <div className="flex items-center text-2xl font-bold text-purple-600">
+              <IndianRupee className="h-6 w-6 mr-1" />
+              {balanceData?.breakdown?.sellerPayouts || 0}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-gray-500">Total Refunds</h3>
+            <div className="flex items-center text-2xl font-bold text-orange-600">
+              <IndianRupee className="h-6 w-6 mr-1" />
+              {balanceData?.breakdown?.refunds || 0}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t">
+          <h3 className="text-sm font-medium text-gray-500 mb-2">Platform Fees Breakdown</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-sm text-gray-500">From Buyers:</span>
+              <div className="flex items-center text-lg font-semibold">
+                <IndianRupee className="h-4 w-4 mr-1" />
+                {balanceData?.breakdown?.platformFees?.fromBuyers || 0}
+              </div>
+            </div>
+            <div>
+              <span className="text-sm text-gray-500">From Sellers:</span>
+              <div className="flex items-center text-lg font-semibold">
+                <IndianRupee className="h-4 w-4 mr-1" />
+                {balanceData?.breakdown?.platformFees?.fromSellers || 0}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-6">
         <div className="grid gap-4 md:grid-cols-4 mb-4">
@@ -287,33 +345,7 @@ export default function AdminTransactions() {
                     {new Date(transaction.createdAt).toLocaleDateString()}
                   </td>
                   <td className="p-3">{getStatusBadge(transaction.status)}</td>
-                  <td className="p-3 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={["COMPLETED", "FAILED"].includes(transaction.status)}
-                        >
-                          Update Status
-                          <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {transactionStatuses
-                          .filter((status) => status !== "ALL")
-                          .map((status) => (
-                            <DropdownMenuItem
-                              key={status}
-                              onClick={() => handleUpdateStatus(transaction._id, status)}
-                              disabled={["COMPLETED", "FAILED"].includes(transaction.status)}
-                            >
-                              {status}
-                            </DropdownMenuItem>
-                          ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
+                 
                 </tr>
               ))}
             </tbody>

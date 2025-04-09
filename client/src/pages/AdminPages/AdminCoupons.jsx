@@ -391,16 +391,16 @@ const AdminCoupons = () => {
 
                     {!coupon.isActive ? (
                       <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-green-100 hover:bg-green-200 text-green-700"
-                      onClick={() => {
-                        setSelectedCoupon(coupon);
-                        handleDeleteCoupon()
-                      }}
-                    >
-                      <TicketCheck className="h-4 w-4" />
-                    </Button>
+                        variant="outline"
+                        size="sm"
+                        className="bg-green-100 hover:bg-green-200 text-green-700"
+                        onClick={async () => {
+                          setSelectedCoupon(coupon);
+                          await handleDeleteCoupon(coupon._id); // Pass coupon ID directly
+                        }}
+                      >
+                        <TicketCheck className="h-4 w-4" />
+                      </Button>
                     ) : (
                       <Button
                         variant="outline"

@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import  { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { SellerLayout } from "../components/seller/SellerLayout";
 import ProtectedRoute from "./ProtectedRoutes";

@@ -1,8 +1,7 @@
 import express from "express";
 import { 
+  getAdminBalance,
   getAllTransactions, 
-  updateTransactionStatus, 
-  getTransactionById 
 } from "../controller/transactionsController.js";
 import {  authenticateAdmin, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
@@ -12,10 +11,9 @@ const transactionRouter = express.Router();
 transactionRouter
   .route("/admin")
   .get(authenticateAdmin, authorizeAdmin, getAllTransactions);
-
 transactionRouter
-  .route("/admin/:transactionId")
-  .get(authenticateAdmin, authorizeAdmin,  getTransactionById)
-  .put(authenticateAdmin, authorizeAdmin, updateTransactionStatus);
+  .route("/admin/balance")
+  .get(authenticateAdmin, authorizeAdmin, getAdminBalance);
+
 
 export default transactionRouter;

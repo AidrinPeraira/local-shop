@@ -2,6 +2,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Return from "../models/returnsModel.js";
 import Order from "../models/orderModel.js";
 import Wallet from "../models/walletModel.js";
+import { createRefundTransaction } from "../utils/transactionOperations.js";
 
 export const createUserReturnRequest = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -140,6 +141,9 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
       });
     }
 
+    
+    
+
     // Generate transaction ID for refund
     const timestamp = new Date()
       .toISOString()
@@ -164,6 +168,8 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
     wallet.transactions.push(refundTransaction);
     wallet.balance += returnRequest.returnAmount;
     await wallet.save();
+    const order = await Order.findById(returnRequest.orderId);
+    await createRefundTransaction(order, "RETURN");
   }
   // Update order status if return is approved/rejected
   const order = await Order.findById(returnRequest.orderId);

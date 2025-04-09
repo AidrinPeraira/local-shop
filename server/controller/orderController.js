@@ -7,7 +7,7 @@ import Coupon from "../models/couponModel.js";
 import Wallet from "../models/walletModel.js";
 import { razorpay } from "../utils/razorpay.js";
 import crypto from 'crypto';
-import Transaction from "../models/adminTransactionModel.js";
+import { createOrderTransaction, createRefundTransaction } from "../utils/transactionOperations.js";
 //buyer side controllers
 
 export const createUserOrder = asyncHandler(async (req, res) => {
@@ -187,35 +187,9 @@ export const createUserOrder = asyncHandler(async (req, res) => {
     // 4. Save the order
     await order.save();
 
-    // make transaction
-    const transaction = new Transaction({
-      orderId: order._id,
-      transactionId: `TXN${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
-      type: "ORDER_PAYMENT",
-      amount: finalAmount,
-      platformFee: {
-        buyerFee: cart.summary.platformFee,
-        sellerFee: 0
-      },
-      status: paymentMethod === "ONLINE" 
-        ? (paymentStatus === "COMPLETED" ? "COMPLETED" : "FAILED")
-        : "PENDING",
-      paymentMethod: paymentMethod,
-      from: {
-        entity: userId,
-        type: "BUYER"
-      },
-      to: {
-        entity: "localShop Pvt Ltd", 
-        type: "ADMIN"
-      },
-      scheduledDate: new Date(),
-      processedDate: paymentMethod === "ONLINE" && paymentStatus === "COMPLETED" 
-        ? new Date() 
-        : null
-    });
-
-    await transaction.save();
+    if (order.payment.method === "ONLINE" || order.payment.method === "WALLET") {
+      await createOrderTransaction(order);
+    }
 
     // 5. Clear cart
     const purchasedProductIds = order.items.map(item => item.productId.toString());
@@ -452,28 +426,7 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
 
     
 
-    const refundTransaction = new Transaction({
-      orderId: order._id,
-      transactionId: `REF${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
-      type: "REFUND",
-      amount: order.summary.cartTotal,
-      platformFee: {
-        buyerFee: -order.summary.platformFee, // Negative to indicate refund
-        sellerFee: 0
-      },
-      status: "COMPLETED",
-      paymentMethod: order.payment.method,
-      from: {
-        entity: "localShop Pvt Ltd",
-        type: "ADMIN"
-      },
-      to: {
-        entity: userId,
-        type: "BUYER"
-      },
-      scheduledDate: new Date(),
-      processedDate: null
-    });
+    
 
     if ((order.payment.method === "ONLINE" || order.payment.method === "WALLET") 
       && order.payment.status === "COMPLETED") {
@@ -502,9 +455,9 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
     wallet.balance += order.summary.cartTotal;
     wallet.transactions.push(walletTransaction);
     await wallet.save();
+    await createRefundTransaction(order, "REFUND");
   }
 
-    await refundTransaction.save();
 
     // Restore product stock
     for (const item of order.items) {
@@ -584,6 +537,8 @@ export const returnUserOrders = asyncHandler(async (req, res) => {
     });
 
     await order.save();
+
+    
 
     res.status(200).json({
       success: true,
@@ -807,42 +762,10 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
     await order.save();
 
     if (status === "DELIVERED" && order.payment.method === "COD") {
-      await Transaction.findOneAndUpdate(
-        { orderId: order._id, type: "ORDER_PAYMENT" },
-        { 
-          status: "COMPLETED",
-          processedDate: new Date()
-        }
-      );
+      await createOrderTransaction(order);
     }
 
-    // Handle return completed status
-    if (status === "RETURNED") {
-      const refundTransaction = new Transaction({
-        orderId: order._id,
-        transactionId: `REF${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
-        type: "REFUND",
-        amount: order.summary.cartTotal,
-        platformFee: {
-          buyerFee: -order.summary.platformFee,
-          sellerFee: 0
-        },
-        status: "PROCESSING",
-        paymentMethod: order.payment.method,
-        from: {
-          entity: "localShop Pvt Ltd",
-          type: "ADMIN"
-        },
-        to: {
-          entity: order.user,
-          type: "BUYER"
-        },
-        scheduledDate: new Date(),
-        processedDate: null
-      });
-
-      await refundTransaction.save();
-    }
+    
 
     res.status(200).json({
       success: true,
