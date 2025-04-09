@@ -128,7 +128,7 @@ const AdminPayouts = () => {
           />
         </td>
         <td className="p-3">{payout.vendor.name}</td>
-        <td className="p-3">₹{payout.amount}</td>
+        <td className="p-3">₹{payout.amount.toLocaleString()}</td>
         <td className="p-3">{payout.orderCount}</td>
         <td className="p-3">
           <Badge variant={payout.status === "PENDING" ? "warning" : 
@@ -136,7 +136,20 @@ const AdminPayouts = () => {
             {payout.status}
           </Badge>
         </td>
-        <td className="p-3">{payout.bankDetails}</td>
+        <td className="p-3">
+          <div className="text-sm">
+            <p className="font-medium">{payout.vendor.bankDetails.bankName}</p>
+            <p className="text-gray-600">
+              A/C: {payout.vendor.bankDetails.accountNumber}
+            </p>
+            <p className="text-gray-600">
+              {payout.vendor.bankDetails.accountHolderName}
+            </p>
+            <p className="text-gray-500 text-xs">
+              IFSC: {payout.vendor.bankDetails.ifscCode}
+            </p>
+          </div>
+        </td>
         <td className="p-3">
           <Button
             variant="outline"
@@ -150,7 +163,6 @@ const AdminPayouts = () => {
       </tr>
     ))
   );
-
 
 
   return (

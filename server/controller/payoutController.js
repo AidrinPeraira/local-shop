@@ -6,71 +6,132 @@ import User from "../models/userModel.js";
 
 // Get vendor payouts with filters
 export const getVendorPayouts = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, status, search, dateRange } = req.query;
+  const { page = 1, limit = 10, status = "PENDING", search = "", dateRange = "all" } = req.query;
 
   try {
+    // Build base query for delivered orders
     const query = {
-      type: "VENDOR_PAYOUT",
+      orderStatus: "DELIVERED",
+      "payment.status": "COMPLETED"
     };
 
-    if (status && status !== "ALL") {
-      query.status = status;
-    }
-
-    if (search) {
-      query.$or = [
-        { "to.entity": { $regex: search, $options: "i" } },
-        { transactionId: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    if (dateRange && dateRange !== "all") {
-      const date = new Date();
+    // Add date range filter if specified
+    if (dateRange !== "all") {
+      const today = new Date();
+      let startDate = new Date();
+      
       switch (dateRange) {
-        case "today":
-          date.setHours(0, 0, 0, 0);
-          query.createdAt = { $gte: date };
-          break;
         case "week":
-          date.setDate(date.getDate() - 7);
-          query.createdAt = { $gte: date };
+          startDate.setDate(today.getDate() - 7);
           break;
         case "month":
-          date.setMonth(date.getMonth() - 1);
-          query.createdAt = { $gte: date };
+          startDate.setMonth(today.getMonth() - 1);
+          break;
+        case "year":
+          startDate.setFullYear(today.getFullYear() - 1);
           break;
       }
+      
+      query.createdAt = { $gte: startDate, $lte: today };
     }
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    const total = await Transaction.countDocuments(query);
-
-    const payouts = await Transaction.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit))
-      .populate("to.entity", "sellerName bankDetails")
-      .lean();
-
-    const formattedPayouts = payouts.map(payout => ({
-      _id: payout._id,
-      vendor: {
-        name: payout.to.entity.sellerName,
-        bankDetails: payout.to.entity.bankDetails
+    // Get all delivered orders grouped by seller
+    const orders = await Order.aggregate([
+      { $match: query },
+      { $unwind: "$items" },
+      {
+        $group: {
+          _id: "$items.seller",
+          totalAmount: {
+            $sum: {
+              $subtract: [
+                "$items.productTotal",
+                { 
+                  $multiply: [
+                    "$items.productTotal",
+                    { $divide: ["$summary.couponDiscount", "$summary.subtotalAfterDiscount"] }
+                  ]
+                }
+              ]
+            }
+          },
+          orderCount: { $sum: 1 },
+          orderIds: { $addToSet: "$_id" }
+        }
       },
-      amount: payout.amount,
-      orderCount: payout.metadata?.orderCount || 0,
-      status: payout.status,
-      createdAt: payout.createdAt
+      {
+        $lookup: {
+          from: "sellers",
+          localField: "_id",
+          foreignField: "_id",
+          as: "sellerDetails"
+        }
+      },
+      {
+        $match: search ? {
+          "sellerDetails.sellerName": { $regex: search, $options: "i" }
+        } : {}
+      },
+      {
+        $project: {
+          vendor: {
+            _id: "$_id",
+            name: { $arrayElemAt: ["$sellerDetails.sellerName", 0] },
+            bankDetails: {
+              bankName: { $arrayElemAt: ["$sellerDetails.bankDetails.bankName", 0] },
+              accountNumber: { $arrayElemAt: ["$sellerDetails.bankDetails.accountNumber", 0] },
+              accountHolderName: { $arrayElemAt: ["$sellerDetails.bankDetails.accountHolderName", 0] },
+              ifscCode: { $arrayElemAt: ["$sellerDetails.bankDetails.ifscCode", 0] }
+            }
+          },
+          amount: { $round: ["$totalAmount", 2] },
+          orderCount: 1,
+          orderIds: 1,
+          status: "PENDING"
+        }
+      },
+      {
+        $addFields: {
+          "vendor.bankDetails.formatted": {
+            $concat: [
+              { $arrayElemAt: ["$sellerDetails.bankDetails.bankName", 0] },
+              " - ",
+              { $arrayElemAt: ["$sellerDetails.bankDetails.accountHolderName", 0] },
+              " (", 
+              { $substr: [{ $arrayElemAt: ["$sellerDetails.bankDetails.accountNumber", 0] }, -4, 4] },
+              ")"
+            ]
+          }
+        }
+      }
+    ]);
+
+    // Check for existing transactions to update status
+    const payouts = await Promise.all(orders.map(async (order) => {
+      const existingTransaction = await Transaction.findOne({
+        'from.entity': order.vendor._id,
+        type: "SELLER_PAYOUT",
+      }).sort({ createdAt: -1 });
+
+      return {
+        ...order,
+        status: existingTransaction ? existingTransaction.status : "PENDING"
+      };
     }));
 
-    res.json({
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const paginatedPayouts = payouts.slice(startIndex, startIndex + parseInt(limit));
+    const totalPages = Math.ceil(payouts.length / limit);
+
+    res.status(200).json({
       success: true,
-      payouts: formattedPayouts,
-      total,
-      page: parseInt(page),
-      totalPages: Math.ceil(total / parseInt(limit))
+      payouts: paginatedPayouts,
+      total: payouts.length,
+      totalPages
     });
+
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -80,81 +141,8 @@ export const getVendorPayouts = asyncHandler(async (req, res) => {
   }
 });
 
-// Get buyer refunds with filters
-export const getBuyerRefunds = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, status, search, dateRange } = req.query;
+export const processVendorPayout = asyncHandler(async (req, res) => {
 
-  try {
-    const query = {
-      type: "REFUND",
-    };
+})
 
-    if (status && status !== "ALL") {
-      query.status = status;
-    }
-
-    if (search) {
-      query.$or = [
-        { "to.entity": { $regex: search, $options: "i" } },
-        { orderId: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    if (dateRange && dateRange !== "all") {
-      const date = new Date();
-      switch (dateRange) {
-        case "today":
-          date.setHours(0, 0, 0, 0);
-          query.createdAt = { $gte: date };
-          break;
-        case "week":
-          date.setDate(date.getDate() - 7);
-          query.createdAt = { $gte: date };
-          break;
-        case "month":
-          date.setMonth(date.getMonth() - 1);
-          query.createdAt = { $gte: date };
-          break;
-      }
-    }
-
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    const total = await Transaction.countDocuments(query);
-
-    const refunds = await Transaction.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit))
-      .populate("to.entity", "username")
-      .populate("orderId")
-      .lean();
-
-    const formattedRefunds = refunds.map(refund => ({
-      _id: refund._id,
-      orderId: refund.orderId?.orderId || "N/A",
-      buyer: {
-        name: refund.to.entity.username
-      },
-      amount: refund.amount,
-      reason: refund.metadata?.reason || "Not specified",
-      status: refund.status,
-      paymentMethod: refund.paymentMethod,
-      createdAt: refund.createdAt
-    }));
-
-    res.json({
-      success: true,
-      refunds: formattedRefunds,
-      total,
-      page: parseInt(page),
-      totalPages: Math.ceil(total / parseInt(limit))
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching buyer refunds",
-      error: error.message
-    });
-  }
-});
 

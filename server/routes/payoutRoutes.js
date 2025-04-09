@@ -1,9 +1,9 @@
 import express from "express";
+import { getVendorPayouts } from "../controller/payoutController.js";
 import {
-  getVendorPayouts,
-  getBuyerRefunds,
-} from "../controller/payoutController.js";
-import { authenticateAdmin, authorizeAdmin } from "../middlewares/authMiddleware.js";
+  authenticateAdmin,
+  authorizeAdmin,
+} from "../middlewares/authMiddleware.js";
 
 const payoutRouter = express.Router();
 
@@ -11,11 +11,5 @@ const payoutRouter = express.Router();
 payoutRouter
   .route("/admin/vendor-payouts")
   .get(authenticateAdmin, authorizeAdmin, getVendorPayouts);
-
-payoutRouter
-  .route("/admin/buyer-refunds")
-  .get(authenticateAdmin, authorizeAdmin, getBuyerRefunds);
-
-
 
 export default payoutRouter;
