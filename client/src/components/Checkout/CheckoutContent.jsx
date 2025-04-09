@@ -55,7 +55,6 @@ const CheckoutContent = () => {
   const navigate = useNavigate();
   const cart = useSelector((state) => state.cart.cart);
   const user = useSelector((state) => state.user.user);
-  const dispatch = useDispatch();
   const [availableCoupons, setAvailableCoupons] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);

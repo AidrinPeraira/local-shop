@@ -7,19 +7,19 @@ const sellerTransactionSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    sellerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
     orderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order",
       required: true,
     },
+    seller: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Seller",
+      required: true,
+    },
     type: {
       type: String,
-      enum: ["ORDER_EARNING", "PLATFORM_FEE", "PAYOUT", "REFUND_DEDUCTION"],
+      enum: ["ORDER_SETTLEMENT", "REFUND_DEDUCTION", "PLATFORM_FEE"],
       required: true,
     },
     amount: {
@@ -29,27 +29,33 @@ const sellerTransactionSchema = new mongoose.Schema(
     platformFee: {
       type: Number,
       required: true,
-    },
-    netAmount: {
-      type: Number,
-      required: true,
+      default: 0,
     },
     status: {
       type: String,
-      enum: ["PENDING", "SCHEDULED", "PROCESSING", "COMPLETED", "FAILED"],
+      enum: ["PENDING", "PROCESSING", "COMPLETED", "FAILED"],
       default: "PENDING",
     },
-    payoutDetails: {
-      method: {
-        type: String,
-        enum: ["BANK_TRANSFER", "UPI", "RAZORPAY"],
-      },
-      accountId: String,
-      reference: String,
+    paymentMethod: {
+      type: String,
+      required: true,
     },
-    scheduledDate: Date,
-    processedDate: Date,
-    description: String,
+    bankDetails: {
+      bankName: String,
+      accountNumber: String,
+      ifscCode: String,
+      accountHolderName: String
+    },
+    scheduledDate: {
+      type: Date,
+    },
+    processedDate: {
+      type: Date,
+    },
+    settlementPeriod: {
+      from: Date,
+      to: Date
+    },
     metadata: {
       type: mongoose.Schema.Types.Mixed,
     },
@@ -68,10 +74,16 @@ sellerTransactionSchema.pre("save", async function (next) {
       .split(".")[0]
       .replace("T", "");
     const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
-    this.transactionId = `STXN${timestamp}${randomStr}`;
+    this.transactionId = `SELTXN${timestamp}${randomStr}`;
   }
   next();
 });
+
+// Indexes for better query performance
+sellerTransactionSchema.index({ seller: 1, status: 1 });
+sellerTransactionSchema.index({ transactionId: 1 });
+sellerTransactionSchema.index({ orderId: 1 });
+sellerTransactionSchema.index({ createdAt: 1 });
 
 const SellerTransaction = mongoose.model("SellerTransaction", sellerTransactionSchema);
 

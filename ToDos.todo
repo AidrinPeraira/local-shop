@@ -380,28 +380,23 @@ Week 4:
         
         ☐ Admin Dashboard - Chart with filter(yearly,monthly etc.)
         ☐ Best selling product (top 10)
-        ☐ Best selling category (top 10)
+        ☐ Best selling category (top 10)b
         ☐ Best selling brands (top 10)
         ☐ Generate ledger book (optional)
         
-
-
-
-
-    
 MY TASKS:
     ✔ need a payout option for seller payout @done (3/26/2025, 10:46:09 PM)
     ✔ don't update return stock. might be bad items @done (4/3/2025, 11:23:06 AM)
     ✔ duplicate cart addition @done (4/2/2025, 8:45:53 PM)
     ☐ blocked user log out logic implentation
     ☐ deactivate coupon id error
-    ☐ wallet payment logic
+    ✔ wallet payment logic @done (4/8/2025, 12:22:42 PM)
     ☐ show product details for returns
     ☐ getting returns data needs aggregation pipeline. to show product being returned.
-    ☐ order success and fail navigation error
-    ☐ need to update logic for purchaseing using wallet balance
-    ☐ invoice values not correct
-    ☐ activate exzpired
+    ✔ order success and fail navigation error @done (4/8/2025, 12:19:12 PM)
+    ✔ need to update logic for purchaseing using wallet balance @done (4/8/2025, 12:18:53 PM)
+    ✔ invoice values not correct @done (4/8/2025, 12:18:48 PM)
+    ✔ activate exzpired @done (4/8/2025, 12:18:36 PM)
 
 MAJOR TODO:
     ☐ add neft transactions
