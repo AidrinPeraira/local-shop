@@ -217,7 +217,6 @@ const AdminReturns = () => {
             <thead>
               <tr className="border-b">
                 <th className="text-left p-3 w-10"></th>
-                <th className="text-left p-3">Return ID</th>
                 <th className="text-left p-3">Order ID</th>
                 <th className="text-left p-3">Customer</th>
                 <th className="text-left p-3">Date</th>
@@ -244,7 +243,6 @@ const AdminReturns = () => {
                         )}
                       </Button>
                     </td>
-                    <td className="p-3">{returnRequest.returnId}</td>
                     <td className="p-3">{returnRequest.orderId.orderId}</td>
                     <td className="p-3">{returnRequest.userId.username}</td>
                     <td className="p-3">

@@ -26,7 +26,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
   }
 
   // Find the specific item in the order
-  const orderItem = order.items.find(item => item._id.toString() === itemId);
+  const orderItem = order.items.find((item) => item._id.toString() === itemId);
   if (!orderItem) {
     return res.status(404).json({
       success: false,
@@ -39,20 +39,24 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
     orderId: order._id,
     userId,
     sellerId: orderItem.seller,
-    items: [{
-      productId: orderItem.productId,
-      variantId: orderItem.variants[0].variantId,
-      quantity: orderItem.variants[0].quantity,
-      returnReason,
-      condition: "UNOPENED" // Default condition
-    }],
+    items: [
+      {
+        productId: orderItem.productId,
+        variantId: orderItem.variants[0].variantId,
+        quantity: orderItem.variants[0].quantity,
+        returnReason,
+        condition: "UNOPENED", // Default condition
+      },
+    ],
     returnAmount: orderItem.productTotal,
     pickupAddress: order.shippingAddress,
-    timeline: [{
-      status: "RETURN_REQUESTED",
-      comment: "Return request initiated by user",
-      updatedBy: "USER"
-    }]
+    timeline: [
+      {
+        status: "RETURN_REQUESTED",
+        comment: "Return request initiated by user",
+        updatedBy: "USER",
+      },
+    ],
   });
 
   // Update order status
@@ -60,7 +64,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
     orderItem.returnStatus = {
       status: "RETURN_REQUESTED",
       reason: returnReason,
-      requestDate: new Date()
+      requestDate: new Date(),
     };
     await order.save();
   }
@@ -68,7 +72,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     message: "Return request created successfully",
-    return: returnRequest
+    return: returnRequest,
   });
 });
 
@@ -76,18 +80,18 @@ export const getAllReturnRequests = asyncHandler(async (req, res) => {
   const sellerId = req.user._id;
   const { page = 1, limit = 10, status } = req.query;
 
-  const query = {  };
+  const query = {};
   if (status) {
     query.status = status;
   }
 
-  if(req.user.role == "SELLER"){
+  if (req.user.role == "SELLER") {
     query = { sellerId };
   }
 
   const returns = await Return.find(query)
-    .populate('orderId')
-    .populate('userId')
+    .populate("orderId")
+    .populate("userId")
     .sort({ createdAt: -1 })
     .limit(limit)
     .skip((page - 1) * limit);
@@ -98,7 +102,7 @@ export const getAllReturnRequests = asyncHandler(async (req, res) => {
     success: true,
     returns,
     total,
-    totalPages: Math.ceil(total / limit)
+    totalPages: Math.ceil(total / limit),
   });
 });
 
@@ -110,7 +114,7 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
   if (!returnRequest) {
     return res.status(404).json({
       success: false,
-      message: "Return request not found"
+      message: "Return request not found",
     });
   }
 
@@ -119,7 +123,7 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
   returnRequest.sellerResponse = {
     status: status === "RETURN_APPROVED" ? "APPROVED" : "REJECTED",
     comment,
-    responseDate: new Date()
+    responseDate: new Date(),
   };
 
   // Add timeline entry
@@ -127,22 +131,19 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
     status,
     comment,
     updatedBy: "SELLER",
-    timestamp: new Date()
+    timestamp: new Date(),
   });
 
   if (status === "REFUND_COMPLETED") {
     // Find user's wallet
     let wallet = await Wallet.findOne({ user: returnRequest.userId });
-    
+
     if (!wallet) {
       wallet = await Wallet.create({
         user: returnRequest.userId,
-        balance: 0
+        balance: 0,
       });
     }
-
-    
-    
 
     // Generate transaction ID for refund
     const timestamp = new Date()
@@ -161,7 +162,7 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
       orderId: returnRequest.orderId,
       description: `Refund for return request #${returnRequest._id}`,
       status: "COMPLETED",
-      balance: wallet.balance + returnRequest.returnAmount
+      balance: wallet.balance + returnRequest.returnAmount,
     };
 
     // Add transaction and update wallet balance
@@ -175,20 +176,22 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
   const order = await Order.findById(returnRequest.orderId);
   if (order) {
     const orderItem = order.items.find(
-      item => item._id.toString() === returnRequest.items[0].productId.toString()
+      (item) =>
+        item._id.toString() === returnRequest.items[0].productId.toString()
     );
 
     if (orderItem) {
       // Update the return status of the specific item
       orderItem.returnStatus = {
-        status: status === "RETURN_APPROVED" ? "RETURN_APPROVED" : "RETURN_REJECTED",
+        status:
+          status === "RETURN_APPROVED" ? "RETURN_APPROVED" : "RETURN_REJECTED",
         reason: returnRequest.items[0].returnReason,
         requestDate: returnRequest.createdAt,
         approvalDate: new Date(),
       };
-      
+      order.orderStatus = "RETURNED"
       await order.save();
-  }
+    }
   }
 
   await returnRequest.save();
@@ -196,6 +199,6 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Return request updated successfully",
-    return: returnRequest
+    return: returnRequest,
   });
 });
