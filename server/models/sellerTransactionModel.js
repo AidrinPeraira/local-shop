@@ -5,7 +5,6 @@ const sellerTransactionSchema = new mongoose.Schema(
     transactionId: {
       type: String,
       required: true,
-      unique: true,
     },
     orderId: {
       type: mongoose.Schema.Types.ObjectId,

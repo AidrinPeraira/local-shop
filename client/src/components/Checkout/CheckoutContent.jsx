@@ -68,7 +68,7 @@ const CheckoutContent = () => {
     city: "",
     state: "",
     pincode: "",
-  isDefault: false,
+    isDefault: false,
   });
 
   const [walletBalance, setWalletBalance] = useState(0);
@@ -369,6 +369,40 @@ const CheckoutContent = () => {
           return;
         }
 
+        const walletPaymentResponse = await processWalletPaymentApi({
+          cart,
+          amount,
+          selectedAddressId,
+          couponId: selectedCoupon?._id
+        });
+
+        if (walletPaymentResponse.data.success) {
+          // Create order with completed payment status
+          const orderData = {
+            cart,
+            selectedAddressId,
+            paymentMethod: "WALLET",
+            userProfile,
+            couponId: selectedCoupon?._id,
+            paymentStatus: "COMPLETED",
+            transactionId: walletPaymentResponse.data.transactionId
+          };
+      
+          const response = await createOrderApi(orderData);
+          setOrderId(response.data.order.orderId);
+          setOrderSuccess("success");
+      
+          // Update wallet balance
+          setWalletBalance(walletPaymentResponse.data.remainingBalance);
+        } else {
+          toast({
+            title: "Error",
+            description: "Wallet payment failed",
+            variant: "destructive",
+          });
+        }
+      
+
         const orderData = {
           cart,
           selectedAddressId,
@@ -377,32 +411,9 @@ const CheckoutContent = () => {
           couponId: selectedCoupon?._id,
           paymentStatus: "PENDING",
         };
+       
+
         
-        const orderResponse = await createOrderApi(orderData);
-        const orderId = orderResponse.data.order.orderId;
-        
-        // Then process wallet payment with orderId
-        const walletPaymentResponse = await processWalletPaymentApi({
-          orderId,
-          customOrderId :  orderResponse.data.order.customOrderId,
-          amount: amount,
-        });
-        
-        if (walletPaymentResponse.data.success) {
-          // Update order status to completed
-          const updateOrderData = {
-            ...orderData,
-            paymentStatus: "COMPLETED",
-            transactionId: walletPaymentResponse.data.transactionId,
-          };
-        
-          const response = await createOrderApi(updateOrderData);
-          setOrderId(response.data.order.orderId);
-          setOrderSuccess("success");
-        
-          // Update wallet balance
-          setWalletBalance(walletPaymentResponse.data.remainingBalance);
-        }
       } else {
         //for cod
         const orderData = {
@@ -745,7 +756,6 @@ const CheckoutContent = () => {
                       )}
                     </Label>
                   </div>
-
                 </RadioGroup>
               </CardContent>
             </Card>

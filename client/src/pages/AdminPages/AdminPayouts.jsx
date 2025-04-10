@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -24,23 +24,31 @@ import {
   Filter,
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
-import { 
-    getVendorPayoutsApi, 
-    processVendorPayoutApi,
-  } from "../../api/payoutApi";
+import {
+  getVendorPayoutsApi,
+  processVendorPayoutApi,
+} from "../../api/payoutApi";
 
 const AdminPayouts = () => {
   // States for vendor payouts
   const [vendorPayouts, setVendorPayouts] = useState([]);
-  const [selectedVendors, setSelectedVendors] = useState([]);
   const [vendorFilter, setVendorFilter] = useState({
     status: "PENDING",
     dateRange: "all",
     search: "",
-    page: 1
+    page: 1,
   });
+  
 
+  
 
+  // Add date range options
+  const dateRangeOptions = [
+    { label: "All Time", value: "all" },
+    { label: "Last Week", value: "week" },
+    { label: "Last Month", value: "month" },
+    { label: "Last Year", value: "year" },
+  ];
 
   const { toast } = useToast();
 
@@ -56,11 +64,11 @@ const AdminPayouts = () => {
         limit: 10,
         status: vendorFilter.status,
         search: vendorFilter.search,
-        dateRange: vendorFilter.dateRange
+        dateRange: vendorFilter.dateRange,
       };
 
       const { data } = await getVendorPayoutsApi(params);
-      
+
       if (data.success) {
         setVendorPayouts(data.payouts);
         setVendorTotalPages(data.totalPages);
@@ -78,61 +86,49 @@ const AdminPayouts = () => {
     }
   };
 
-
-
-  // Process vendor payouts
-  const processVendorPayouts = async () => {
+  // Process single vendor payout
+  const processSinglePayout = async (orderId, sellerId) => {
     try {
-      const { data } = await processVendorPayoutApi(selectedVendors);
-      
+      const { data } = await processVendorPayoutApi({ orderId, sellerId });
+
       if (data.success) {
         toast({
           title: "Success",
-          description: "Vendor payouts processed successfully",
+          description: "Vendor payout processed successfully",
         });
         fetchVendorPayouts(); // Refresh the list
-        setSelectedVendors([]); // Clear selection
       } else {
         throw new Error(data.message);
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to process vendor payouts",
+        description: error.message || "Failed to process vendor payout",
         variant: "destructive",
       });
     }
   };
 
- 
-
   useEffect(() => {
     fetchVendorPayouts();
   }, [vendorFilter]);
 
-
-  const renderVendorRows = () => (
+  const renderVendorRows = () =>
     vendorPayouts.map((payout) => (
       <tr key={payout._id} className="border-b hover:bg-gray-50">
-        <td className="p-3">
-          <input
-            type="checkbox"
-            checked={selectedVendors.includes(payout._id)}
-            onChange={(e) => {
-              if (e.target.checked) {
-                setSelectedVendors([...selectedVendors, payout._id]);
-              } else {
-                setSelectedVendors(selectedVendors.filter(id => id !== payout._id));
-              }
-            }}
-          />
-        </td>
         <td className="p-3">{payout.vendor.name}</td>
         <td className="p-3">₹{payout.amount.toLocaleString()}</td>
-        <td className="p-3">{payout.orderCount}</td>
+        <td className="p-3">{payout.orderId}</td>
         <td className="p-3">
-          <Badge variant={payout.status === "PENDING" ? "warning" : 
-                         payout.status === "PROCESSING" ? "info" : "success"}>
+          <Badge
+            variant={
+              payout.status === "PENDING"
+                ? "warning"
+                : payout.status === "PROCESSING"
+                ? "info"
+                : "success"
+            }
+          >
             {payout.status}
           </Badge>
         </td>
@@ -155,15 +151,13 @@ const AdminPayouts = () => {
             variant="outline"
             size="sm"
             disabled={payout.status === "COMPLETED"}
-            onClick={() => handleProcessSinglePayout(payout._id)}
+            onClick={() => processSinglePayout(payout._id, payout.vendor._id)}
           >
             Process
           </Button>
         </td>
       </tr>
-    ))
-  );
-
+    ));
 
   return (
     <div className="space-y-6">
@@ -172,6 +166,7 @@ const AdminPayouts = () => {
       <Card className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex gap-4">
+            {/* Status Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
@@ -180,32 +175,73 @@ const AdminPayouts = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setVendorFilter({ ...vendorFilter, status: "PENDING" })}>
-                  Pending
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setVendorFilter({ ...vendorFilter, status: "PROCESSING" })}>
-                  Processing
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setVendorFilter({ ...vendorFilter, status: "COMPLETED" })}>
-                  Completed
-                </DropdownMenuItem>
+                {["PENDING", "PROCESSING", "COMPLETED"].map((status) => (
+                  <DropdownMenuItem
+                    key={status}
+                    onClick={() =>
+                      setVendorFilter({ ...vendorFilter, status, page: 1 })
+                    }
+                  >
+                    {status}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Input
-              placeholder="Search vendor..."
-              value={vendorFilter.search}
-              onChange={(e) => setVendorFilter({ ...vendorFilter, search: e.target.value })}
-              className="w-64"
-            />
-          </div>
+            {/* Date Range Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Date:{" "}
+                  {
+                    dateRangeOptions.find(
+                      (opt) => opt.value === vendorFilter.dateRange
+                    )?.label
+                  }
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {dateRangeOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() =>
+                      setVendorFilter({
+                        ...vendorFilter,
+                        dateRange: option.value,
+                        page: 1,
+                      })
+                    }
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <Button
-            onClick={processVendorPayouts}
-            disabled={selectedVendors.length === 0}
-          >
-            Process Selected Payouts
-          </Button>
+            {/* Search Input */}
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Search vendor..."
+                value={vendorFilter.search}
+                onChange={(e) => {
+                  setVendorFilter({
+                    ...vendorFilter,
+                    search: e.target.value,
+                    page: 1, // Reset page when searching
+                  });
+                }}
+                className="w-64"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setVendorFilter({ ...vendorFilter, search: "" })}
+              >
+                Clear
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Vendor Payouts Table */}
@@ -213,30 +249,47 @@ const AdminPayouts = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left p-3">
-                  <input
-                    type="checkbox"
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedVendors(vendorPayouts.map(p => p.id));
-                      } else {
-                        setSelectedVendors([]);
-                      }
-                    }}
-                  />
-                </th>
+                {/* Removed checkbox column */}
                 <th className="text-left p-3">Vendor</th>
                 <th className="text-left p-3">Amount</th>
-                <th className="text-left p-3">Orders</th>
+                <th className="text-left p-3">Order ID</th>
                 <th className="text-left p-3">Status</th>
                 <th className="text-left p-3">Bank Details</th>
                 <th className="text-left p-3">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {renderVendorRows()}
-            </tbody>
+            <tbody>{renderVendorRows()}</tbody>
           </table>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {vendorPayouts.length} results
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={vendorFilter.page === 1}
+              onClick={() =>
+                setVendorFilter((prev) => ({ ...prev, page: prev.page - 1 }))
+              }
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={vendorFilter.page === vendorTotalPages}
+              onClick={() =>
+                setVendorFilter((prev) => ({ ...prev, page: prev.page + 1 }))
+              }
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </Card>
     </div>

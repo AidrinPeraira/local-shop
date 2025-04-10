@@ -331,9 +331,9 @@ Pendings:
     ✔ Invoice amount mismatch @done (4/7/2025, 9:54:52 AM)
     ✔ Order success/failere not redirecting to the order details page @done (4/7/2025, 4:39:16 PM)
     ✔ Coupon validation - if it's expired coupon update the expired with new values @done (4/7/2025, 4:46:06 PM)
-    ☐ In case of canceled orders, refund the amount directly.
+    ✔ In case of canceled orders, refund the amount directly. @done (4/10/2025, 12:03:18 PM)
     ☐ Sales report(Daily, Weekly, Yearly, Custom date)
-    ☐ Generate sales report
+    ✔ Generate sales report @done (4/10/2025, 12:03:21 PM)
     ☐ Should be able to filter based on
     ☐ Custom date range
     ☐ 1 Day / week / month
@@ -359,8 +359,8 @@ Pendings:
 Week 4:
 
     User side :
-        ☐ Order above Rs 1000 should not be allowed for COD.
-        ☐ Delivery charge can be applied according to location / fixed charges (optional)
+        ✔ Order above Rs 1000 should not be allowed for COD. @done (4/10/2025, 12:02:42 PM)
+        ✔ Delivery charge can be applied according to location / fixed charges (optional) @done (4/10/2025, 12:02:44 PM)
     Admin side :
         ☐ Wallet Management.
         ☐ Implement wallet management

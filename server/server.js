@@ -122,7 +122,7 @@ app.use('/api/orders', orderRouter)
 app.use('/api/return', returnRouter)
 app.use('/api/coupons', couponRouter)
 app.use('/api/transactions', transactionRouter)
-app.use('/api/transactions', payoutRouter)
+app.use('/api/payouts', payoutRouter)
 app.use('/api/admin', dashboardRouter);
 app.use('/api/wallet', walletRouter);
 

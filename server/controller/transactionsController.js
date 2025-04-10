@@ -151,6 +151,18 @@ export const getAdminBalance = asyncHandler(async (req, res) => {
         case "SELLER_PAYOUT":
           balance -= transaction.amount;
           breakdown.sellerPayouts += transaction.amount;
+          if (transaction.platformFee) {
+            if (transaction.platformFee.buyerFee) {
+              balance += transaction.platformFee.buyerFee;
+              totalPlatformFees += transaction.platformFee.buyerFee;
+              breakdown.platformFees.fromBuyers += transaction.platformFee.buyerFee;
+            }
+            if (transaction.platformFee.sellerFee) {
+              balance += transaction.platformFee.sellerFee;
+              totalPlatformFees += transaction.platformFee.sellerFee;
+              breakdown.platformFees.fromSellers += transaction.platformFee.sellerFee;
+            }
+          }
           break;
 
         case "REFUND":
