@@ -1,45 +1,74 @@
-✔ Add querry params when navigating to the shop and product page @done (3/13/2025, 10:34:07 AM)
-✘ make the dashboard side nav autoclose for responsiveness @cancelled (3/21/2025, 12:02:25 PM)
-✘ after verifying email. set the verification status to global state in redux @cancelled (2/21/2025, 4:05:22 PM)
-✔ add a count for the number of invalid otp attempts @done (3/13/2025, 10:34:23 AM)
-✔ check if otp doc is being deleted form mongodb collection @done (2/21/2025, 4:05:07 PM)
-✘ check if timer is clearing otp @cancelled (3/21/2025, 12:02:30 PM)
-✘ add cart and wishlist to global state on signup or login @cancelled (3/21/2025, 12:05:34 PM)
-✔ when buyer registers there is a small delay before showing the model for email verification @done (3/13/2025, 10:34:35 AM)
-✔ need to re arrange seller registration to give it a proper structure @done (3/13/2025, 10:34:43 AM)
-✔ how do we use the remember me function? @done (3/13/2025, 10:36:10 AM)
-✔ lazy loading not working @done (3/2/2025, 7:12:43 PM)
-✔ make a profile page for user @done (3/19/2025, 2:31:31 PM)
-✔ small bug on nav bar pop ups - pop ups not closing on outside click @done (3/19/2025, 2:31:29 PM)
-✔ need to add small preview for wishlist and cart @done (2/27/2025, 6:57:32 PM)
-✔ should we add phone number login or phone/email login @done (3/13/2025, 10:35:06 AM)
-✔ should we make the profile and other dropdowns a seperate component? do this for normal user homwpage @done (3/13/2025, 10:36:43 AM)
-✔ should we add a field to record the details of the user who updated the category ot other fields? @done (3/13/2025, 10:36:47 AM)
-✔ make some components reusab @done (3/13/2025, 10:36:49 AM)
-✔ block access to blocked users @done (3/13/2025, 10:42:18 AM)
-✔ make blocking parent category block all child category?? @done (3/19/2025, 2:31:51 PM)
-✔ category page edit and delte button not responsive @done (3/21/2025, 12:05:44 PM)
-✘ how do we cache pages to optimise loding times and reduce the number of requests? @cancelled (3/21/2025, 12:05:53 PM)
-✘ do we cache it in the browser or where? @cancelled (3/21/2025, 12:05:57 PM)
-✔ should we do pagination form backend or front end when using react @done (3/21/2025, 12:06:03 PM)
-✘ how do i verify the varients submitted by the user @cancelled (3/21/2025, 12:06:08 PM)
-✔ back to ligin restriction @done (3/13/2025, 10:33:56 AM)
-✘ add use memo for pages @cancelled (3/21/2025, 12:06:23 PM)
-✔ check for bugs  in delete / deactivate category by admin @done (3/23/2025, 11:19:43 AM)
-✔ add rensend otp function and email @done (3/13/2025, 10:42:42 AM)
-✘ add pagination from backend for categories @cancelled (3/23/2025, 11:25:58 AM)
-    //catgegories have only very limited data. Front end handling is better. reduced querries to backend. seems more efficient
-✔ the logout is causing a rendering bug when logging out from admin and seller dash. Check for other pages also @done (3/13/2025, 10:42:51 AM)
-✔ the prevent accessing page causees a bug, after loggin in as seller try changing the path to try and acess the login page and then logging out @done (3/21/2025, 12:07:24 PM)
-✘ PRON?? @cancelled (3/21/2025, 12:07:29 PM)
-✘ can we use querryClient from tanstack query or something else to reduce api calls @cancelled (3/13/2025, 10:43:22 AM)
+MY TASKS:
+    ✔ Add querry params when navigating to the shop and product page @done (3/13/2025, 10:34:07 AM)
+    ✘ make the dashboard side nav autoclose for responsiveness @cancelled (3/21/2025, 12:02:25 PM)
+    ✘ after verifying email. set the verification status to global state in redux @cancelled (2/21/2025, 4:05:22 PM)
+    ✔ add a count for the number of invalid otp attempts @done (3/13/2025, 10:34:23 AM)
+    ✔ check if otp doc is being deleted form mongodb collection @done (2/21/2025, 4:05:07 PM)
+    ✘ check if timer is clearing otp @cancelled (3/21/2025, 12:02:30 PM)
+    ✘ add cart and wishlist to global state on signup or login @cancelled (3/21/2025, 12:05:34 PM)
+    ✔ when buyer registers there is a small delay before showing the model for email verification @done (3/13/2025, 10:34:35 AM)
+    ✔ need to re arrange seller registration to give it a proper structure @done (3/13/2025, 10:34:43 AM)
+    ✔ how do we use the remember me function? @done (3/13/2025, 10:36:10 AM)
+    ✔ lazy loading not working @done (3/2/2025, 7:12:43 PM)
+    ✔ make a profile page for user @done (3/19/2025, 2:31:31 PM)
+    ✔ small bug on nav bar pop ups - pop ups not closing on outside click @done (3/19/2025, 2:31:29 PM)
+    ✔ need to add small preview for wishlist and cart @done (2/27/2025, 6:57:32 PM)
+    ✔ should we add phone number login or phone/email login @done (3/13/2025, 10:35:06 AM)
+    ✔ should we make the profile and other dropdowns a seperate component? do this for normal user homwpage @done (3/13/2025, 10:36:43 AM)
+    ✔ should we add a field to record the details of the user who updated the category ot other fields? @done (3/13/2025, 10:36:47 AM)
+    ✔ make some components reusab @done (3/13/2025, 10:36:49 AM)
+    ✔ block access to blocked users @done (3/13/2025, 10:42:18 AM)
+    ✔ make blocking parent category block all child category?? @done (3/19/2025, 2:31:51 PM)
+    ✔ category page edit and delte button not responsive @done (3/21/2025, 12:05:44 PM)
+    ✘ how do we cache pages to optimise loding times and reduce the number of requests? @cancelled (3/21/2025, 12:05:53 PM)
+    ✘ do we cache it in the browser or where? @cancelled (3/21/2025, 12:05:57 PM)
+    ✔ should we do pagination form backend or front end when using react @done (3/21/2025, 12:06:03 PM)
+    ✘ how do i verify the varients submitted by the user @cancelled (3/21/2025, 12:06:08 PM)
+    ✔ back to ligin restriction @done (3/13/2025, 10:33:56 AM)
+    ✘ add use memo for pages @cancelled (3/21/2025, 12:06:23 PM)
+    ✔ check for bugs  in delete / deactivate category by admin @done (3/23/2025, 11:19:43 AM)
+    ✔ add rensend otp function and email @done (3/13/2025, 10:42:42 AM)
+    ✔ add pagination from backend for categories @done (4/10/2025, 10:57:40 PM)
+    ✔ blocked category??? @done (3/23/2025, 11:19:48 AM)
+    ✔ varaints are not showing when trying to edit product @done (3/23/2025, 11:29:03 AM)
+    ✔ need to add unit for existing products @done (3/23/2025, 11:23:47 AM)
+    ✔ the otp keeps being sent when the user enters incorrecct data. button is deactivated @done (3/23/2025, 7:54:45 PM)
+    ✔ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store @done (3/29/2025, 11:41:26 AM)
+    ✔ the logout is causing a rendering bug when logging out from admin and seller dash. Check for other pages also @done (3/13/2025, 10:42:51 AM)
+    ✔ the prevent accessing page causees a bug, after loggin in as seller try changing the path to try and acess the login page and then logging out @done (3/21/2025, 12:07:24 PM)
+    ✘ PRON?? @cancelled (3/21/2025, 12:07:29 PM)
+    ✘ can we use querryClient from tanstack query or something else to reduce api calls @cancelled (3/13/2025, 10:43:22 AM)
+    ✔ need a payout option for seller payout @done (3/26/2025, 10:46:09 PM)
+    ✔ don't update return stock. might be bad items @done (4/3/2025, 11:23:06 AM)
+    ✔ duplicate cart addition @done (4/2/2025, 8:45:53 PM)
+    ☐ blocked user log out logic implentation
+    ☐ deactivate coupon id error
+    ✔ wallet payment logic @done (4/8/2025, 12:22:42 PM)
+    ☐ show product details for returns
+    ☐ getting returns data needs aggregation pipeline. to show product being returned.
+    ✔ order success and fail navigation error @done (4/8/2025, 12:19:12 PM)
+    ✔ need to update logic for purchaseing using wallet balance @done (4/8/2025, 12:18:53 PM)
+    ✔ invoice values not correct @done (4/8/2025, 12:18:48 PM)
+    ✔ activate exzpired @done (4/8/2025, 12:18:36 PM)
+    ✔ platform fee collected from user should be deducted before showing the seller the order details. @done (4/10/2025, 10:55:22 PM)
+    ✔ seller must be charged an amount per order by the admin. will be deducted during seller payout @done (4/10/2025, 10:55:25 PM)
+    ✔ returning order with items from multiple sellers? @done (4/10/2025, 10:55:28 PM)
+    ✔ buy now feature not updating the discounts @done (4/10/2025, 10:55:33 PM)
+    ☐ need to show units wherever necessary
+        ☐ - orders
+        ✔ - products @done (3/26/2025, 10:44:01 PM)
+        ☐ - cart
+        ☐ - summmary
+    ✘ want to make the seller specify shipping prices @cancelled (3/26/2025, 10:44:15 PM)
+    ✔ need to make the invoice more aesthetic and detailed @done (4/10/2025, 10:55:40 PM)
+
+MAJOR TODO:
+    ☐ add neft transactions
+    ☐ add razorpayx for payouts
+    ✔ handle order cancel delte by preveetning one order with multiple sellers @done (4/3/2025, 12:18:31 PM)
 
 
-✔ blocked category??? @done (3/23/2025, 11:19:48 AM)
-✔ varaints are not showing when trying to edit product @done (3/23/2025, 11:29:03 AM)
-✔ need to add unit for existing products @done (3/23/2025, 11:23:47 AM)
-✔ the otp keeps being sent when the user enters incorrecct data. button is deactivated @done (3/23/2025, 7:54:45 PM)
-✔ there is a smll bug when checking out a pop shows about empty cart. need to fix. caused by clearing the store @done (3/29/2025, 11:41:26 AM)
+
 
 
 Assigned Pendings:
@@ -60,8 +89,8 @@ Assigned Pendings:
     ✔ SHOW MORE DETAILED ORDERS PAGE DATE ADRESS ETC @done (3/30/2025, 10:37:38 AM)
 
     ✔ Give choose option in signing for seller and buyer @done (3/25/2025, 6:40:20 PM)
-    ☐ Seller signup validation - recheck
-    ☐ Same cat can be added multiple times in signup
+    ✔ Seller signup validation - recheck @done (4/10/2025, 10:58:16 PM)
+    ✔ Same cat can be added multiple times in signup @done (4/10/2025, 10:58:18 PM)
     ✔ Blocking users and sellers @done (3/25/2025, 8:34:24 PM)
     ✔ Add category not working @done (3/26/2025, 10:45:29 PM)
     ✔ Pagination handle in backend @done (3/25/2025, 8:34:30 PM)
@@ -98,7 +127,7 @@ Admin side :
         //image cropping done by cloudnary settingsd in multer
 
 User side :
-☐ Home page
+✔ Home page @done (4/10/2025, 10:58:22 PM)
     ✔ Users sign up & login with validation. @done (3/2/2025, 4:03:37 PM)
     ✔ Sign up using OTP with OTP timer and Resend Otp @done (3/10/2025, 4:02:57 PM)
     ✔ Login or signup with single sign on (google , facebook …) @done (3/10/2025, 4:02:53 PM)
@@ -132,18 +161,18 @@ Additional Note:
 
 Product Details Page:
     ✔ Product details view on the user side with image zoom. @done (3/14/2025, 9:35:21 AM)
-    ☐ Product detailed page should contain following
+    ✔ Product detailed page should contain following @done (4/10/2025, 10:58:43 PM)
         ✔ Breadcrumbs @done (3/14/2025, 9:35:04 AM)
-        ☐ Ratings
+        ✘ Ratings @cancelled (4/10/2025, 10:58:41 PM)
         ✔ Price @done (3/14/2025, 9:35:11 AM)
         ✔ Discounts or coupons applied @done (3/6/2025, 3:17:57 PM)
             //no discount coupons. discounted price is shown based on the quantity of itmes
-        ☐ Reviews
+        ✘ Reviews @cancelled (4/10/2025, 10:58:36 PM)
         ✔ Stock @done (3/14/2025, 9:35:13 AM)
     ✔ Proper error handles Sold out / unavailable  and  out of stock EXAMPLE @done (3/26/2025, 10:46:45 PM)
     ✔ Highlights / specs of product @done (3/14/2025, 2:29:47 PM)
     ✔ Related product recommendations @done (3/14/2025, 2:29:49 PM)
-    ☐ Redirect users to product listing page,  if 
+    ✔ Redirect users to product listing page,  if @done (4/10/2025, 10:58:47 PM)
         ✔ the product is blocked or @done (3/14/2025, 2:43:31 PM)
         ✔ unavailable on refresh or on other actions (example: onclick of a addtocart Button) @done (3/14/2025, 2:56:32 PM)
         ✔ User profile(Show user details, show address, show orders, edit profile, cancel orders, forgot password). @done (3/21/2025, 9:21:16 AM)
@@ -344,17 +373,7 @@ Pendings:
     ✔ Learn about cron jobs (suggestion) @done (4/5/2025, 10:23:49 AM)
         //added crone job for coupon deactivation in addition to the existing logic
 
-    ☐ platform fee collected from user should be deducted before showing the seller the order details.
-    ☐ seller must be charged an amount per order by the admin. will be deducted during seller payout
-    ☐ returning order with items from multiple sellers?
-    ☐ buy now feature not updating the discounts
-    ☐ need to show units wherever necessary
-        ☐ - orders
-        ✔ - products @done (3/26/2025, 10:44:01 PM)
-        ☐ - cart
-        ☐ - summmary
-    ✘ want to make the seller specify shipping prices @cancelled (3/26/2025, 10:44:15 PM)
-    ☐ need to make the invoice more aesthetic and detailed
+    
     
 Week 4:
 
@@ -384,21 +403,3 @@ Week 4:
         ☐ Best selling brands (top 10)
         ☐ Generate ledger book (optional)
         
-MY TASKS:
-    ✔ need a payout option for seller payout @done (3/26/2025, 10:46:09 PM)
-    ✔ don't update return stock. might be bad items @done (4/3/2025, 11:23:06 AM)
-    ✔ duplicate cart addition @done (4/2/2025, 8:45:53 PM)
-    ☐ blocked user log out logic implentation
-    ☐ deactivate coupon id error
-    ✔ wallet payment logic @done (4/8/2025, 12:22:42 PM)
-    ☐ show product details for returns
-    ☐ getting returns data needs aggregation pipeline. to show product being returned.
-    ✔ order success and fail navigation error @done (4/8/2025, 12:19:12 PM)
-    ✔ need to update logic for purchaseing using wallet balance @done (4/8/2025, 12:18:53 PM)
-    ✔ invoice values not correct @done (4/8/2025, 12:18:48 PM)
-    ✔ activate exzpired @done (4/8/2025, 12:18:36 PM)
-
-MAJOR TODO:
-    ☐ add neft transactions
-    ☐ add razorpayx for payouts
-    ✔ handle order cancel delte by preveetning one order with multiple sellers @done (4/3/2025, 12:18:31 PM)
