@@ -71,7 +71,7 @@ export const createRefundTransaction = async (order, type = "REFUND") => {
       type: "REFUND",
       amount: order.summary.cartTotal,
       platformFee: {
-        buyerFee: 0,
+        buyerFee: 1000,
         sellerFee: 0,
       },
       status: "COMPLETED",
