@@ -30,6 +30,7 @@ import payoutRouter from './routes/payoutRoutes.js';
 import dashboardRouter from './routes/dashboardRoutes.js';
 import returnRouter from './routes/returnRoutes.js';
 import walletRouter from './routes/walletRoutes.js';
+import salesRouter from './routes/salesRoutes.js';
 
 
 dotenv.config() //load dot env data into 'process.env' by default
@@ -125,6 +126,7 @@ app.use('/api/transactions', transactionRouter)
 app.use('/api/payouts', payoutRouter)
 app.use('/api/admin', dashboardRouter);
 app.use('/api/wallet', walletRouter);
+app.use('/api/sales', salesRouter);
 
 
 

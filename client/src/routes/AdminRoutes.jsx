@@ -26,6 +26,7 @@ const AdminTransactions = LazyComponent(lazy(() => import("../pages/AdminPages/A
 const AdminPayouts = LazyComponent(lazy(() => import("../pages/AdminPages/AdminPayouts")));
 const AdminWallets = LazyComponent(lazy(() => import("../pages/AdminPages/AdminWallets")));
 const AdminReturns = LazyComponent(lazy(() => import("../pages/AdminPages/AdminReturns")));
+const AdminSales = LazyComponent(lazy(() => import("../pages/AdminPages/AdminSales")));
 
 const AdminRoutes = () => {
   return (
@@ -35,6 +36,7 @@ const AdminRoutes = () => {
         <Route path="/" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="sales" element={<AdminSales />} />
           <Route path="sellers" element={<AdminSellers />} />
           <Route path="categories" element={<Categories />} />
           <Route path="products" element={<AdminProductsPage />} />

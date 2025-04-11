@@ -362,7 +362,7 @@ Pendings:
     ✔ Coupon validation - if it's expired coupon update the expired with new values @done (4/7/2025, 4:46:06 PM)
     ✔ In case of canceled orders, refund the amount directly. @done (4/10/2025, 12:03:18 PM)
     ☐ Sales report(Daily, Weekly, Yearly, Custom date)
-    ✔ Generate sales report @done (4/10/2025, 12:03:21 PM)
+    ☐ Generate sales report
     ☐ Should be able to filter based on
     ☐ Custom date range
     ☐ 1 Day / week / month
@@ -373,7 +373,6 @@ Pendings:
     ✔ Learn about cron jobs (suggestion) @done (4/5/2025, 10:23:49 AM)
         //added crone job for coupon deactivation in addition to the existing logic
 
-    
     
 Week 4:
 
@@ -397,9 +396,9 @@ Week 4:
             If the transaction is due to a returned or canceled product, include a button to navigate to the specific order detail page.
         
         
-        ☐ Admin Dashboard - Chart with filter(yearly,monthly etc.)
-        ☐ Best selling product (top 10)
-        ☐ Best selling category (top 10)b
-        ☐ Best selling brands (top 10)
-        ☐ Generate ledger book (optional)
+        ✔ Admin Dashboard - Chart with filter(yearly,monthly etc.) @done (4/11/2025, 10:37:53 AM)
+        ✔ Best selling product (top 10) @done (4/11/2025, 10:37:55 AM)
+        ✔ Best selling category (top 10) @done (4/11/2025, 10:37:55 AM)
+        ✘ Best selling brands (top 10) @cancelled (4/11/2025, 10:37:36 AM)
+        ✔ Generate ledger book (optional) @done (4/11/2025, 10:37:47 AM)
         

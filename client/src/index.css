@@ -35,7 +35,8 @@
     @apply border-border;
   }
   body {
-    @apply select-none focus:outline-none;  
+    /* @apply select-none focus:outline-none;   */
+    @apply  focus:outline-none;  
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
   }

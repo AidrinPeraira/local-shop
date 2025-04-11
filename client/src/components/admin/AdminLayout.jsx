@@ -14,7 +14,8 @@ import {
   Landmark,
   Handshake,
   ArrowLeftFromLine,
-  Wallet
+  Wallet,
+  Sailboat
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useToast } from "../hooks/use-toast";
@@ -52,6 +53,7 @@ export function AdminLayout() {
 
   const navigation = [
     { name: "Dashboard", icon: BarChart3, href: "/admin" },
+    { name: "Sales", icon: Sailboat, href: "/admin/sales" },
     { name: "Categories", icon: Box, href: "/admin/categories" },
     { name: "Users", icon: Users, href: "/admin/users" },
     { name: "Sellers", icon: Store, href: "/admin/sellers" },
