@@ -388,11 +388,11 @@ Week 4:
             ✔ User @done (4/11/2025, 9:53:01 AM)
             ✔ Transaction Type @done (4/11/2025, 9:53:01 AM)
             ✔ Amount @done (4/11/2025, 9:53:02 AM)
-        ☐ Provide a detailed view for each transaction with the following information
-            ☐ User Details
-            ☐ Transaction ID
-            ☐ Transaction Date
-            ☐ Transaction Type
+        ✔ Provide a detailed view for each transaction with the following information @done (4/11/2025, 10:26:46 AM)
+            ✔ User Details @done (4/11/2025, 10:26:46 AM)
+            ✔ Transaction ID @done (4/11/2025, 10:26:47 AM)
+            ✔ Transaction Date @done (4/11/2025, 10:26:48 AM)
+            ✔ Transaction Type @done (4/11/2025, 10:26:48 AM)
         Source of the Transaction:
             If the transaction is due to a returned or canceled product, include a button to navigate to the specific order detail page.
         

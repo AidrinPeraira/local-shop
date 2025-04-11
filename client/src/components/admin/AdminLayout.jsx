@@ -51,7 +51,7 @@ export function AdminLayout() {
   }, [dispatch, navigate]);
 
   const navigation = [
-    { name: "Sales Overview", icon: BarChart3, href: "/admin" },
+    { name: "Dashboard", icon: BarChart3, href: "/admin" },
     { name: "Categories", icon: Box, href: "/admin/categories" },
     { name: "Users", icon: Users, href: "/admin/users" },
     { name: "Sellers", icon: Store, href: "/admin/sellers" },

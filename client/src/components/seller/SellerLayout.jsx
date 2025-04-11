@@ -22,7 +22,7 @@ export function SellerLayout() {
 
 
   const navigation = [
-    { name: "Sales Overview", icon: BarChart3, href: "/seller" },
+    { name: "Dashboard", icon: BarChart3, href: "/seller" },
     { name: "Products", icon: Package, href: "/seller/products" },
     { name: "Orders", icon: ShoppingBag, href: "/seller/orders" },
     { name: "Returns", icon: ArrowLeftFromLine, href: "/seller/returns" },
