@@ -381,13 +381,13 @@ Week 4:
         ✔ Order above Rs 1000 should not be allowed for COD. @done (4/10/2025, 12:02:42 PM)
         ✔ Delivery charge can be applied according to location / fixed charges (optional) @done (4/10/2025, 12:02:44 PM)
     Admin side :
-        ☐ Wallet Management.
-        ☐ Implement wallet management
-            ☐ Transaction ID
-            ☐ Transaction Date
-            ☐ User
-            ☐ Transaction Type
-            ☐ Amount
+        ✔ Wallet Management. @done (4/11/2025, 9:52:57 AM)
+        ✔ Implement wallet management @done (4/11/2025, 9:52:58 AM)
+            ✔ Transaction ID @done (4/11/2025, 9:52:59 AM)
+            ✔ Transaction Date @done (4/11/2025, 9:52:59 AM)
+            ✔ User @done (4/11/2025, 9:53:01 AM)
+            ✔ Transaction Type @done (4/11/2025, 9:53:01 AM)
+            ✔ Amount @done (4/11/2025, 9:53:02 AM)
         ☐ Provide a detailed view for each transaction with the following information
             ☐ User Details
             ☐ Transaction ID

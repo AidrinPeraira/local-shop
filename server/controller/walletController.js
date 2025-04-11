@@ -217,3 +217,83 @@ export const getTransactionHistory = asyncHandler(async (req, res) => {
     transactions: paginatedTransactions,
   });
 });
+
+export const getAllWalletTransactions = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, type, sort = "desc", search } = req.query;
+
+  try {
+    // Build base query to get all wallets
+    let query = {};
+
+    // Add type filter
+    if (type && type !== "ALL") {
+      query["transactions.type"] = type;
+    }
+
+    // Add search functionality
+    if (search) {
+      query.$or = [
+        { "transactions.transactionId": { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Get all wallets
+    const wallets = await Wallet.find(query)
+      .populate('user', 'username email')
+      .lean();
+
+    // Extract and format all transactions
+    let allTransactions = [];
+    wallets.forEach(wallet => {
+      const transactions = wallet.transactions.map(t => ({
+        ...t,
+        user: {
+          _id: wallet.user._id,
+          username: wallet.user.username,
+          email: wallet.user.email
+        }
+      }));
+      allTransactions = [...allTransactions, ...transactions];
+    });
+
+    // Sort transactions
+    allTransactions.sort((a, b) => {
+      return sort === "desc" 
+        ? new Date(b.createdAt) - new Date(a.createdAt)
+        : new Date(a.createdAt) - new Date(b.createdAt);
+    });
+
+    // Calculate pagination
+    const total = allTransactions.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const paginatedTransactions = allTransactions.slice(startIndex, endIndex);
+
+    // Get total statistics
+    const statistics = {
+      totalTransactions: total,
+      totalAmount: allTransactions.reduce((sum, t) => sum + t.amount, 0),
+      breakdown: {
+        ORDER_PAYMENT: allTransactions.filter(t => t.type === "ORDER_PAYMENT").length,
+        REFUND: allTransactions.filter(t => t.type === "REFUND").length,
+        REFERRAL_REWARD: allTransactions.filter(t => t.type === "REFERRAL_REWARD").length,
+        PROMO_CREDIT: allTransactions.filter(t => t.type === "PROMO_CREDIT").length
+      }
+    };
+
+    res.status(200).json({
+      success: true,
+      transactions: paginatedTransactions,
+      total,
+      statistics,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching wallet transactions",
+      error: error.message,
+    });
+  }
+});

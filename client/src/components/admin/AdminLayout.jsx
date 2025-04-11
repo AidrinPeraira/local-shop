@@ -13,7 +13,8 @@ import {
   Ticket,
   Landmark,
   Handshake,
-  ArrowLeftFromLine
+  ArrowLeftFromLine,
+  Wallet
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useToast } from "../hooks/use-toast";
@@ -59,6 +60,7 @@ export function AdminLayout() {
     { name: "Returns", icon: ArrowLeftFromLine, href: "/admin/returns" },
     { name: "Coupons", icon: Ticket, href: "/admin/coupons" },
     { name: "Transactions", icon: Landmark, href: "/admin/transactions" },
+    { name: "Wallets", icon: Wallet, href: "/admin/user-wallets" },
     { name: "Payouts", icon: Handshake, href: "/admin/payouts" },
   ];
 

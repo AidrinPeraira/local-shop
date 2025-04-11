@@ -7,8 +7,9 @@ import {
   addReferralReward,
   addPromoCredit,
   getTransactionHistory,
+  getAllWalletTransactions,
 } from "../controller/walletController.js";
-import { authenticateSeller, authenticateUser, authorizeSeller } from "../middlewares/authMiddleware.js";
+import { authenticateAdmin, authenticateSeller, authenticateUser, authorizeAdmin, authorizeSeller } from "../middlewares/authMiddleware.js";
 
 const walletRoutes = express.Router();
 
@@ -26,5 +27,6 @@ walletRoutes.post("/promo", authenticateUser, addPromoCredit);
 
 // Transaction history route
 walletRoutes.get("/transactions", authenticateUser, getTransactionHistory);
+walletRoutes.get("/admin/transactions", authenticateAdmin, authorizeAdmin, getAllWalletTransactions);
 
 export default walletRoutes;
