@@ -2,6 +2,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Transaction from "../models/adminTransactionModel.js";
 import User from "../models/userModel.js";
 import Seller from "../models/sellerModel.js";
+import SellerTransaction from "../models/sellerTransactionModel.js";
 
 // Get all transactions with filters, search, sort, and pagination
 export const getAllTransactions = asyncHandler(async (req, res) => {
@@ -182,4 +183,113 @@ export const getAdminBalance = asyncHandler(async (req, res) => {
   }
 });
 
+
+
+export const getSellerTransactions = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, type, status, sort = "desc", search } = req.query;
+  const sellerId = req.user._id;
+
+  try {
+    // Build query
+    const query = { seller: sellerId };
+
+    // Add type filter
+    if (type && type !== "ALL") {
+      query.type = type;
+    }
+
+    // Add status filter
+    if (status && status !== "ALL") {
+      query.status = status;
+    }
+
+    // Add search functionality
+    if (search) {
+      query.transactionId = { $regex: search, $options: "i" };
+    }
+
+    // Calculate pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Get total count for pagination
+    const total = await SellerTransaction.countDocuments(query);
+
+    // Fetch transactions with pagination and sorting
+    const transactions = await SellerTransaction.find(query)
+      .sort({ createdAt: sort === "desc" ? -1 : 1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate("orderId", "orderId")
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      transactions,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching transactions",
+      error: error.message,
+    });
+  }
+});
+
+export const getSellerBalance = asyncHandler(async (req, res) => {
+  const sellerId = req.user._id;
+
+  try {
+    const transactions = await SellerTransaction.find({ 
+      seller: sellerId,
+      status: "COMPLETED" 
+    }).select('type amount platformFee').lean();
+
+    let balance = 0;
+    let totalPlatformFees = 0;
+    let breakdown = {
+      orderSettlements: 0,
+      refundDeductions: 0,
+      platformFees: 0
+    };
+
+    transactions.forEach(transaction => {
+      switch (transaction.type) {
+        case "ORDER_SETTLEMENT":
+          balance += transaction.amount;
+          breakdown.orderSettlements += transaction.amount;
+          totalPlatformFees += transaction.platformFee;
+          breakdown.platformFees += transaction.platformFee;
+          break;
+
+        case "REFUND_DEDUCTION":
+          balance -= transaction.amount;
+          breakdown.refundDeductions += transaction.amount;
+          break;
+
+        case "PLATFORM_FEE":
+          balance -= transaction.amount;
+          breakdown.platformFees += transaction.amount;
+          break;
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        currentBalance: balance,
+        totalPlatformFees,
+        breakdown
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error calculating seller balance",
+      error: error.message
+    });
+  }
+});
 
