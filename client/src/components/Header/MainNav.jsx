@@ -153,7 +153,13 @@ const MainNav = () => {
                   setShowProfile(!showProfile);
                 }}
               >
-                <User className="h-6 w-6" />
+                {isLoggedIn && user?.username ? (
+                  <span className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
+                    {user.username.charAt(0).toUpperCase()}
+                  </span>
+                ) : (
+                  <User className="h-6 w-6" />
+                )}
               </Button>
               {showProfile && (
                 <div className="absolute right-0 mt-2 w-52 bg-white shadow-lg rounded-xl p-4 border border-gray-200">
