@@ -12,25 +12,15 @@ const MainNav = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { toast } = useToast();
+  const { count: cartCount } = useSelector((state) => state.cart);
 
   //pop up logic
   const [showCart, setShowCart] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const profileRef = useRef();
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setShowProfile(false);
-      }
-    };
 
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -39,6 +29,19 @@ const MainNav = () => {
       setIsLoggedIn(false);
     }
   }, [user]);
+
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (profileRef.current && !profileRef.current.contains(event.target)) {
+          setShowProfile(false);
+        }
+      };
+  
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
 
   //search logic
   const handleSearch = (e) => {
@@ -111,13 +114,8 @@ const MainNav = () => {
           <div className="flex items-center space-x-4">
             {/* saved-list */}
             <div className="relative">
-              <Link to={'/saved-list'}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative"
-                  
-                >
+              <Link to={"/saved-list"}>
+                <Button variant="ghost" size="icon" className="relative">
                   <Heart className="h-6 w-6" />
                 </Button>
               </Link>
@@ -136,6 +134,11 @@ const MainNav = () => {
                   }}
                 >
                   <ShoppingCart className="h-6 w-6" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
             </div>

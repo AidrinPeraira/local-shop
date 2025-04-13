@@ -22,10 +22,10 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardFooter } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
 import { useToast } from "../../components/hooks/use-toast";
-import { getCartItemsAPI, updateCartAPI } from "../../api/cartApi";
+import { getCartItemsAPI, getCartItemsCountAPI, updateCartAPI } from "../../api/cartApi";
 import { PageLoading } from "../ui/PageLoading";
 import { useDispatch } from "react-redux";
-import { clearCart, setCart } from "../../redux/features/cartSlice";
+import { clearCart, setCart, setCartCount } from "../../redux/features/cartSlice";
 
 const CartContent = () => {
   const [cartData, setCartData] = useState(null);
@@ -163,11 +163,20 @@ const CartContent = () => {
       const response = await updateCartAPI({ variants: updates });
 
       if (response.data.success) {
-        const freshCartData = await getCartItemsAPI();
+        const [freshCartData, cartCountData] = await Promise.all([
+          getCartItemsAPI(),
+          getCartItemsCountAPI()
+        ]);
+  
         if (freshCartData.data.success) {
           setCartData(freshCartData.data.cart);
           dispatch(setCart(freshCartData.data.cart));
-          setLocalCartData(JSON.parse(JSON.stringify(freshCartData.data.cart))); // Ensure exact copy
+          setLocalCartData(JSON.parse(JSON.stringify(freshCartData.data.cart)));
+          
+          // Update the cart count in global state
+          if (cartCountData.data.success) {
+            dispatch(setCartCount(cartCountData.data.count));
+          }
         }
       } else {
         throw new Error(response.data.message || "Failed to update cart");

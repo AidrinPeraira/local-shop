@@ -24,10 +24,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../components/ui/tooltip";
-import { addToCartAPI, processCartItemsAPI } from "../../api/cartApi";
+import { addToCartAPI, getCartItemsCountAPI, processCartItemsAPI } from "../../api/cartApi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setCart } from "../../redux/features/cartSlice";
+import { setCart, setCartCount } from "../../redux/features/cartSlice";
 
 const ProductPurchaseCard = ({ product }) => {
 
@@ -141,6 +141,9 @@ const ProductPurchaseCard = ({ product }) => {
         productId : product.id || product._id,
         variants : selectedVariants
       })
+
+      const countResponse = await getCartItemsCountAPI();
+      dispatch(setCartCount(countResponse.data.count));
 
       toast({
         title: "Added to cart",

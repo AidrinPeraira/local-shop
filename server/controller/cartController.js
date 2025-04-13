@@ -452,3 +452,27 @@ export const processCartItems = asyncHandler(
         });
     }
 );
+
+export const getCartItemsCount = asyncHandler(
+    async (req, res) => {
+        const userId = req.user._id;
+
+        const cart = await Cart.findOne({ user: userId });
+        
+        // If no cart exists, return count as 0
+        if (!cart) {
+            return res.status(200).json({
+                success: true,
+                count: 0
+            });
+        }
+
+        // Simply count the number of items (products) in the cart
+        const totalCount = cart.items.length;
+
+        res.status(200).json({
+            success: true,
+            count: totalCount
+        });
+    }
+);

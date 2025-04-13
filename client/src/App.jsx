@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import { fetchCategories } from "./redux/features/categoriesSlice";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { googleConfig } from "./configuration";
+import { setCartCount } from "./redux/features/cartSlice";
+import { getCartItemsCountAPI } from "./api/cartApi";
 
 
 // Lazy load route components
@@ -20,6 +22,18 @@ function App() {
 
   useEffect(() => {
     dispatch(fetchCategories());
+
+    const fetchCartCount = async () => {
+      try {
+        const response = await getCartItemsCountAPI();
+        dispatch(setCartCount(response.data.count));
+      } catch (error) {
+        console.error("Error fetching cart count:", error);
+      }
+    };
+    fetchCartCount();
+
+
   }, [dispatch]);
 
   return (

@@ -63,8 +63,8 @@ MY TASKS:
     ✔ need to make the invoice more aesthetic and detailed @done (4/10/2025, 10:55:40 PM)
 
 MAJOR TODO:
-    ☐ add neft transactions
-    ☐ add razorpayx for payouts
+    ✘ add neft transactions @cancelled (4/11/2025, 11:59:13 AM)
+    ✘ add razorpayx for payouts @cancelled (4/11/2025, 11:59:12 AM)
     ✔ handle order cancel delte by preveetning one order with multiple sellers @done (4/3/2025, 12:18:31 PM)
 
 
@@ -324,7 +324,7 @@ Week 3 Project:
         ✔ Sales report(Daily, Weekly, Yearly, Custom date) @done (4/3/2025, 12:16:23 PM)
             ✔ Generate sales report @done (4/3/2025, 12:16:23 PM)
             ✔ Should be able to filter based on @done (3/26/2025, 10:43:23 PM)
-                ☐ Custom date range
+                ✔ Custom date range @done (4/11/2025, 11:57:57 AM)
                 ✔ 1 Day / week / month @done (3/26/2025, 10:43:18 PM)
             ✔ Show discount and coupons deduction in sales report @done (3/26/2025, 10:43:15 PM)
             ✔ Overall sales count @done (3/26/2025, 10:43:11 PM)
@@ -361,15 +361,15 @@ Pendings:
     ✔ Order success/failere not redirecting to the order details page @done (4/7/2025, 4:39:16 PM)
     ✔ Coupon validation - if it's expired coupon update the expired with new values @done (4/7/2025, 4:46:06 PM)
     ✔ In case of canceled orders, refund the amount directly. @done (4/10/2025, 12:03:18 PM)
-    ☐ Sales report(Daily, Weekly, Yearly, Custom date)
-    ☐ Generate sales report
-    ☐ Should be able to filter based on
-    ☐ Custom date range
-    ☐ 1 Day / week / month
-    ☐ Show discount and coupons deduction in sales report
-    ☐ Overall sales count
-    ☐ Overall order amount
-    ☐ Overall discount
+    ✔ Sales report(Daily, Weekly, Yearly, Custom date) @done (4/11/2025, 11:57:51 AM)
+    ✔ Generate sales report @done (4/11/2025, 11:57:50 AM)
+    ✔ Should be able to filter based on @done (4/11/2025, 11:57:49 AM)
+    ✔ Custom date range @done (4/11/2025, 11:57:49 AM)
+    ✔ 1 Day / week / month @done (4/11/2025, 11:57:48 AM)
+    ✔ Show discount and coupons deduction in sales report @done (4/11/2025, 11:57:47 AM)
+    ✔ Overall sales count @done (4/11/2025, 11:57:45 AM)
+    ✔ Overall order amount @done (4/11/2025, 11:57:46 AM)
+    ✔ Overall discount @done (4/11/2025, 11:57:46 AM)
     ✔ Learn about cron jobs (suggestion) @done (4/5/2025, 10:23:49 AM)
         //added crone job for coupon deactivation in addition to the existing logic
 
@@ -401,4 +401,28 @@ Week 4:
         ✔ Best selling category (top 10) @done (4/11/2025, 10:37:55 AM)
         ✘ Best selling brands (top 10) @cancelled (4/11/2025, 10:37:36 AM)
         ✔ Generate ledger book (optional) @done (4/11/2025, 10:37:47 AM)
+   
+Week 5 : 
+
+Pendings:
+
+        ☐ Add the user first letter in navbar when user logged in
+        ✔ Add a badge in the cart icon in navbar @done (4/14/2025, 12:47:44 AM)
+        ☐ payment method in order details
+        ☐ Min Purchase amt should be checked while applying coupon
+        ☐ Refresh Token bug
+        ☐ Refund individual item calculation to be changed : platform fee shouldn't be refunded & coupon amt to be considered
+        ☐ Return Request Approved Status is not reflected in order details
         
+    Admin
+        ☐ Edit coupon start date and end date is not prefilled
+        ☐ Wallet Transaction : Order details Hyperlink
+        ☐ Admin Dashboard : Category Graph : Name should be populated instead of ID
+        ☐ Sales Report End date report should be included
+        ☐ Returned item should be removed from sales report
+        ☐ Excel : Sales report data is required
+        
+        ☐ Too many apis are hitting the server on payment completion
+        ☐ use UTC instead of local time in the backend
+        
+    
