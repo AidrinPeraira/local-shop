@@ -19,15 +19,27 @@ const fetchCSRFToken = async () => {
 // Call fetchCSRFToken when setting up the API
 fetchCSRFToken();
 
+API.defaults.retryCount = 0;
+const MAX_RETRIES = 3;
+
 // Add response interceptor to handle CSRF token errors
 API.interceptors.response.use(
-    response => response,
+    response => {
+        // Reset retry count on successful response
+        API.defaults.retryCount = 0;
+        return response;
+    },
     async error => {
-        if (error.response?.status === 403 && error.response?.data?.message?.includes('Invalid CSRF token')) {
-            // If CSRF token is invalid, fetch new token and retry request
+        if (error.response?.status === 403 && 
+            error.response?.data?.message?.includes('Invalid CSRF token') && 
+            API.defaults.retryCount < MAX_RETRIES) {
+            
+            API.defaults.retryCount++;
             await fetchCSRFToken();
             return API(error.config);
         }
+        // Reset retry count and reject the promise
+        API.defaults.retryCount = 0;
         return Promise.reject(error);
     }
 );
