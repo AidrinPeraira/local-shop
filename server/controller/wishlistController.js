@@ -96,3 +96,15 @@ export const getWishlist = asyncHandler(async (req, res) => {
     wishlist,
   });
 });
+
+export const getWishlistCount = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  
+  const wishlist = await Wishlist.findOne({ user: userId });
+  const count = wishlist ? wishlist.products.length : 0;
+
+  res.status(200).json({
+    success: true,
+    count
+  });
+});

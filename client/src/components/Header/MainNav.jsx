@@ -13,14 +13,13 @@ const MainNav = () => {
   const { user } = useSelector((state) => state.user);
   const { toast } = useToast();
   const { count: cartCount } = useSelector((state) => state.cart);
+  const { count: wishlistCount } = useSelector((state) => state.wishlist);
 
   //pop up logic
   const [showCart, setShowCart] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const profileRef = useRef();
-
-
 
   useEffect(() => {
     if (user) {
@@ -30,18 +29,17 @@ const MainNav = () => {
     }
   }, [user]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfile(false);
+      }
+    };
 
-    // Close dropdown when clicking outside
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (profileRef.current && !profileRef.current.contains(event.target)) {
-          setShowProfile(false);
-        }
-      };
-  
-      document.addEventListener("click", handleClickOutside);
-      return () => document.removeEventListener("click", handleClickOutside);
-    }, []);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   //search logic
   const handleSearch = (e) => {
@@ -117,6 +115,11 @@ const MainNav = () => {
               <Link to={"/saved-list"}>
                 <Button variant="ghost" size="icon" className="relative">
                   <Heart className="h-6 w-6" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {wishlistCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
             </div>

@@ -10,6 +10,10 @@ import { getProductDetailsApi } from '../../api/productApi';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { addToWishlistApi, removeFromWishlistApi, getWishlistApi } from '../../api/wishlistApi';
 import { useSelector } from 'react-redux';
+import { useDispatch } from "react-redux";
+import { setWishlistCount } from "../../redux/features/wishlistSlice";
+import { getWishlistCountApi } from "../../api/wishlistApi";
+import { useToast } from '../hooks/use-toast';
 
 const ProductDetailContent = () => {
   const [product, setProduct] = useState(null);
@@ -21,7 +25,8 @@ const ProductDetailContent = () => {
 
   const id = searchParams.get('id');
   const { slug } = useParams();
-
+  const dispatch = useDispatch();
+  const { toast } = useToast();
   const updateRecentProducts = () => {
     if(!id) return;
 
@@ -69,15 +74,17 @@ const ProductDetailContent = () => {
   }, [id]);
 
   const handleWishlist = async () => {
+   
+    
     if (!product) return;
-
+  
     if(user.role !== 'buyer'){
       toast({
         title: "You are not logged in",
         description: "Please login as a buyer to save products",
         variant: "destructive", 
-      })
-      return
+      });
+      return;
     }
     
     try {
@@ -96,6 +103,10 @@ const ProductDetailContent = () => {
           description: "Product saved to your list",
         });
       }
+  
+      // Get updated wishlist count
+      const countResponse = await getWishlistCountApi();
+      dispatch(setWishlistCount(countResponse.data.count));
     } catch (error) {
       toast({
         title: "Error",

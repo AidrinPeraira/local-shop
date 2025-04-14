@@ -6,6 +6,8 @@ import {
   ChevronRight,
   Heart,
 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { setWishlistCount } from "../../redux/features/wishlistSlice";
 import { Button } from "../../components/ui/button.jsx";
 import { Slider } from "../../components/ui/slider.jsx";
 import { Checkbox } from "../../components/ui/checkbox.jsx";
@@ -39,6 +41,7 @@ import {
   addToWishlistApi,
   removeFromWishlistApi,
   getWishlistApi,
+  getWishlistCountApi,
 } from "../../api/wishlistApi";
 
 const ShopContent = () => {
@@ -61,8 +64,8 @@ const ShopContent = () => {
   const [tempRating, setTempRating] = useState(null);
 
   const [wishlistedItems, setWishlistedItems] = useState(new Set());
-
-  const user = useSelector(state => state.user.user)
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
 
   //SETTING THE pagination values
   const [totalProducts, setTotalProducts] = useState(0);
@@ -139,15 +142,17 @@ const ShopContent = () => {
   }, []);
 
   const handleWishlist = async (e, productId) => {
-    e.preventDefault(); // Prevent navigation
-    if(user.role !== 'buyer'){
+    e.preventDefault();
+
+    if (user.role !== "buyer") {
       toast({
         title: "You are not logged in",
         description: "Please login as a buyer to save products",
-        variant: "destructive", 
-      })
-      return
+        variant: "destructive",
+      });
+      return;
     }
+
     try {
       if (wishlistedItems.has(productId)) {
         await removeFromWishlistApi(productId);
@@ -168,6 +173,10 @@ const ShopContent = () => {
           description: "Product saved to your list",
         });
       }
+
+      // Get updated wishlist count
+      const countResponse = await getWishlistCountApi();
+      dispatch(setWishlistCount(countResponse.data.count));
     } catch (error) {
       toast({
         title: "Error",
@@ -308,7 +317,7 @@ const ShopContent = () => {
     setSelectedRating(null);
     setSortOption("latest");
     setCurrentPage(1);
-  
+
     const newParams = new URLSearchParams(searchParams);
     newParams.set("priceRange", "0,3000");
     newParams.set("sort", "latest");
