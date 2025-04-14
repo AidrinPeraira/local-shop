@@ -15,11 +15,11 @@ import {
   ChevronLeft,
   Search,
   MapPin,
+  CreditCard,
   ArrowDown,
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
 import { getSellerOrdersApi, updateOrderStatusApi } from "../../api/orderApi";
-
 
 const orderStatuses = [
   "ALL",
@@ -27,7 +27,7 @@ const orderStatuses = [
   "PROCESSING",
   "SHIPPED",
   "DELIVERED",
-  "CANCELLED"
+  "CANCELLED",
 ];
 
 export default function SellerOrders() {
@@ -94,6 +94,19 @@ export default function SellerOrders() {
         ? prev.filter((id) => id !== orderId)
         : [...prev, orderId]
     );
+  };
+
+  const getPaymentMethodDisplay = (method) => {
+    switch (method) {
+      case "COD":
+        return "Cash on Delivery";
+      case "ONLINE":
+        return "Online Payment";
+      case "WALLET":
+        return "Wallet Payment";
+      default:
+        return method;
+    }
   };
 
   const handleStatusUpdate = async (orderId, newStatus) => {
@@ -263,7 +276,7 @@ export default function SellerOrders() {
                               "DELIVERED",
                               "CANCELLED",
                               "RETURNED",
-                              "FAILED"
+                              "FAILED",
                             ].includes(order.orderStatus)}
                           >
                             Update Status
@@ -306,6 +319,46 @@ export default function SellerOrders() {
                     <tr>
                       <td colSpan={7} className="p-0 border-b">
                         <div className="bg-gray-50 p-4 space-y-4">
+                          {/* Payment Method */}
+                          <div className="bg-white p-4 rounded-lg shadow-sm">
+                            <h3 className="font-medium text-sm mb-2 flex items-center">
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              Payment Information
+                            </h3>
+                            <div className="text-sm space-y-1">
+                              <div className="flex justify-between">
+                                <span>Payment Method:</span>
+                                <span>
+                                  {getPaymentMethodDisplay(
+                                    order.payment?.method
+                                  )}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Payment Status:</span>
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-xs ${
+                                    order.payment?.status === "COMPLETED"
+                                      ? "bg-green-100 text-green-800"
+                                      : order.payment?.status === "FAILED"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                                  }`}
+                                >
+                                  {order.payment?.status}
+                                </span>
+                              </div>
+                              {order.payment?.paymentDetails?.paymentId && (
+                                <div className="flex justify-between">
+                                  <span>Transaction ID:</span>
+                                  <span className="font-mono">
+                                    {order.payment.paymentDetails.paymentId}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
                           {/* Shipping Address */}
                           <div className="bg-white p-4 rounded-lg shadow-sm">
                             <h3 className="font-medium text-sm mb-2 flex items-center">
@@ -323,7 +376,6 @@ export default function SellerOrders() {
                               Phone: {order.shippingAddress.phone}
                             </p>
                           </div>
-                          
 
                           {/* retunr reason */}
                           {[
@@ -361,8 +413,6 @@ export default function SellerOrders() {
                               </div>
                             </div>
                           )}
-
-                          
 
                           {/* Order Items */}
                           <div>
@@ -439,7 +489,7 @@ export default function SellerOrders() {
                                 <span>Platform Fee</span>
                                 <span>₹{order.summary.platformFee}</span>
                               </div>
-                             
+
                               <div className="flex justify-between font-medium pt-2 border-t">
                                 <span>Total</span>
                                 <span>₹{order.summary.cartTotal}</span>

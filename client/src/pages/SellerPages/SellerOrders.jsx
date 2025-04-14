@@ -12,6 +12,7 @@ import {
 import {
   ChevronDown,
   ChevronRight,
+  CreditCard,
   ChevronLeft,
   Search,
   MapPin,
@@ -64,6 +65,19 @@ export default function SellerOrders() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getPaymentMethodDisplay = (method) => {
+    switch (method) {
+      case 'COD':
+        return 'Cash on Delivery';
+      case 'ONLINE':
+        return 'Online Payment';
+      case 'WALLET':
+        return 'Wallet Payment';
+      default:
+        return method;
     }
   };
 
@@ -305,6 +319,48 @@ export default function SellerOrders() {
                     <tr>
                       <td colSpan={7} className="p-0 border-b">
                         <div className="bg-gray-50 p-4 space-y-4">
+
+                           {/* Payment Method */}
+                           <div className="bg-white p-4 rounded-lg shadow-sm">
+                            <h3 className="font-medium text-sm mb-2 flex items-center">
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              Payment Information
+                            </h3>
+                            <div className="text-sm space-y-1">
+                              <div className="flex justify-between">
+                                <span>Payment Method:</span>
+                                <span>
+                                  {getPaymentMethodDisplay(
+                                    order.payment?.method
+                                  )}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Payment Status:</span>
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-xs ${
+                                    order.payment?.status === "COMPLETED"
+                                      ? "bg-green-100 text-green-800"
+                                      : order.payment?.status === "FAILED"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                                  }`}
+                                >
+                                  {order.payment?.status}
+                                </span>
+                              </div>
+                              {order.payment?.paymentDetails?.paymentId && (
+                                <div className="flex justify-between">
+                                  <span>Transaction ID:</span>
+                                  <span className="font-mono">
+                                    {order.payment.paymentDetails.paymentId}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+
                           {/* Shipping Address */}
                           <div className="bg-white p-4 rounded-lg shadow-sm">
                             <h3 className="font-medium text-sm mb-2 flex items-center">

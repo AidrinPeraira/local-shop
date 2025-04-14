@@ -53,7 +53,7 @@ const OrderDetails = () => {
         setOrder(response.data.order);
       } else {
         toast({
-          title: "Error", 
+          title: "Error",
           description: "Order not found",
           variant: "destructive",
         });
@@ -167,7 +167,7 @@ const OrderDetails = () => {
 
   const generateInvoice = () => {
     const doc = new jsPDF();
-    
+
     // Add title and header info (unchanged)
     doc.setFontSize(20);
     doc.text("INVOICE", 14, 22);
@@ -194,16 +194,19 @@ const OrderDetails = () => {
     });
 
     // Modified order items table with grouped variants
-    const orderItems = order.items.map(item => {
+    const orderItems = order.items.map((item) => {
       // Calculate applicable bulk discount
-      const totalQuantity = item.variants.reduce((total, v) => total + v.quantity, 0);
+      const totalQuantity = item.variants.reduce(
+        (total, v) => total + v.quantity,
+        0
+      );
       let discountPercentage = 0;
-      
+
       if (item.bulkDiscount) {
         const applicableDiscount = [...item.bulkDiscount]
           .sort((a, b) => b.minQty - a.minQty)
-          .find(discount => totalQuantity >= discount.minQty);
-        
+          .find((discount) => totalQuantity >= discount.minQty);
+
         if (applicableDiscount) {
           discountPercentage = applicableDiscount.priceDiscountPerUnit;
         }
@@ -211,15 +214,15 @@ const OrderDetails = () => {
 
       // Create variant details string
       const variantDetails = item.variants
-        .map(v => `${v.attributes} (Qty: ${v.quantity})`)
-        .join('\n');
-      
+        .map((v) => `${v.attributes} (Qty: ${v.quantity})`)
+        .join("\n");
+
       return [
         item.productName,
         variantDetails,
         totalQuantity,
-        discountPercentage > 0 ? `${discountPercentage}%` : '-',
-        `Rs. ${item.productTotal}`
+        discountPercentage > 0 ? `${discountPercentage}%` : "-",
+        `Rs. ${item.productTotal}`,
       ];
     });
 
@@ -230,15 +233,18 @@ const OrderDetails = () => {
       theme: "grid",
       headStyles: { fillColor: [136, 132, 216] },
       columnStyles: {
-        1: { cellWidth: 'auto', whiteSpace: 'pre-line' },
-        3: { halign: 'center' },
-        4: { halign: 'right' }
+        1: { cellWidth: "auto", whiteSpace: "pre-line" },
+        3: { halign: "center" },
+        4: { halign: "right" },
       },
     });
 
     // Rest of the code remains the same
     const summaryData = [
-      ["Subtotal before discount", `Rs. ${order.summary.subtotalBeforeDiscount}`],
+      [
+        "Subtotal before discount",
+        `Rs. ${order.summary.subtotalBeforeDiscount}`,
+      ],
       ["Product Discount", `- Rs. ${order.summary.totalDiscount}`],
       ["Subtotal after discount", `Rs. ${order.summary.subtotalAfterDiscount}`],
       ["Coupon Discount", `- Rs. ${order.summary.couponDiscount}`],
@@ -258,7 +264,12 @@ const OrderDetails = () => {
     // Footer (unchanged)
     doc.setFontSize(10);
     doc.text("Authorized Signature", 14, doc.lastAutoTable.finalY + 30);
-    doc.text("Thank you for shopping with us!", doc.internal.pageSize.getWidth() / 2, doc.lastAutoTable.finalY + 30, { align: "center" });
+    doc.text(
+      "Thank you for shopping with us!",
+      doc.internal.pageSize.getWidth() / 2,
+      doc.lastAutoTable.finalY + 30,
+      { align: "center" }
+    );
 
     doc.save(`invoice-${order.orderId}.pdf`);
   };
@@ -283,6 +294,19 @@ const OrderDetails = () => {
         {returnStatus.status.replace("_", " ")}
       </span>
     );
+  };
+
+  const getPaymentMethodDisplay = (method) => {
+    switch (method) {
+      case "COD":
+        return "Cash on Delivery";
+      case "ONLINE":
+        return "Online Payment";
+      case "WALLET":
+        return "Wallet Payment";
+      default:
+        return method;
+    }
   };
 
   return (
@@ -339,7 +363,7 @@ const OrderDetails = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Payment Method</span>
-                    <span className="font-medium">{order.payment.method}</span>
+                    <span>{order?.payment?.method ? getPaymentMethodDisplay(order.payment.method) : 'N/A'}</span>
                   </div>
                 </div>
               </Card>
@@ -394,7 +418,7 @@ const OrderDetails = () => {
               <Card className="p-6">
                 <h2 className="text-lg font-semibold mb-4">Price Details</h2>
                 <div className="space-y-3">
-                  <div className="flex justify-between text-sm"> 
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-600">
                       Subtotal before discount
                     </span>
