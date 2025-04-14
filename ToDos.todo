@@ -409,13 +409,13 @@ Pendings:
         ✔ Add the user first letter in navbar when user logged in @done (4/14/2025, 12:52:00 AM)
         ✔ Add a badge in the cart icon in navbar @done (4/14/2025, 12:47:44 AM)
         ✔ payment method in order details @done (4/14/2025, 12:59:20 PM)
-        ☐ Min Purchase amt should be checked while applying coupon
+        ✔ Min Purchase amt should be checked while applying coupon @done (4/15/2025, 1:16:46 AM)
         ✔ Refresh Token bug @done (4/15/2025, 1:09:02 AM)
         ☐ Refund individual item calculation to be changed : platform fee shouldn't be refunded & coupon amt to be considered
         ☐ Return Request Approved Status is not reflected in order details
         
     Admin
-        ☐ Edit coupon start date and end date is not prefilled
+        ✔ Edit coupon start date and end date is not prefilled @done (4/15/2025, 1:22:31 AM)
         ☐ Wallet Transaction : Order details Hyperlink
         ✔ Admin Dashboard : Category Graph : Name should be populated instead of ID @done (4/14/2025, 1:10:25 PM)
         ☐ Sales Report End date report should be included

@@ -158,12 +158,22 @@ const AdminCoupons = () => {
     }
   };
 
+  const formatDateForInput = (dateString) => {
+    return dateString ? new Date(dateString).toISOString().split('T')[0] : '';
+  };
+
   const handleEditCoupon = async (e) => {
     e.preventDefault();
     try {
+      const formattedData = {
+        ...couponForm,
+        validFrom: new Date(couponForm.validFrom).toISOString(),
+        validUntil: new Date(couponForm.validUntil).toISOString(),
+      };
+  
       const response = await adminUpdateCouponApi({
         id: selectedCoupon._id,
-        ...couponForm,
+        ...formattedData,
       });
       if (response.data.success) {
         toast({
@@ -370,7 +380,11 @@ const AdminCoupons = () => {
                           size="sm"
                           onClick={() => {
                             setSelectedCoupon(coupon);
-                            setCouponForm(coupon);
+                            setCouponForm({
+                              ...coupon,
+                              validFrom: formatDateForInput(coupon.validFrom),
+                              validUntil: formatDateForInput(coupon.validUntil),
+                            });
                           }}
                         >
                           <Edit className="h-4 w-4" />
