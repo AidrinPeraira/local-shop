@@ -177,6 +177,19 @@ const CheckoutContent = () => {
 
   const handleApplyCoupon = (event, coupon) => {
     event.stopPropagation();
+
+    // Check if cart subtotal meets minimum purchase requirement
+    if (cart.summary.subtotalBeforeDiscount < coupon.minPurchase) {
+      toast({
+        title: "Invalid Coupon",
+        description: `Minimum purchase amount of ₹${formatPrice(
+          coupon.minPurchase
+        )} required to use this coupon`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSelectedCoupon(coupon);
     setIsApplyingCoupon(false);
   };
@@ -373,7 +386,7 @@ const CheckoutContent = () => {
           cart,
           amount,
           selectedAddressId,
-          couponId: selectedCoupon?._id
+          couponId: selectedCoupon?._id,
         });
 
         if (walletPaymentResponse.data.success) {
@@ -385,13 +398,13 @@ const CheckoutContent = () => {
             userProfile,
             couponId: selectedCoupon?._id,
             paymentStatus: "COMPLETED",
-            transactionId: walletPaymentResponse.data.transactionId
+            transactionId: walletPaymentResponse.data.transactionId,
           };
-      
+
           const response = await createOrderApi(orderData);
           setOrderId(response.data.order.orderId);
           setOrderSuccess("success");
-      
+
           // Update wallet balance
           setWalletBalance(walletPaymentResponse.data.remainingBalance);
         } else {
@@ -401,7 +414,6 @@ const CheckoutContent = () => {
             variant: "destructive",
           });
         }
-      
 
         const orderData = {
           cart,
@@ -411,9 +423,6 @@ const CheckoutContent = () => {
           couponId: selectedCoupon?._id,
           paymentStatus: "PENDING",
         };
-       
-
-        
       } else {
         //for cod
         const orderData = {
@@ -841,7 +850,12 @@ const CheckoutContent = () => {
                       {availableCoupons.map((coupon) => (
                         <div
                           key={coupon._id}
-                          className="border rounded-lg p-4 space-y-2 hover:border-primary cursor-pointer"
+                          className={`border rounded-lg p-4 space-y-2 ${
+                            cart.summary.subtotalBeforeDiscount >=
+                            coupon.minPurchase
+                              ? "hover:border-primary cursor-pointer"
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
                           onClick={(e) => handleApplyCoupon(e, coupon)}
                         >
                           <div className="flex justify-between items-start">
@@ -856,6 +870,17 @@ const CheckoutContent = () => {
                           </div>
                           <div className="text-sm text-gray-500">
                             Min. Purchase: ₹{coupon.minPurchase}
+                            {cart.summary.subtotalBeforeDiscount <
+                              coupon.minPurchase && (
+                              <span className="text-red-500 ml-2">
+                                (Add ₹
+                                {formatPrice(
+                                  coupon.minPurchase -
+                                    cart.summary.subtotalBeforeDiscount
+                                )}{" "}
+                                more to use)
+                              </span>
+                            )}
                           </div>
                           <div className="text-sm text-gray-500">
                             Max Discount: ₹{coupon.maxDiscount}
