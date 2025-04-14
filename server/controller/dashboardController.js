@@ -102,8 +102,17 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
       },
       { $unwind: "$product" },
       {
+        $lookup: {
+          from: "categories",
+          localField: "product.category",
+          foreignField: "_id",
+          as: "categoryInfo"
+        }
+      },
+      { $unwind: "$categoryInfo" },
+      {
         $group: {
-          _id: "$product.category",
+          _id: "$categoryInfo.name", 
           value: { $sum: "$items.totalQuantity" },
         },
       },

@@ -3,7 +3,7 @@ import { Toaster } from "./components/ui/toaster";
 import { lazy, Suspense, useEffect } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PageLoading } from "./components/ui/PageLoading";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "./redux/features/categoriesSlice";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { googleConfig } from "./configuration";
@@ -19,19 +19,22 @@ const AdminRoutes = lazy(() => import('./routes/AdminRoutes'));
 function App() {
 
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user); 
 
   useEffect(() => {
     dispatch(fetchCategories());
 
-    const fetchCartCount = async () => {
-      try {
-        const response = await getCartItemsCountAPI();
-        dispatch(setCartCount(response.data.count));
-      } catch (error) {
-        console.error("Error fetching cart count:", error);
-      }
-    };
-    fetchCartCount();
+    if(user.role === 'buyer') {
+      const fetchCartCount = async () => {
+        try {
+          const response = await getCartItemsCountAPI();
+          dispatch(setCartCount(response.data.count));
+        } catch (error) {
+          console.error("Error fetching cart count:", error);
+        }
+      };
+      fetchCartCount();
+    }
 
 
   }, [dispatch]);
