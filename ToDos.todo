@@ -411,7 +411,7 @@ Pendings:
         ✔ payment method in order details @done (4/14/2025, 12:59:20 PM)
         ✔ Min Purchase amt should be checked while applying coupon @done (4/15/2025, 1:16:46 AM)
         ✔ Refresh Token bug @done (4/15/2025, 1:09:02 AM)
-        ☐ Refund individual item calculation to be changed : platform fee shouldn't be refunded & coupon amt to be considered
+        ☐ Refund individual item calculation to be changed  : platform fee shouldn't be refunded & coupon amt to be considered
         ☐ Return Request Approved Status is not reflected in order details
         
     Admin

@@ -21,13 +21,39 @@ import { useToast } from "../hooks/use-toast";
 
 const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   // Set up react-hook-form with default values from initialData
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageError, setImageError] = useState(
+    "At least 3 images are required"
+  );
+  const [variantError, setVariantError] = useState("");
+  const [images, setImages] = useState(initialData.images || []);
+  const [variantTypes, setVariantTypes] = useState(
+    initialData.variantTypes || [{ id: Date.now().toString(), name: "Type", values: ["Universal"] }]
+  );
+  const [variants, setVariants] = useState(initialData.variants || []);
+  const [tierPrices, setTierPrices] = useState(
+    initialData.tierPrices || [
+      { id: "1", minQuantity: 10, price: 5 },
+      { id: "2", minQuantity: 50, price: 10 },
+    ]
+  );
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempFile, setTempFile] = useState(null);
+  
+
+  // Validate images count
+  useEffect(() => {
+    setImageError(images.length < 3 ? "At least 3 images are required" : "");
+  }, [images]);
+
   const {
     register,
     handleSubmit,
     control,
     watch,
     setValue,
-    formState: { errors },
+    trigger,
+    formState: { errors, isValid },
   } = useForm({
     defaultValues: {
       productName: initialData.name || "",
@@ -36,9 +62,39 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
       basePrice: initialData.basePrice || 0,
       stockUnit: initialData.stockUnit || "Nos",
       stock: initialData.stock || 0,
-      useVariants: initialData.variants
-        ? initialData.variants.length > 0
-        : false,
+      useVariants: true,
+    },
+    resolver: async (data) => {
+      const errors = {};
+
+      if (!data.productName?.trim()) {
+        errors.productName = { message: "Product name is required" };
+      }
+
+      if (!data.description?.trim()) {
+        errors.description = { message: "Description is required" };
+      }
+
+      if (!data.category) {
+        errors.category = { message: "Category is required" };
+      }
+
+      if (!data.basePrice || data.basePrice <= 0) {
+        errors.basePrice = { message: "Base price must be greater than 0" };
+      }
+
+      if (!data.stockUnit?.trim()) {
+        errors.stockUnit = { message: "Stock unit is required" };
+      }
+
+      if (!data.useVariants && (!data.stock || data.stock < 0)) {
+        errors.stock = { message: "Stock must be 0 or greater" };
+      }
+
+      return {
+        values: data,
+        errors: Object.keys(errors).length > 0 ? errors : {},
+      };
     },
   });
 
@@ -46,22 +102,31 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   const useVariants = watch("useVariants");
   const basePrice = watch("basePrice");
   const stock = watch("stock");
-const toast = useToast();
-  // State for complex fields that need special handling
-  const [images, setImages] = useState(initialData.images || []);
-  const [variantTypes, setVariantTypes] = useState(
-    initialData.variantTypes || []
-  );
-  const [variants, setVariants] = useState(initialData.variants || []);
-  const [tierPrices, setTierPrices] = useState(
-    initialData.tierPrices || [
-      { id: "1", minQuantity: 1, price: 0 },
-      { id: "2", minQuantity: 1, price: 0 },
-    ]
-  );
+  const toast = useToast();
 
-  const [cropModalOpen, setCropModalOpen] = useState(false);
-  const [tempFile, setTempFile] = useState(null);
+
+  
+  // Validate variants
+  useEffect(() => {
+    if (useVariants) {
+      const validVariantTypes = variantTypes.filter(
+        (vt) => vt.name && vt.values.length > 0
+      );
+      if (validVariantTypes.length === 0) {
+        setVariantError("Please add at least one variant type with values");
+      } else if (
+        variants.some(
+          (v) => !v.price || v.price <= 0 || !v.stock || v.stock < 0
+        )
+      ) {
+        setVariantError("All variants must have valid price and stock values");
+      } else {
+        setVariantError("");
+      }
+    } else {
+      setVariantError("");
+    }
+  }, [useVariants, variantTypes, variants]);
 
   // Image upload logic
   const handleImageUpload = (e) => {
@@ -241,7 +306,7 @@ const toast = useToast();
   // Final Submit
   const handleFormSubmit = async (formData) => {
     try {
-
+      // Image validation
       if (images.length < 3) {
         toast({
           title: "Validation Error",
@@ -251,7 +316,69 @@ const toast = useToast();
         return;
       }
 
-      // Create a new FormData instance
+      // Variant validation
+      if (useVariants) {
+        const validVariantTypes = variantTypes.filter(
+          (vt) => vt.name && vt.values.length > 0
+        );
+        if (validVariantTypes.length === 0) {
+          toast({
+            title: "Validation Error",
+            description: "Please add at least one variant type with values",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Check for empty variant type names
+        const emptyNameTypes = variantTypes.filter((vt) => !vt.name.trim());
+        if (emptyNameTypes.length > 0) {
+          toast({
+            title: "Variant Error",
+            description: "All variant types must have a name",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Check for variant types without values
+        const emptyValueTypes = variantTypes.filter(
+          (vt) => vt.values.length === 0
+        );
+        if (emptyValueTypes.length > 0) {
+          toast({
+            title: "Variant Error",
+            description: `Please add at least one value for each variant type`,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Validate variant prices and stock
+        const invalidVariants = variants.filter(
+          (v) => !v.price || v.price <= 0 || !v.stock || v.stock < 0
+        );
+        if (invalidVariants.length > 0) {
+          toast({
+            title: "Variant Error",
+            description:
+              "All variants must have valid price (> 0) and stock (≥ 0) values",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      if (Object.keys(errors).length > 0) {
+        toast({
+          title: "Validation Error",
+          description: "Please fix all form errors before submitting",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsSubmitting(true);
       const submitFormData = new FormData();
 
       // Add all the basic form fields
@@ -273,7 +400,10 @@ const toast = useToast();
         const validVariantTypes = variantTypes.filter(
           (vt) => vt.name && vt.values.length > 0
         );
-        submitFormData.append("variantTypes", JSON.stringify(validVariantTypes));
+        submitFormData.append(
+          "variantTypes",
+          JSON.stringify(validVariantTypes)
+        );
         submitFormData.append("variants", JSON.stringify(variants));
       }
 
@@ -282,16 +412,28 @@ const toast = useToast();
         submitFormData.append("id", initialData.id);
       }
 
-      await onSubmit(submitFormData);
+      const response = await onSubmit(submitFormData);
+
+      if (response?.success) {
+        toast({
+          title: "Success",
+          description: "Product saved successfully!",
+          variant: "default",
+        });
+        return true; // Indicate success to parent component
+      }
+
+      return false; // Indicate failure to parent component
     } catch (error) {
       console.error("Error submitting form:", error);
-      
-      // Show error toast with string message
       toast({
         title: "Error",
-        description: "Some error occurred while submitting the form.",
+        description: error?.response?.data?.message || "Failed to save product",
         variant: "destructive",
       });
+      return false; // Indicate failure to parent component
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -312,6 +454,7 @@ const toast = useToast();
             className={errors.productName ? "border-red-500" : ""}
             {...register("productName", {
               required: "Product name is required",
+              onChange: () => trigger("productName")
             })}
           />
           {errors.productName && (
@@ -325,7 +468,10 @@ const toast = useToast();
           <Controller
             name="description"
             control={control}
-            rules={{ required: "Description is required" }}
+            rules={{ 
+              required: "Description is required",
+              onChange: () => trigger("description")
+            }}
             render={({ field }) => (
               <div
                 className={`rounded-lg border ${
@@ -336,8 +482,11 @@ const toast = useToast();
                   theme="snow"
                   id="description"
                   value={field.value}
-                  onChange={field.onChange}
-                  className="rounded-lg  text-gray-800"
+                  onChange={(value) => {
+                    field.onChange(value);
+                    trigger("description");
+                  }}
+                  className="rounded-lg text-gray-800"
                 />
               </div>
             )}
@@ -380,7 +529,7 @@ const toast = useToast();
               accept="image/*"
               multiple
               onChange={handleImageUpload}
-              className="flex-1"
+              className={`flex-1 ${imageError ? "border-red-500" : ""}`}
             />
             <Button
               type="button"
@@ -389,11 +538,7 @@ const toast = useToast();
               <Upload className="h-4 w-4 mr-2" /> Upload
             </Button>
           </div>
-          {images.length < 3 && (
-            <p className="text-red-500 text-sm">
-              At least 3 images are required
-            </p>
-          )}
+          {imageError && <p className="text-red-500 text-sm">{imageError}</p>}
         </div>
 
         {images.length > 0 && (
@@ -608,7 +753,7 @@ const toast = useToast();
 
       {/* ADDING VARIANTS */}
       <div className="space-y-4 border-t pt-4">
-        <div className="flex items-center space-x-2">
+        <div className="items-center space-x-2 hidden">
           <Controller
             name="useVariants"
             control={control}
@@ -643,6 +788,9 @@ const toast = useToast();
                   <Plus className="h-4 w-4 mr-1" /> Add Variant Type
                 </Button>
               </div>
+              {variantError && (
+                <p className="text-red-500 text-sm">{variantError}</p>
+              )}
 
               {variantTypes.length === 0 && (
                 <div className="text-center p-4 border border-dashed rounded-md">
@@ -656,7 +804,9 @@ const toast = useToast();
               {variantTypes.map((variantType, typeIndex) => (
                 <div
                   key={variantType.id}
-                  className="border rounded-md p-4 space-y-4"
+                  className={`border rounded-md p-4 space-y-4 ${
+                    !variantType.name ? "border-red-500" : ""
+                  }`}
                 >
                   <div className="flex justify-between items-center">
                     <h5 className="font-medium">
@@ -675,7 +825,7 @@ const toast = useToast();
 
                   <div className="space-y-2">
                     <Label htmlFor={`variantType-${variantType.id}`}>
-                      Type Name
+                      Type Name <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id={`variantType-${variantType.id}`}
@@ -687,74 +837,76 @@ const toast = useToast();
                           e.target.value
                         )
                       }
-                      placeholder="e.g. Color, Size, Material"
+                      className={!variantType.name ? "border-red-500" : ""}
+                      placeholder="e.g. Size, Color"
                     />
+                    {!variantType.name && (
+                      <p className="text-red-500 text-sm">
+                        Variant type name is required
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Values</Label>
-                    <div className="space-y-2">
+                    <Label>
+                      Values <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="flex flex-wrap gap-2">
                       {variantType.values.map((value, valueIndex) => (
                         <div
-                          key={`${variantType.id}-value-${valueIndex}`}
-                          className="flex items-center gap-2"
+                          key={valueIndex}
+                          className="flex items-center bg-gray-100 rounded-full px-3 py-1"
                         >
-                          <Input
-                            value={value}
-                            onChange={(e) => {
-                              const newValues = [...variantType.values];
-                              newValues[valueIndex] = e.target.value;
-                              updateVariantType(
-                                variantType.id,
-                                "values",
-                                newValues
-                              );
-                            }}
-                            placeholder={`Value #${valueIndex + 1}`}
-                            className="flex-1"
-                          />
-                          <Button
+                          <span>{value}</span>
+                          <button
                             type="button"
-                            size="icon"
-                            variant="ghost"
                             onClick={() =>
                               removeVariantValue(variantType.id, valueIndex)
                             }
-                            className="text-red-500"
+                            className="ml-2 text-gray-500 hover:text-red-500"
                           >
                             <X className="h-4 w-4" />
-                          </Button>
+                          </button>
                         </div>
                       ))}
-
-                      <div className="flex items-center gap-2">
-                        <Input
-                          placeholder="Add new value..."
-                          id={`new-value-${variantType.id}`}
-                          className="flex-1"
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              const input = e.target;
-                              addVariantValue(variantType.id, input.value);
-                              input.value = "";
+                    </div>
+                    {variantType.values.length === 0 && (
+                      <p className="text-red-500 text-sm">
+                        At least one value is required
+                      </p>
+                    )}
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Enter a value"
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            const value = e.target.value;
+                            if (value) {
+                              addVariantValue(variantType.id, value);
+                              e.target.value = "";
                             }
-                          }}
-                        />
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={() => {
-                            const input = document.getElementById(
-                              `new-value-${variantType.id}`
-                            );
-                            addVariantValue(variantType.id, input.value);
+                          }
+                        }}
+                        className={
+                          variantType.values.length === 0
+                            ? "border-red-500"
+                            : ""
+                        }
+                      />
+                      <Button
+                        type="button"
+                        onClick={(e) => {
+                          const input = e.target.previousElementSibling;
+                          const value = input.value;
+                          if (value) {
+                            addVariantValue(variantType.id, value);
                             input.value = "";
-                          }}
-                        >
-                          <Plus className="h-4 w-4" /> Add
-                        </Button>
-                      </div>
+                          }
+                        }}
+                      >
+                        Add
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -871,8 +1023,45 @@ const toast = useToast();
       </div>
 
       <div className="pt-4 flex justify-end">
-        <Button type="submit">
-          {initialData.id ? "Update Product" : "Create Product"}
+        <Button
+          type="submit"
+          disabled={isSubmitting || !isValid || Object.keys(errors).length > 0}
+          className="relative"
+        >
+          {isSubmitting ? (
+            <>
+              <svg
+                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Saving...
+            </>
+          ) : (
+            <>
+              {Object.keys(errors).length > 0 && (
+                <span className="absolute -top-8 right-0 text-xs text-red-500">
+                  Please fix all errors before submitting
+                </span>
+              )}
+              {initialData.id ? "Update Product" : "Create Product"}
+            </>
+          )}
         </Button>
       </div>
 

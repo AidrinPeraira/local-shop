@@ -45,6 +45,14 @@ const ProductDialogs = ({ selectedProduct, isOpen, onOpenChange, onSubmit, categ
     }))
   } : null;
 
+  const handleSubmit = async (formData) => {
+    const success = await onSubmit(formData);
+    if (success) {
+      // Only close dialog on successful submission
+      setOpen(false);
+    }
+  };
+
 
   return (
     <Dialog 
@@ -59,10 +67,7 @@ const ProductDialogs = ({ selectedProduct, isOpen, onOpenChange, onSubmit, categ
         </DialogHeader>
         <ProductForm 
           initialData={initialData || {}}
-          onSubmit={(data) => {
-            onSubmit(data);
-            onOpenChange(false);
-          }}
+          onSubmit={handleSubmit}
           categories={categories}
         />
       </DialogContent>
