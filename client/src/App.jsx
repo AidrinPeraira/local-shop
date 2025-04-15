@@ -24,7 +24,7 @@ function App() {
   useEffect(() => {
     dispatch(fetchCategories());
 
-    if (user.role === "buyer") {
+    if (user?.role === "buyer") {
       const fetchCounts = async () => {
         try {
           // Fetch cart count

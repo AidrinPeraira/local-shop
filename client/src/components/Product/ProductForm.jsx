@@ -17,6 +17,7 @@ import { NestedCategoryDropdown } from "../seller/NestedCategoryDropdown";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import CropModal from "./ProductCropImage";
+import { useToast } from "../hooks/use-toast";
 
 const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   // Set up react-hook-form with default values from initialData
@@ -45,7 +46,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   const useVariants = watch("useVariants");
   const basePrice = watch("basePrice");
   const stock = watch("stock");
-
+const toast = useToast();
   // State for complex fields that need special handling
   const [images, setImages] = useState(initialData.images || []);
   const [variantTypes, setVariantTypes] = useState(
@@ -238,43 +239,60 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   };
 
   // Final Submit
-  const handleFormSubmit = (formData) => {
-    // Create a new FormData instance
-    const submitFormData = new FormData();
+  const handleFormSubmit = async (formData) => {
+    try {
 
-    // Add all the basic form fields
-    submitFormData.append("productName", formData.productName);
-    submitFormData.append("description", formData.description);
-    submitFormData.append("category", formData.category);
-    submitFormData.append("basePrice", formData.basePrice);
-    submitFormData.append("stock", formData.stock);
-
-    // Add the images
-    images.forEach((image) => {
-      if (image.file) {
-        // Only append if it's a new file
-        submitFormData.append("images", image.file);
+      if (images.length < 3) {
+        toast({
+          title: "Validation Error",
+          description: "Please upload at least 3 product images",
+          variant: "destructive",
+        });
+        return;
       }
-    });
 
-    // Add other complex data as JSON strings
+      // Create a new FormData instance
+      const submitFormData = new FormData();
 
-    // Add variant types data
-    if (useVariants) {
-      // Filter out empty variant types
-      const validVariantTypes = variantTypes.filter(
-        (vt) => vt.name && vt.values.length > 0
-      );
-      submitFormData.append("variantTypes", JSON.stringify(validVariantTypes));
-      submitFormData.append("variants", JSON.stringify(variants));
+      // Add all the basic form fields
+      submitFormData.append("productName", formData.productName);
+      submitFormData.append("description", formData.description);
+      submitFormData.append("category", formData.category);
+      submitFormData.append("basePrice", formData.basePrice);
+      submitFormData.append("stock", formData.stock);
+
+      // Add the images
+      images.forEach((image) => {
+        if (image.file) {
+          submitFormData.append("images", image.file);
+        }
+      });
+
+      // Add variant types data
+      if (useVariants) {
+        const validVariantTypes = variantTypes.filter(
+          (vt) => vt.name && vt.values.length > 0
+        );
+        submitFormData.append("variantTypes", JSON.stringify(validVariantTypes));
+        submitFormData.append("variants", JSON.stringify(variants));
+      }
+
+      submitFormData.append("bulkDiscount", JSON.stringify(tierPrices));
+      if (initialData.id) {
+        submitFormData.append("id", initialData.id);
+      }
+
+      await onSubmit(submitFormData);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      
+      // Show error toast with string message
+      toast({
+        title: "Error",
+        description: "Some error occurred while submitting the form.",
+        variant: "destructive",
+      });
     }
-
-    submitFormData.append("bulkDiscount", JSON.stringify(tierPrices));
-    if (initialData.id) {
-      submitFormData.append("id", initialData.id);
-    }
-
-    onSubmit(submitFormData);
   };
 
   return (

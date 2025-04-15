@@ -119,7 +119,7 @@ export default function SellerProducts() {
     } catch (error) {
       toast({
         title: "Add Product Error",
-        description: error,
+        description: "Error adding product",
         variant: "destructive",
       });
     }
