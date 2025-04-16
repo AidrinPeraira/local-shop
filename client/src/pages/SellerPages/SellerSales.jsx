@@ -21,6 +21,7 @@ import { useToast } from "../../components/hooks/use-toast";
 import { getSalesReportApi } from "../../api/salesApi";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
 
 export default function SellerSales() {
   const [orders, setOrders] = useState([]);
@@ -83,8 +84,9 @@ export default function SellerSales() {
     fetchSalesData();
   }, [currentPage, period, startDate, endDate, sortBy, sortOrder, searchQuery]);
 
-  const generateSalesReport = () => {
-    const doc = new jsPDF();
+  const generateSalesReport = (format = 'pdf') => {
+    if (format === 'pdf') {
+      const doc = new jsPDF();
 
     // Add title
     doc.setFontSize(20);
@@ -131,19 +133,72 @@ export default function SellerSales() {
     doc.save(
       `sales-report-${period}-${new Date().toISOString().split("T")[0]}.pdf`
     );
+    } else if (format === 'excel') {
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+
+      // Summary Sheet
+      const summaryData = [
+        ['Sales Summary'],
+        ['Generated on:', new Date().toLocaleDateString()],
+        ['Period:', period === "custom" ? `${startDate} to ${endDate}` : period],
+        [],
+        ['Metric', 'Value'],
+        ['Total Orders', stats.totalOrders],
+        ['Total Amount', stats.totalAmount],
+        ['Total Discount', stats.totalDiscount],
+        ['Product Discounts', stats.totalProductDiscount],
+        ['Coupon Discounts', stats.totalCouponDiscount],
+        ['Platform Fee', stats.totalPlatformFee],
+        ['Shipping Charges', stats.totalShippingCharge]
+      ];
+      const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
+
+      // Orders Sheet
+      const ordersData = [
+        ['Order ID', 'Date', 'Customer', 'Email', 'Amount', 'Discount', 'Platform Fee', 'Status']
+      ];
+      orders.forEach(order => {
+        ordersData.push([
+          order.orderId,
+          new Date(order.createdAt).toLocaleDateString(),
+          order.user.name,
+          order.user.email,
+          order.summary.cartTotal,
+          order.summary.totalDiscount + order.summary.couponDiscount,
+          order.summary.platformFee,
+          order.orderStatus
+        ]);
+      });
+      const ordersWs = XLSX.utils.aoa_to_sheet(ordersData);
+      XLSX.utils.book_append_sheet(wb, ordersWs, 'Orders');
+
+      // Save Excel file
+      XLSX.writeFile(wb, `sales-report-${period}-${new Date().toISOString().split("T")[0]}.xlsx`);
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Sales Report</h1>
-        <Button
-          onClick={generateSalesReport}
-          className="flex items-center gap-2"
-        >
-          <Download className="h-4 w-4" />
-          Download Report
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Download Report
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => generateSalesReport('pdf')}>
+              PDF Format
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => generateSalesReport('excel')}>
+              Excel Format
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Stats Cards */}

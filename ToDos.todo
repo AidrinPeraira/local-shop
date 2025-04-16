@@ -420,7 +420,7 @@ Pendings:
         ✔ Admin Dashboard : Category Graph : Name should be populated instead of ID @done (4/14/2025, 1:10:25 PM)
         ✔ Sales Report End date report should be included @done (4/16/2025, 2:05:36 PM)
         ☐ Returned item should be removed from sales report
-        ☐ Excel : Sales report data is required
+        ✔ Excel : Sales report data is required @done (4/16/2025, 2:12:24 PM)
         
         ✔ Too many apis are hitting the server on payment completion @done (4/15/2025, 1:08:57 AM)
         ☐ use UTC instead of local time in the backend
