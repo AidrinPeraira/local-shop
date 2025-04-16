@@ -243,11 +243,11 @@ export const processVendorPayout = asyncHandler(async (req, res) => {
       },
       status: "COMPLETED",
       paymentMethod: "BANK_TRANSFER",
-      from: {
+      to: {
         entity: seller._id,
         type: "SELLER"
       },
-      to: {
+      from: {
         entity: "PLATFORM",
         type: "ADMIN"
       },

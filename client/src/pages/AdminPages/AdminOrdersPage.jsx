@@ -3,6 +3,7 @@ import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
+import { useSearchParams } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,9 +32,11 @@ const orderStatuses = [
 ];
 
 export default function SellerOrders() {
+  const [searchParams] = useSearchParams();
   const [orders, setOrders] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("ALL");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const [appliedSearch, setAppliedSearch] = useState(searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState("desc");
   const [expandedOrders, setExpandedOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,7 +45,15 @@ export default function SellerOrders() {
   const { toast } = useToast();
   const [appliedStatus, setAppliedStatus] = useState("ALL");
   const [appliedSort, setAppliedSort] = useState("desc");
-  const [appliedSearch, setAppliedSearch] = useState("");
+  
+
+  useEffect(() => {
+    const searchFromUrl = searchParams.get("search");
+    if (searchFromUrl) {
+      setSearchQuery(searchFromUrl);
+      setAppliedSearch(searchFromUrl);
+    }
+  }, [searchParams]);
 
   const fetchOrders = async () => {
     try {

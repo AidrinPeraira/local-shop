@@ -256,6 +256,19 @@ export const getAllWalletTransactions = asyncHandler(async (req, res) => {
       allTransactions = [...allTransactions, ...transactions];
     });
 
+    // Apply type filter
+    if (type && type !== "ALL") {
+      allTransactions = allTransactions.filter(t => t.type === type);
+    }
+
+    // Apply search filter
+    if (search) {
+      allTransactions = allTransactions.filter(t => 
+        t.transactionId.toLowerCase().includes(search.toLowerCase()) ||
+        t.customOrderId?.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
     // Sort transactions
     allTransactions.sort((a, b) => {
       return sort === "desc" 

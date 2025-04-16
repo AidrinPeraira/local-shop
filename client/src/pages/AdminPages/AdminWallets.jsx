@@ -18,8 +18,15 @@ import {
 } from "lucide-react";
 import { useToast } from "../../components/hooks/use-toast";
 import { getAdminWalletTransactionsApi } from "../../api/walletApi";
+import { useNavigate } from "react-router-dom";
 
-const transactionTypes = ["ALL", "ORDER_PAYMENT", "REFUND", "REFERRAL_REWARD", "PROMO_CREDIT"];
+const transactionTypes = [
+  "ALL",
+  "ORDER_PAYMENT",
+  "REFUND",
+  "REFERRAL_REWARD",
+  "PROMO_CREDIT",
+];
 
 export default function AdminWallets() {
   const [transactions, setTransactions] = useState([]);
@@ -34,6 +41,7 @@ export default function AdminWallets() {
   const [appliedType, setAppliedType] = useState("ALL");
   const [appliedSort, setAppliedSort] = useState("desc");
   const [appliedSearch, setAppliedSearch] = useState("");
+  const navigate = useNavigate();
 
   const fetchTransactions = async () => {
     try {
@@ -43,11 +51,11 @@ export default function AdminWallets() {
         limit: 10,
         type: appliedType,
         sort: appliedSort,
-        search: appliedSearch
+        search: appliedSearch,
       };
 
       const { data } = await getAdminWalletTransactionsApi(params);
-      
+
       if (data.success) {
         setTransactions(data.transactions);
         setTotalPages(data.totalPages);
@@ -69,7 +77,7 @@ export default function AdminWallets() {
   useEffect(() => {
     fetchTransactions();
   }, [currentPage, appliedType, appliedSort, appliedSearch]);
-  
+
   const handleApplyFilters = () => {
     setCurrentPage(1);
     setAppliedType(selectedType);
@@ -96,9 +104,7 @@ export default function AdminWallets() {
     };
 
     return (
-      <Badge className={`${typeColors[type] || "bg-gray-500"}`}>
-        {type}
-      </Badge>
+      <Badge className={`${typeColors[type] || "bg-gray-500"}`}>{type}</Badge>
     );
   };
 
@@ -112,12 +118,14 @@ export default function AdminWallets() {
       <Card className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-gray-500">Total Transactions</h3>
+            <h3 className="text-sm font-medium text-gray-500">
+              Total Transactions
+            </h3>
             <div className="text-2xl font-bold">
               {statistics?.totalTransactions || 0}
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <h3 className="text-sm font-medium text-gray-500">Total Amount</h3>
             <div className="flex items-center text-2xl font-bold">
@@ -127,7 +135,9 @@ export default function AdminWallets() {
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-gray-500">Order Payments</h3>
+            <h3 className="text-sm font-medium text-gray-500">
+              Order Payments
+            </h3>
             <div className="text-2xl font-bold">
               {statistics?.breakdown?.ORDER_PAYMENT || 0}
             </div>
@@ -232,6 +242,7 @@ export default function AdminWallets() {
                 <th className="text-left p-3">Balance</th>
                 <th className="text-left p-3">Date</th>
                 <th className="text-left p-3">Description</th>
+                <th className="text-left p-3">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -240,8 +251,12 @@ export default function AdminWallets() {
                   <td className="p-3">{transaction.transactionId}</td>
                   <td className="p-3">
                     <div>
-                      <div className="font-medium">{transaction.user.username}</div>
-                      <div className="text-sm text-gray-500">{transaction.user.email}</div>
+                      <div className="font-medium">
+                        {transaction.user.username}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {transaction.user.email}
+                      </div>
                     </div>
                   </td>
                   <td className="p-3">{getTypeBadge(transaction.type)}</td>
@@ -261,6 +276,21 @@ export default function AdminWallets() {
                     {new Date(transaction.createdAt).toLocaleDateString()}
                   </td>
                   <td className="p-3">{transaction.description}</td>
+                  <td className="p-3">
+                    {transaction.customOrderId && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          navigate(
+                            `/admin/orders?search=${transaction.customOrderId}`
+                          )
+                        }
+                      >
+                        View Order
+                      </Button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

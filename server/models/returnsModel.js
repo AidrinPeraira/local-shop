@@ -7,6 +7,9 @@ const returnSchema = new mongoose.Schema(
       ref: "Order",
       required: true,
     },
+    customOrderId : {
+      type: String
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

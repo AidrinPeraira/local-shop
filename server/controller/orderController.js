@@ -181,6 +181,16 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       order.payment.wallet = {
         transactionId: transactionId
       };
+
+      await Wallet.findOneAndUpdate(
+        { "transactions.transactionId": transactionId },
+        { 
+          $set: { 
+            "transactions.$.customOrderId": customOrderId,
+            "transactions.$.description": `Payment for order #${customOrderId}`
+          }
+        }
+      );
     }
 
 
@@ -446,6 +456,7 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
       type: "REFUND",
       amount: order.summary.cartTotal,
       orderId: order._id,
+      customOrderId: order.orderId,
       description: `Refund for cancelled order #${order.orderId}`,
       status: "COMPLETED",
       balance: wallet.balance + order.summary.cartTotal

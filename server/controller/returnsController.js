@@ -37,6 +37,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
   // Create return request
   const returnRequest = await Return.create({
     orderId: order._id,
+    customOrderId: order.customOrderId,
     userId,
     sellerId: orderItem.seller,
     items: [
@@ -160,36 +161,49 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
       type: "REFUND",
       amount: returnRequest.returnAmount,
       orderId: returnRequest.orderId,
-      description: `Refund for return request #${returnRequest._id}`,
+
       status: "COMPLETED",
       balance: wallet.balance + returnRequest.returnAmount,
     };
 
+    const order = await Order.findById(returnRequest.orderId);
+
+    refundTransaction.customOrderId = order.orderId;
+    refundTransaction.description = `Refund for order ${order.orderId}`;
     // Add transaction and update wallet balance
     wallet.transactions.push(refundTransaction);
     wallet.balance += returnRequest.returnAmount;
     await wallet.save();
-    const order = await Order.findById(returnRequest.orderId);
+
+    
+
+
     await createRefundTransaction(order, "RETURN");
   }
   // Update order status if return is approved/rejected
   const order = await Order.findById(returnRequest.orderId);
   if (order) {
     const orderItem = order.items.find(
-      (item) =>
-        item._id.toString() === returnRequest.items[0].productId.toString()
+      (item) => item.productId.toString() === returnRequest.items[0].productId.toString()
     );
 
     if (orderItem) {
       // Update the return status of the specific item
       orderItem.returnStatus = {
-        status:
-          status === "RETURN_APPROVED" ? "RETURN_APPROVED" : "RETURN_REJECTED",
+        status: status === "REFUND_COMPLETED" ? "REFUND_COMPLETED" : 
+                status === "RETURN_APPROVED" ? "RETURN_APPROVED" : 
+                "RETURN_REJECTED",
         reason: returnRequest.items[0].returnReason,
         requestDate: returnRequest.createdAt,
         approvalDate: new Date(),
+        completionDate: status === "REFUND_COMPLETED" ? new Date() : undefined
       };
-      order.orderStatus = "RETURNED"
+
+      // Only update order status to RETURNED if refund is completed
+      if (status === "REFUND_COMPLETED") {
+        order.orderStatus = "RETURNED";
+      }
+      
       await order.save();
     }
   }
