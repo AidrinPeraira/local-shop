@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Container } from '../../components/ui/container';
-import ProductBreadcrumbs from './ProductBreadcrumbs';
+import ProductBreadcrumbs from './ProducBreadcrumb';
 import ProductGallery from './ProductGallery';
 import ProductInfo from './ProductInfo';
 import ProductPurchaseCard from './ProducPurchaseCard';
