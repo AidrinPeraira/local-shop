@@ -17,11 +17,11 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../components/ui/tooltip";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardFooter } from "../../components/ui/card";
-import { Separator } from "../../components/ui/separator";
-import { useToast } from "../../components/hooks/use-toast";
+} from "../ui/tooltip";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardFooter } from "../ui/card";
+import { Separator } from "../ui/separator";
+import { useToast } from "../hooks/use-toast";
 import { getCartItemsAPI, getCartItemsCountAPI, updateCartAPI } from "../../api/cartApi";
 import { PageLoading } from "../ui/PageLoading";
 import { useDispatch } from "react-redux";
