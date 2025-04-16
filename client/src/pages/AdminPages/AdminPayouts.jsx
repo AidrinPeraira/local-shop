@@ -61,7 +61,7 @@ const AdminPayouts = () => {
       setVendorLoading(true);
       const params = {
         page: vendorFilter.page,
-        limit: 10,
+        limit: 5 ,
         status: vendorFilter.status,
         search: vendorFilter.search,
         dateRange: vendorFilter.dateRange,

@@ -56,7 +56,7 @@ export const getSalesReport = async (req, res) => {
       dateFilter = {
         createdAt: {
           $gte: new Date(startDate),
-          $lt: new Date(endDate),
+          $lte: new Date(endDate),
         },
       };
     }

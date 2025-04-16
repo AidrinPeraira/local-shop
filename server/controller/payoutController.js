@@ -10,7 +10,7 @@ import mongoose from "mongoose";
 export const getVendorPayouts = asyncHandler(async (req, res) => {
   const {
     page = 1,
-    limit = 10,
+    limit = 5,
     status = "PENDING",
     search = "",
     dateRange = "all",
@@ -46,6 +46,7 @@ export const getVendorPayouts = asyncHandler(async (req, res) => {
     // Get all delivered orders with seller details
     const orders = await Order.aggregate([
       { $match: query },
+      { $sort: { createdAt: -1 } },
       { $unwind: "$items" },
       {
         $lookup: {
