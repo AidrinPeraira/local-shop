@@ -1,10 +1,10 @@
 import Transaction from "../models/adminTransactionModel.js";
+import { getUTCDateTime } from "./dateUtillServerSide.js";
 
 export const createOrderTransaction = async (order) => {
   try {
     // Generate transaction ID
-    const timestamp = new Date()
-      .toISOString()
+    const timestamp = getUTCDateTime()
       .replace(/[-:]/g, "")
       .split(".")[0]
       .replace("T", "");
@@ -30,8 +30,8 @@ export const createOrderTransaction = async (order) => {
         entity: "PLATFORM",
         type: "SYSTEM",
       },
-      scheduledDate: new Date(),
-      processedDate: order.payment.method === "COD" ? null : new Date(),
+      scheduledDate: getUTCDateTime(),
+      processedDate: order.payment.method === "COD" ? null : getUTCDateTime(),
       razorpayPaymentId: order.payment.paymentDetails?.paymentId || null,
       metadata: {
         orderTotal: order.summary.cartTotal,
@@ -57,8 +57,7 @@ export const createOrderTransaction = async (order) => {
 export const createRefundTransaction = async (order, type = "REFUND") => {
   try {
     // Generate transaction ID
-    const timestamp = new Date()
-      .toISOString()
+    const timestamp = getUTCDateTime()
       .replace(/[-:]/g, "")
       .split(".")[0]
       .replace("T", "");
@@ -84,8 +83,8 @@ export const createRefundTransaction = async (order, type = "REFUND") => {
         entity: order.user.toString(),
         type: "USER",
       },
-      scheduledDate: new Date(),
-      processedDate: new Date(),
+      scheduledDate: getUTCDateTime(),
+      processedDate: getUTCDateTime(),
       metadata: {
         refundReason: type === "REFUND" ? "Order Cancelled" : "Order Returned",
         originalOrderTotal: order.summary.cartTotal,

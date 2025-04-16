@@ -8,6 +8,7 @@ import Wallet from "../models/walletModel.js";
 import { razorpay } from "../utils/razorpay.js";
 import crypto from 'crypto';
 import { createOrderTransaction, createRefundTransaction } from "../utils/transactionOperations.js";
+import { getUTCDateTime } from "../utils/dateUtillServerSide.js";
 //buyer side controllers
 
 export const createUserOrder = asyncHandler(async (req, res) => {
@@ -156,7 +157,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
         paymentDetails: {
           orderId: razorpay_order_id || null,
           paymentId: razorpay_payment_id || null,
-          timestamp: new Date(),
+          timestamp: getUTCDateTime(),
           paymentMethod: paymentMethod
         }
       },
@@ -168,7 +169,8 @@ export const createUserOrder = asyncHandler(async (req, res) => {
           status: paymentMethod === "ONLINE"
             ? (paymentStatus === "COMPLETED" ? "Order Placed" : "Payment Failed")
             : "Order Placed",
-          timestamp: new Date(),          description: paymentMethod === "ONLINE"
+          timestamp: getUTCDateTime(),          
+          description: paymentMethod === "ONLINE"
             ? (paymentStatus === "COMPLETED" 
                 ? "Your order has been placed successfully" 
                 : "Payment failed for your order")
@@ -543,7 +545,7 @@ export const returnUserOrders = asyncHandler(async (req, res) => {
     // Add tracking detail with return reason
     order.trackingDetails.push({
       status: "RETURN-REQUESTED",
-      timestamp: new Date(),
+      timestamp: getUTCDateTime(),
       description: `Return requested by user. Reason: ${reason}`
     });
 
@@ -766,7 +768,7 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
     // Add tracking detail
     order.trackingDetails.push({
       status,
-      timestamp: new Date(),
+      timestamp: getUTCDateTime(),
       description: `Order ${status.toLowerCase()} by ${user.role} ${user._id}`,
     });
 
@@ -823,7 +825,7 @@ export const updateOrderPaymentStatus = asyncHandler(async (req, res) => {
       order.payment.paymentDetails = {
         orderId: razorpay_order_id,
         paymentId: razorpay_payment_id,
-        timestamp: new Date(),
+        timestamp: getUTCDateTime(),
         paymentMethod: "ONLINE"
       };
       order.orderStatus = "PENDING";
@@ -831,7 +833,7 @@ export const updateOrderPaymentStatus = asyncHandler(async (req, res) => {
       // Add tracking detail
       order.trackingDetails.push({
         status: "Payment Completed",
-        timestamp: new Date(),
+        timestamp: getUTCDateTime(),
         description: "Payment completed successfully"
       });
 

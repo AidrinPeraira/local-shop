@@ -5,6 +5,7 @@ import Seller from "../models/sellerModel.js";
 import SellerTransaction from "../models/sellerTransactionModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
+import { getUTCDateTime } from "../utils/dateUtillServerSide.js";
 
 // Get vendor payouts with filters
 export const getVendorPayouts = asyncHandler(async (req, res) => {
@@ -252,7 +253,7 @@ export const processVendorPayout = asyncHandler(async (req, res) => {
         entity: "PLATFORM",
         type: "ADMIN"
       },
-      scheduledDate: new Date(),
+      scheduledDate: getUTCDateTime(),
       metadata: {
         orderIds: [order._id],
         sellerDetails: {
@@ -274,10 +275,10 @@ export const processVendorPayout = asyncHandler(async (req, res) => {
       status: "COMPLETED",
       paymentMethod: "BANK_TRANSFER",
       bankDetails: seller.bankDetails,
-      scheduledDate: new Date(),
+      scheduledDate: getUTCDateTime(),
       settlementPeriod: {
         from: order.createdAt,
-        to: new Date()
+        to: getUTCDateTime()
       }
     });
 

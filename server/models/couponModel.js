@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { getUTCDateTime } from "../utils/dateUtillServerSide";
 
 const couponSchema = new mongoose.Schema(
   {
@@ -63,7 +64,7 @@ const couponSchema = new mongoose.Schema(
 );
 
 couponSchema.statics.invalidateExpiredCoupons = async function() {
-  const currentDate = new Date();
+  const currentDate = getUTCDateTime();
   const result = await this.updateMany(
     {
       validUntil: { $lt: currentDate },

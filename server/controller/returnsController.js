@@ -3,6 +3,7 @@ import Return from "../models/returnsModel.js";
 import Order from "../models/orderModel.js";
 import Wallet from "../models/walletModel.js";
 import { createRefundTransaction } from "../utils/transactionOperations.js";
+import { getUTCDateTime } from "../utils/dateUtillServerSide.js";
 
 export const createUserReturnRequest = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -65,7 +66,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
     orderItem.returnStatus = {
       status: "RETURN_REQUESTED",
       reason: returnReason,
-      requestDate: new Date(),
+      requestDate: getUTCDateTime(),
     };
     await order.save();
   }
@@ -124,7 +125,7 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
   returnRequest.sellerResponse = {
     status: status === "RETURN_APPROVED" ? "APPROVED" : "REJECTED",
     comment,
-    responseDate: new Date(),
+    responseDate: getUTCDateTime(),
   };
 
   // Add timeline entry
@@ -132,7 +133,7 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
     status,
     comment,
     updatedBy: "SELLER",
-    timestamp: new Date(),
+    timestamp: getUTCDateTime(),
   });
 
   if (status === "REFUND_COMPLETED") {
@@ -195,8 +196,8 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
                 "RETURN_REJECTED",
         reason: returnRequest.items[0].returnReason,
         requestDate: returnRequest.createdAt,
-        approvalDate: new Date(),
-        completionDate: status === "REFUND_COMPLETED" ? new Date() : undefined
+        approvalDate: getUTCDateTime(),
+        completionDate: status === "REFUND_COMPLETED" ? getUTCDateTime() : undefined
       };
 
       // Only update order status to RETURNED if refund is completed
