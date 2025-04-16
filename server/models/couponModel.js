@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { getUTCDateTime } from "../utils/dateUtillServerSide";
+import { getUTCDateTime } from "../utils/dateUtillServerSide.js";
 
 const couponSchema = new mongoose.Schema(
   {
