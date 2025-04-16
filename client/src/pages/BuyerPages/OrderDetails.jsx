@@ -47,7 +47,6 @@ const OrderDetails = () => {
     try {
       setLoading(true);
       const response = await getOrderByIdApi(id);
-      console.log(response.data);
       // Check if the response contains the order data
       if (response.data.success) {
         setOrder(response.data.order);

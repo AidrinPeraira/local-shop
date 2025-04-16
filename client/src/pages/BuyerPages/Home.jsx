@@ -27,84 +27,9 @@ import { useEffect, useState } from "react";
 import { getShopProductsApi } from "../../api/productApi";
 
 export default function Home() {
-  const industries = [
-    {
-      id: 1,
-      name: "Equipments",
-      image:
-        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163584.jpg?t=st=1741325045~exp=1741328645~hmac=3e5181756393886d0563bb0d6504f86804cb04ef13c65013486588588b92f205&w=740",
-    },
-    {
-      id: 2,
-      name: "Services",
-      image:
-        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163577.jpg?ga=GA1.1.1465198438.1741275083",
-    },
-    {
-      id: 3,
-      name: "Healthcare",
-      image:
-        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163569.jpg?t=st=1741324820~exp=1741328420~hmac=c6e6f2f0e2f7ab14827da271e2d442d4d50fae67d841ee487cef75b461781db9&w=740",
-    },
-    {
-      id: 4,
-      name: "Organic",
-      image:
-        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163601.jpg?t=st=1741324885~exp=1741328485~hmac=10fd7beb587319b868301910c4fc26ef7194abd1709f0deddc5903ab617e31ff&w=740",
-    },
-    {
-      id: 5,
-      name: "Automotive",
-      image:
-        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163610.jpg?t=st=1741324845~exp=1741328445~hmac=636a11bffa39a6317573687c62d80df5991ab3aaab199151e500577ee117e0a9&w=740",
-    },
-    {
-      id: 6,
-      name: "Logistics",
-      image:
-        "https://img.freepik.com/free-photo/person-their-job-position_23-2150163596.jpg?t=st=1741324777~exp=1741328377~hmac=0fbc98c236f2e6ba1cec50e724402ef6a89a56561eccf3b38935e7816764c5b0&w=1060",
-    },
-  ];
+  
 
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "MacBook Pro 16",
-      price: 2499.99,
-      rating: 5,
-      image: "/placeholder.svg",
-      discount: 15,
-      badge: "HOT",
-    },
-    {
-      id: 2,
-      name: "iPhone 15 Pro",
-      price: 999.99,
-      rating: 5,
-      image: "/placeholder.svg",
-      discount: 10,
-      badge: "NEW",
-    },
-    {
-      id: 3,
-      name: "Sony WH-1000XM4",
-      price: 349.99,
-      rating: 4,
-      image: "/placeholder.svg",
-      discount: 20,
-      badge: "SALE",
-    },
-    {
-      id: 4,
-      name: "Samsung Galaxy S24",
-      price: 899.99,
-      rating: 5,
-      image: "/placeholder.svg",
-      discount: 12,
-      badge: "BEST DEAL",
-    },
-  ];
-
+  
   const { categories } = useSelector((state) => state.categories);
   const [categoryProducts, setCategoryProducts] = useState({});
 
@@ -288,7 +213,11 @@ export default function Home() {
         <div className="overflow-x-auto">
           <div className="flex gap-4 pb-4">
             {level3Categories.map((category) => (
-              <div key={category?.id} className="flex-none w-64">
+               <Link 
+               key={category.id} 
+               to={`/shop?category=${category.id}&categoryName=${encodeURIComponent(category.name)}`}
+             >
+              <div key={category?._id} className="flex-none w-64">
                 <div className="group cursor-pointer">
                   <div className="aspect-square rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden mb-3">
                     <div className="opacity-40 group-hover:opacity-60 transition-opacity">
@@ -310,6 +239,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              </Link>
             ))}
           </div>
         </div>
