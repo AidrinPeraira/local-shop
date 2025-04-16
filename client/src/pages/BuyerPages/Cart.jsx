@@ -2,7 +2,7 @@ import React from 'react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import { Container } from '../../components/ui/container';
-import CartContent from '../../components/Cart/CartContent';
+import CartContent from '../../components/cart/CartContent';
 
 const Cart = () => {
   return (
