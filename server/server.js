@@ -45,10 +45,7 @@ const app = express() //initialise an instance of express
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())
-app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true // 
-  }))
+app.use(cors())
 app.use(helmet()); // To protect against the xss seAllow sending cookiescurity threarts
 app.use(morgan("dev")); // Logs requests in 'dev' format
 
