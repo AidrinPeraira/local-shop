@@ -9,37 +9,52 @@ const API = axios.create({
 // Function to fetch CSRF token
 const fetchCSRFToken = async () => {
     try {
-        const response = await API.get('/csrf-token');
+        const response = await axios.get(`${configuration.baseURL}/csrf-token`, { withCredentials: true });
         API.defaults.headers.common['X-CSRF-Token'] = response.data.csrfToken;
+        return response.data.csrfToken;
     } catch (error) {
         console.error('Error fetching CSRF token:', error);
+        return null;
     }
 };
 
 // Call fetchCSRFToken when setting up the API
 fetchCSRFToken();
 
-API.defaults.retryCount = 0;
-const MAX_RETRIES = 3;
+
+API.interceptors.request.use(
+    async config => {
+        if (!config.headers['X-CSRF-Token']) {
+            const token = await fetchCSRFToken();
+            if (token) {
+                config.headers['X-CSRF-Token'] = token;
+            }
+        }
+        return config;
+    },
+    error => Promise.reject(error)
+);
+
+// API.defaults.retryCount = 0;
+// const MAX_RETRIES = 3;
 
 // Add response interceptor to handle CSRF token errors
 API.interceptors.response.use(
-    response => {
-        // Reset retry count on successful response
-        API.defaults.retryCount = 0;
-        return response;
-    },
+    response => response,
     async error => {
+        const originalRequest = error.config;
+        
         if (error.response?.status === 403 && 
             error.response?.data?.message?.includes('Invalid CSRF token') && 
-            API.defaults.retryCount < MAX_RETRIES) {
+            !originalRequest._retry) {
             
-            API.defaults.retryCount++;
-            await fetchCSRFToken();
-            return API(error.config);
+            originalRequest._retry = true;
+            const token = await fetchCSRFToken();
+            if (token) {
+                originalRequest.headers['X-CSRF-Token'] = token;
+                return API(originalRequest);
+            }
         }
-        // Reset retry count and reject the promise
-        API.defaults.retryCount = 0;
         return Promise.reject(error);
     }
 );

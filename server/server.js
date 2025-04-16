@@ -67,26 +67,22 @@ app.use((req, res, next) => {
   const token = req.headers['x-csrf-token'];
   const secret = req.cookies['csrf-secret'];
 
-  // If no secret in cookie, request new token
-  if (!secret) {
+  if (!token || !secret) {
       return res.status(403).json({ message: 'Invalid CSRF token' });
   }
 
-  // Validate the token
-  if (!token || !tokens.verify(secret, token)) {
+  try {
+      if (tokens.verify(secret, token)) {
+          return next();
+      }
+      return res.status(403).json({ message: 'Invalid CSRF token' });
+  } catch (error) {
       return res.status(403).json({ message: 'Invalid CSRF token' });
   }
-
-  next();
 });
 
 app.get('/api/csrf-token', (req, res) => {
-  // Use existing secret if available
-  let secret = req.cookies['csrf-secret'];
-  if (!secret) {
-      secret = tokens.secretSync();
-  }
-  
+  const secret = tokens.secretSync();
   const token = tokens.create(secret);
   
   res.cookie('csrf-secret', secret, {
