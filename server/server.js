@@ -45,7 +45,10 @@ const app = express() //initialise an instance of express
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())
-app.use(cors())
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true // 
+  }))
 app.use(helmet()); // To protect against the xss seAllow sending cookiescurity threarts
 app.use(morgan("dev")); // Logs requests in 'dev' format
 
