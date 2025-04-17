@@ -425,5 +425,5 @@ Pendings:
         ✔ Too many apis are hitting the server on payment completion @done (4/15/2025, 1:08:57 AM)
         ✔ use UTC instead of local time in the backend @done (4/16/2025, 11:23:29 PM)
         
-    
+    ☐ csrf not allowing login
         
