@@ -67,6 +67,9 @@ app.use((req, res, next) => {
   const token = req.headers['x-csrf-token'];
   const secret = req.cookies['csrf-secret'];
 
+  console.log( "token - secrret",token, secret); // Log the received token and secret for analysi  
+  
+
   if (!token || !secret) {
       return res.status(403).json({ message: 'Invalid CSRF token' });
   }
