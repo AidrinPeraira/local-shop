@@ -15,6 +15,8 @@ export const authenticateUser = asyncHandler(
 
         //read jwt form the cookie
         token = req.cookies.jwt;
+        console.log("token", token)
+        console.log("cookie", req.cookies)
 
         if (token) {
             console.log("hit")
