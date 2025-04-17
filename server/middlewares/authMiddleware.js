@@ -22,10 +22,12 @@ export const authenticateUser = asyncHandler(
                 req.user = await User.findById(decoded.userId).select('-password') //.select('-password') ensures that the password field is excluded from the result.
                 next()
             } catch (error) {
+                console.log("e1jwt", error)
                 res.status(HTTP_CODES.UNAUTHORIZED)
                 throw new Error('Not authorised, plaese login as buyer to continue')
             }
         } else {
+            console.log("e2jwt", error)
             res.status(HTTP_CODES.UNAUTHORIZED)
             throw new Error('Not authorised. plaese login as buyer to continue.')
 
