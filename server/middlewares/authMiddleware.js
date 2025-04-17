@@ -17,6 +17,7 @@ export const authenticateUser = asyncHandler(
         token = req.cookies.jwt;
 
         if (token) {
+            console.log("hit")
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET) //we created token using _id therfore we get id on decoding
                 req.user = await User.findById(decoded.userId).select('-password') //.select('-password') ensures that the password field is excluded from the result.
@@ -27,7 +28,6 @@ export const authenticateUser = asyncHandler(
                 throw new Error('Not authorised, plaese login as buyer to continue')
             }
         } else {
-            console.log("e2jwt", error)
             res.status(HTTP_CODES.UNAUTHORIZED)
             throw new Error('Not authorised. plaese login as buyer to continue.')
 
