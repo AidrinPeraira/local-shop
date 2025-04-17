@@ -11,7 +11,8 @@ const generateToken = (res, userId) => {
         httpOnly : true,
         secure: process.env.NODE_ENV === 'production', 
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        maxAge: 30*24*60*60*1000
+        maxAge: 30*24*60*60*1000,
+        path : '/'
     })
 
     return token
