@@ -411,7 +411,7 @@ Pendings:
         ✔ payment method in order details @done (4/14/2025, 12:59:20 PM)
         ✔ Min Purchase amt should be checked while applying coupon @done (4/15/2025, 1:16:46 AM)
         ✔ Refresh Token bug @done (4/15/2025, 1:09:02 AM)
-        ☐ Refund individual item calculation to be changed  : platform fee shouldn't be refunded & coupon amt to be considered
+        ✔ Refund individual item calculation to be changed  : platform fee shouldn't be refunded & coupon amt to be considered @done (4/17/2025, 3:51:29 PM)
         ✔ Return Request Approved Status is not reflected in order details @done (4/16/2025, 1:36:50 PM)
         
     Admin
@@ -419,7 +419,7 @@ Pendings:
         ✔ Wallet Transaction : Order details Hyperlink @done (4/16/2025, 1:36:53 PM)
         ✔ Admin Dashboard : Category Graph : Name should be populated instead of ID @done (4/14/2025, 1:10:25 PM)
         ✔ Sales Report End date report should be included @done (4/16/2025, 2:05:36 PM)
-        ☐ Returned item should be removed from sales report
+        ✔ Returned item should be removed from sales report @done (4/17/2025, 3:51:13 PM)
         ✔ Excel : Sales report data is required @done (4/16/2025, 2:12:24 PM)
         
         ✔ Too many apis are hitting the server on payment completion @done (4/15/2025, 1:08:57 AM)
@@ -428,5 +428,8 @@ Pendings:
     ✔ csrf not allowing login @done (4/17/2025, 3:17:03 PM)
     ✔ jwt not working @done (4/17/2025, 3:48:22 PM)
     ☐ revenue chart not showing
+    ☐ return item in sales report
+    ☐ refund calculation coupon and platform fee
+    ☐ seller excel sheet
 
-        
+    ☐ clear wishlist and cart badge on logout

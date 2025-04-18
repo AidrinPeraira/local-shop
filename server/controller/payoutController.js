@@ -196,7 +196,6 @@ export const getVendorPayouts = asyncHandler(async (req, res) => {
 export const processVendorPayout = asyncHandler(async (req, res) => {
   const { orderId, sellerId } = req.body;
 
-  console.log(orderId, sellerId);
 
   try {
     // Get the payout details from orders

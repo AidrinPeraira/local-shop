@@ -395,7 +395,6 @@ export const processCartItems = asyncHandler(
                     0
                 );
 
-                console.log("Product Subtotal:", productSubtotal);
                 
                 const productDiscount = processedVariants.reduce(
                     (sum, variant) => sum + variant.variantDiscount,

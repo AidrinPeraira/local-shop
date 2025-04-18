@@ -213,7 +213,6 @@ const ProductPurchaseCard = ({ product }) => {
       
       
     } catch (error) {
-      console.log("buy now error", error)
       toast({
         title: "Error",
         description: `Error adding products to cart`,
