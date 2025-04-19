@@ -139,7 +139,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     isActive: true,
     basePrice: parseFloat(basePrice),
     stock: parseFloat(stock),
-    stockUnit: stockUnit || "Nos",
+    stockUnit: stockUnit 
   };
 
   //IF THERE ARE VARIANTS
