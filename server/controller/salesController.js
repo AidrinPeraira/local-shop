@@ -76,27 +76,42 @@ export const getSalesReport = async (req, res) => {
       ...dateFilter,
       ...searchFilter,
       ...roleFilter,
-      orderStatus: { $nin: ["FAILED", "CANCELLED"] },
+      orderStatus: { $nin: ["FAILED", "CANCELLED", "RETURNED"] },
     };
 
-    const totalCount = await Order.countDocuments(filter);
-    const totalPages = Math.ceil(totalCount / limit);
+    // const totalCount = await Order.countDocuments(filter);
+    // const totalPages = Math.ceil(totalCount / limit);
 
-    const orders = await Order.find(filter)
-      .sort({ [sort]: order })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .populate("user", "name email")
-      .populate({
-        path: "items",
-        populate: {
-          path: "seller",
-          select: "sellerName email",
+    // const orders = await Order.find(filter)
+    //   .sort({ [sort]: order })
+    //   .skip((page - 1) * limit)
+    //   .limit(limit)
+    //   .populate("user", "name email")
+    //   .populate({
+    //     path: "items",
+    //     populate: {
+    //       path: "seller",
+    //       select: "sellerName email",
+    //     },
+    //   })
+    //   .lean();
+
+    const aggregationPipeline = [
+      { $match: filter },
+      { $unwind: "$items" },
+      {
+        $match: {
+          $and: [
+            {
+              "items.returnStatus.status": {
+                $nin: ["RETURN_COMPLETED", "CANCELLED"],
+              },
+            },
+            { orderStatus: { $nin: ["FAILED", "CANCELLED"] } },
+          ],
         },
-      })
-      .lean();
-
-    const aggregationPipeline = [{ $match: filter }];
+      },
+    ];
 
     if (req.user.role === "seller") {
       aggregationPipeline.push(
@@ -105,10 +120,12 @@ export const getSalesReport = async (req, res) => {
       );
     }
 
+    // Group by order for counting and calculations
     aggregationPipeline.push({
       $group: {
         _id: null,
-        totalOrders: { $sum: 1 },
+        uniqueOrders: { $addToSet: "$_id" }, // Count unique orders
+        totalItems: { $sum: 1 },
         totalAmount: {
           $sum:
             req.user.role === "seller"
@@ -119,9 +136,7 @@ export const getSalesReport = async (req, res) => {
           $sum:
             req.user.role === "seller"
               ? "$items.productDiscount"
-              : {
-                  $add: ["$summary.totalDiscount", "$summary.couponDiscount"],
-                },
+              : { $add: ["$summary.totalDiscount", "$summary.couponDiscount"] },
         },
         totalProductDiscount: {
           $sum:
@@ -141,6 +156,41 @@ export const getSalesReport = async (req, res) => {
       },
     });
 
+    // Modified orders query to exclude returned/cancelled items
+    const orders = await Order.aggregate([
+      { $match: filter },
+      { $unwind: "$items" },
+      {
+        $match: {
+          $and: [
+            { "items.returnStatus.status": { $nin: ["RETURN_COMPLETED", "CANCELLED"] } },
+            { orderStatus: { $nin: ["FAILED", "CANCELLED"] } }
+          ]
+        }
+      },
+      ...(req.user.role === "seller" ? [{ $match: { "items.seller": req.user._id } }] : []),
+      {
+        $group: {
+          _id: "$_id",
+          orderId: { $first: "$orderId" },
+          createdAt: { $first: "$createdAt" },
+          user: { $first: "$user" },
+          items: { $push: "$items" },
+          summary: { $first: "$summary" },
+          orderStatus: { $first: "$orderStatus" }
+        }
+      },
+      { $sort: { [sort]: order === "desc" ? -1 : 1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: parseInt(limit) }
+    ]).exec();
+
+    // Populate user and seller details
+    await Order.populate(orders, [
+      { path: "user", select: "name email" },
+      { path: "items.seller", select: "sellerName email" }
+    ]);
+
     const aggregatedData = await Order.aggregate(aggregationPipeline);
 
     const stats = aggregatedData[0] || {
@@ -153,10 +203,16 @@ export const getSalesReport = async (req, res) => {
       totalShippingCharge: 0,
     };
 
+    if (aggregatedData[0]) {
+      stats.totalOrders = aggregatedData[0].uniqueOrders.length;
+    }
+    const totalCount = orders.length;
+    const totalPages = Math.ceil(totalCount / limit);
+
     res.json({
       orders,
       pagination: {
-        currentPage: page,
+        currentPage: parseInt(page),
         totalPages,
         totalItems: totalCount,
         hasNext: page < totalPages,
