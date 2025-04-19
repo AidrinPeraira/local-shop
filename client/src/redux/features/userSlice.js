@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { adminLoginApi, adminLogoutApi, googleAuthApi, sellerLoginApi, sellerLogoutApi, sellerRegApi, userLoginApi, userLogoutApi, userRegApi } from "../../api/userAuthApi";
 import Cookies from 'js-cookie'
+import { clearCart } from "./cartSlice";
+import { setWishlistCount } from "./wishlistSlice";
+
 
 
 //first we will create an async thunk midelware
@@ -35,11 +38,16 @@ export const loginUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk(
   "user/logoutUser",
-  async (_,{ rejectWithValue }) => {
+  async (_,{ rejectWithValue, dispatch }) => {
     try {
       const response = await userLogoutApi();
       Cookies.remove("jwt"); 
       localStorage.removeItem("user"); 
+
+      dispatch(clearCart());
+      dispatch(setWishlistCount(0));
+
+
       return true; 
     } catch (error) {
       return rejectWithValue(error.message);

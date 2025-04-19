@@ -11,6 +11,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
   const isSeller = req.user.role === "seller";
   const sellerId = isSeller ? req.user._id : null;
 
+  
+
   try {
     // Calculate date range
     const endDate = new Date();
@@ -31,19 +33,19 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
 
     const baseMatch = {
       createdAt: { $gte: startDate, $lte: endDate },
-      ...(isSeller && { "items.sellerId": sellerId }),
+      ...(isSeller && { "items.seller": sellerId }),
     };
 
     // Get total orders and related metrics
     const orderMetrics = await Order.aggregate([
       { $match: baseMatch },
       { $unwind: "$items" },
-      ...(isSeller ? [{ $match: { "items.sellerId": sellerId } }] : []),
+      ...(isSeller ? [{ $match: { "items.seller": sellerId } }] : []),
       {
         $group: {
           _id: null,
           totalOrders: { $sum: 1 },
-          totalSales: { $sum: "$items.totalPrice" },
+          totalSales: { $sum: "$items.productTotal" },
           totalDiscounts: { $sum: "$items.discount" },
           cancellations: {
             $sum: { $cond: [{ $eq: ["$orderStatus", "CANCELLED"] }, 1, 0] },
@@ -80,16 +82,17 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         },
       },
       { $unwind: "$items" },
-      ...(isSeller ? [{ $match: { "items.sellerId": sellerId } }] : []),
+      ...(isSeller ? [{ $match: { "items.seller": sellerId } }] : []),
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          revenue: { $sum: "$items.totalPrice" },
+          revenue: { $sum: "$items.productTotal" },
         },
       },
       { $sort: { _id: 1 } },
       { $project: { date: "$_id", revenue: 1, _id: 0 } },
     ]);
+
 
     // Get category distribution
     const categoryDistribution = await Order.aggregate([
@@ -100,7 +103,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         },
       },
       { $unwind: "$items" },
-      ...(isSeller ? [{ $match: { "items.sellerId": sellerId } }] : []),
+      ...(isSeller ? [{ $match: { "items.seller": sellerId } }] : []),
       {
         $lookup: {
           from: "products",
@@ -137,7 +140,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         },
       },
       { $unwind: "$items" },
-      ...(isSeller ? [{ $match: { "items.sellerId": sellerId } }] : []),
+      ...(isSeller ? [{ $match: { "items.seller": sellerId } }] : []),
       {
         $group: {
           _id: "$items.productId",
@@ -152,7 +155,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
 
     // Get total customers and sellers
     const totalCustomers = isSeller
-      ? await Order.distinct("userId", { "items.sellerId": sellerId }).length
+      ? await Order.distinct("userId", { "items.seller": sellerId }).length
       : await User.countDocuments();
 
     const totalSellers = isSeller ? 1 : await Seller.countDocuments();
