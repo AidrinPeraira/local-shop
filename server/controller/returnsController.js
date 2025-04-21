@@ -4,6 +4,7 @@ import Order from "../models/orderModel.js";
 import Wallet from "../models/walletModel.js";
 import { createRefundTransaction } from "../utils/transactionOperations.js";
 import { getUTCDateTime } from "../utils/dateUtillServerSide.js";
+import { HTTP_CODES } from "../utils/responseCodes.js";
 
 export const createUserReturnRequest = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -12,7 +13,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
   // Find the order
   const order = await Order.findById(orderId);
   if (!order) {
-    return res.status(404).json({
+    return res.status(HTTP_CODES.NOT_FOUND).json({
       success: false,
       message: "Order not found",
     });
@@ -20,7 +21,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
 
   // Check if order is delivered
   if (order.orderStatus !== "DELIVERED") {
-    return res.status(400).json({
+    return res.status(HTTP_CODES.BAD_REQUEST).json({
       success: false,
       message: "Only delivered orders can be returned",
     });
@@ -29,7 +30,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
   // Find the specific item in the order
   const orderItem = order.items.find((item) => item._id.toString() === itemId);
   if (!orderItem) {
-    return res.status(404).json({
+    return res.status(HTTP_CODES.NOT_FOUND).json({
       success: false,
       message: "Order item not found",
     });
@@ -71,7 +72,7 @@ export const createUserReturnRequest = asyncHandler(async (req, res) => {
     await order.save();
   }
 
-  res.status(201).json({
+  res.status(HTTP_CODES.CREATED).json({
     success: true,
     message: "Return request created successfully",
     return: returnRequest,
@@ -100,7 +101,7 @@ export const getAllReturnRequests = asyncHandler(async (req, res) => {
 
   const total = await Return.countDocuments(query);
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     returns,
     total,
@@ -114,7 +115,7 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
 
   const returnRequest = await Return.findById(id);
   if (!returnRequest) {
-    return res.status(404).json({
+    return res.status(HTTP_CODES.NOT_FOUND).json({
       success: false,
       message: "Return request not found",
     });
@@ -211,7 +212,7 @@ export const updateUserReturnRequest = asyncHandler(async (req, res) => {
 
   await returnRequest.save();
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     message: "Return request updated successfully",
     return: returnRequest,

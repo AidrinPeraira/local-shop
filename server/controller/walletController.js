@@ -1,5 +1,6 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Wallet from "../models/walletModel.js";
+import { HTTP_CODES } from "../utils/responseCodes.js";
 
 // Create or get wallet for user
 export const getWallet = asyncHandler(async (req, res) => {
@@ -15,7 +16,7 @@ export const getWallet = asyncHandler(async (req, res) => {
     });
   }
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     data: wallet,
   });
@@ -27,11 +28,11 @@ export const getWalletBalance = asyncHandler(async (req, res) => {
   const wallet = await Wallet.findOne({ user: userId });
 
   if (!wallet) {
-    res.status(404);
+    res.status(HTTP_CODES.NOT_FOUND);
     throw new Error("Wallet not found");
   }
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     balance: wallet.balance,
   });
@@ -45,17 +46,17 @@ export const processWalletPayment = asyncHandler(async (req, res) => {
   const wallet = await Wallet.findOne({ user: userId });
 
   if (!wallet) {
-    res.status(404);
+    res.status(HTTP_CODES.NOT_FOUND);
     throw new Error("Wallet not found");
   }
 
   if (!wallet.isActive) {
-    res.status(400);
+    res.status(HTTP_CODES.BAD_REQUEST);
     throw new Error("Wallet is inactive");
   }
 
   if (wallet.balance < amount) {
-    res.status(400);
+    res.status(HTTP_CODES.BAD_REQUEST);
     throw new Error("Insufficient wallet balance");
   }
 
@@ -78,7 +79,7 @@ export const processWalletPayment = asyncHandler(async (req, res) => {
 
   await wallet.save();
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     message: "Payment processed successfully",
     remainingBalance: wallet.balance,
@@ -94,7 +95,7 @@ export const processRefund = asyncHandler(async (req, res) => {
   const wallet = await Wallet.findOne({ user: userId });
 
   if (!wallet) {
-    res.status(404);
+    res.status(HTTP_CODES.NOT_FOUND);
     throw new Error("Wallet not found");
   }
 
@@ -111,7 +112,7 @@ export const processRefund = asyncHandler(async (req, res) => {
 
   await wallet.save();
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     message: "Refund processed successfully",
     currentBalance: wallet.balance,
@@ -126,7 +127,7 @@ export const addReferralReward = asyncHandler(async (req, res) => {
   const wallet = await Wallet.findOne({ user: userId });
 
   if (!wallet) {
-    res.status(404);
+    res.status(HTTP_CODES.NOT_FOUND);
     throw new Error("Wallet not found");
   }
 
@@ -143,7 +144,7 @@ export const addReferralReward = asyncHandler(async (req, res) => {
 
   await wallet.save();
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     message: "Referral reward added successfully",
     currentBalance: wallet.balance,
@@ -158,7 +159,7 @@ export const addPromoCredit = asyncHandler(async (req, res) => {
   const wallet = await Wallet.findOne({ user: userId });
 
   if (!wallet) {
-    res.status(404);
+    res.status(HTTP_CODES.NOT_FOUND);
     throw new Error("Wallet not found");
   }
 
@@ -175,7 +176,7 @@ export const addPromoCredit = asyncHandler(async (req, res) => {
 
   await wallet.save();
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     message: "Promo credit added successfully",
     currentBalance: wallet.balance,
@@ -190,7 +191,7 @@ export const getTransactionHistory = asyncHandler(async (req, res) => {
   const wallet = await Wallet.findOne({ user: userId });
 
   if (!wallet) {
-    res.status(404);
+    res.status(HTTP_CODES.NOT_FOUND);
     throw new Error("Wallet not found");
   }
 
@@ -209,7 +210,7 @@ export const getTransactionHistory = asyncHandler(async (req, res) => {
   const endIndex = page * limit;
   const paginatedTransactions = transactions.slice(startIndex, endIndex);
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     success: true,
     currentPage: page,
     totalPages: Math.ceil(transactions.length / limit),
@@ -294,7 +295,7 @@ export const getAllWalletTransactions = asyncHandler(async (req, res) => {
       }
     };
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       transactions: paginatedTransactions,
       total,
@@ -303,7 +304,7 @@ export const getAllWalletTransactions = asyncHandler(async (req, res) => {
       totalPages: Math.ceil(total / parseInt(limit)),
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error fetching wallet transactions",
       error: error.message,

@@ -416,7 +416,7 @@ export const getAllCategories = asyncHandler(async (req, res) => {
   //   }
   // ]);
 
-  res.status(200).json({
+  res.status(HTTP_CODES.OK).json({
     categories,
     pagination: {
       total,
@@ -541,5 +541,5 @@ export const getActiveCategories = asyncHandler(async (req, res) => {
     }
   ]);
 
-  res.status(200).json(categories);
+  res.status(HTTP_CODES.OK).json(categories);
 });

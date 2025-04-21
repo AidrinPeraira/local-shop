@@ -6,6 +6,7 @@ import SellerTransaction from "../models/sellerTransactionModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { getUTCDateTime } from "../utils/dateUtillServerSide.js";
+import { HTTP_CODES } from "../utils/responseCodes.js";
 
 // Get vendor payouts with filters
 export const getVendorPayouts = asyncHandler(async (req, res) => {
@@ -178,14 +179,14 @@ export const getVendorPayouts = asyncHandler(async (req, res) => {
     );
     const totalPages = Math.ceil(payouts.length / limit);
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       payouts: paginatedPayouts,
       total: payouts.length,
       totalPages,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error fetching vendor payouts",
       error: error.message,
@@ -207,7 +208,7 @@ export const processVendorPayout = asyncHandler(async (req, res) => {
     });
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: "No eligible orders found for payout",
       });
@@ -215,7 +216,7 @@ export const processVendorPayout = asyncHandler(async (req, res) => {
 
     const seller = await Seller.findById(sellerId);
     if (!seller) {
-      return res.status(404).json({
+      return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: "Seller not found",
       });
@@ -281,7 +282,7 @@ export const processVendorPayout = asyncHandler(async (req, res) => {
       }
     });
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       message: "Payout processrd",
       data: {
@@ -290,7 +291,7 @@ export const processVendorPayout = asyncHandler(async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error processing vendor payout",
       error: error.message,

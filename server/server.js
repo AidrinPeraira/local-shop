@@ -31,6 +31,7 @@ import dashboardRouter from './routes/dashboardRoutes.js';
 import returnRouter from './routes/returnRoutes.js';
 import walletRouter from './routes/walletRoutes.js';
 import salesRouter from './routes/salesRoutes.js';
+import returnsModel from './models/returnsModel.js';
 
 
 dotenv.config() //load dot env data into 'process.env' by default
@@ -69,16 +70,16 @@ app.use((req, res, next) => {
   
 
   if (!token || !secret) {
-      return res.status(403).json({ message: 'Invalid CSRF token' });
+      return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
   }
 
   try {
       if (tokens.verify(secret, token)) {
           return next();
       }
-      return res.status(403).json({ message: 'Invalid CSRF token' });
+      return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
   } catch (error) {
-      return res.status(403).json({ message: 'Invalid CSRF token' });
+      return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
   }
 });
 
@@ -127,6 +128,10 @@ app.use('/api/wallet', walletRouter);
 app.use('/api/sales', salesRouter);
 
 
+//
+// admin aprove returns
+// check order date > 10
+// if any coupon give 70 % as refund1
 
 //handle errors after evrything is done
 app.use(errorHandler)

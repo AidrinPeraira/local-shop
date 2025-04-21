@@ -221,6 +221,6 @@ export const getSalesReport = async (req, res) => {
       stats,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({ message: error.message });
   }
 };

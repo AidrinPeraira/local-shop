@@ -12,6 +12,7 @@ import {
   createRefundTransaction,
 } from "../utils/transactionOperations.js";
 import { getUTCDateTime } from "../utils/dateUtillServerSide.js";
+import { HTTP_CODES } from "../utils/responseCodes.js";
 //buyer side controllers
 
 export const createUserOrder = asyncHandler(async (req, res) => {
@@ -42,7 +43,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
     // 2. Get shipping address
     const shippingAddress = await Address.findById(selectedAddressId);
     if (!shippingAddress) {
-      return res.status(400).json({
+      return res.status(HTTP_CODES.BAD_REQUEST).json({
         success: false,
         message: "Shipping address not found",
       });
@@ -222,7 +223,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       }
     );
 
-    res.status(201).json({
+    res.status(HTTP_CODES.CREATED).json({
       success: true,
       message: "Orders created successfully",
       order: {
@@ -238,7 +239,7 @@ export const createUserOrder = asyncHandler(async (req, res) => {
       })),
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(HTTP_CODES.BAD_REQUEST).json({
       success: false,
       message: "Failed to create orders",
       error: error.message,
@@ -321,7 +322,7 @@ export const getUserOrders = asyncHandler(async (req, res) => {
       trackingDetails: order.trackingDetails,
     }));
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       orders: formattedOrders,
       total,
@@ -329,7 +330,7 @@ export const getUserOrders = asyncHandler(async (req, res) => {
       totalPages: Math.ceil(total / parseInt(limit)),
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error fetching orders",
       error: error.message,
@@ -351,7 +352,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
       .lean();
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: "Order not found",
       });
@@ -404,12 +405,12 @@ export const getOrderById = asyncHandler(async (req, res) => {
       trackingDetails: order.trackingDetails,
     };
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       order: formattedOrder,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error fetching order details",
       error: error.message,
@@ -429,7 +430,7 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
     });
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: "Order not found or cannot be cancelled",
       });
@@ -500,12 +501,12 @@ export const cancelUserOrders = asyncHandler(async (req, res) => {
 
     await order.save();
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       message: "Order cancelled successfully",
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error cancelling order",
       error: error.message,
@@ -526,7 +527,7 @@ export const returnUserOrders = asyncHandler(async (req, res) => {
     });
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: "Order not found or cannot be returned",
       });
@@ -544,7 +545,7 @@ export const returnUserOrders = asyncHandler(async (req, res) => {
       );
 
       if (daysSinceDelivery > 7) {
-        return res.status(400).json({
+        return res.status(HTTP_CODES.BAD_REQUEST).json({
           success: false,
           message: "Return window has expired (7 days from delivery)",
         });
@@ -563,12 +564,12 @@ export const returnUserOrders = asyncHandler(async (req, res) => {
 
     await order.save();
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       message: "Return request submitted successfully",
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error processing return request",
       error: error.message,
@@ -589,12 +590,12 @@ export const createRazorpayOrder = asyncHandler(async (req, res) => {
 
     const order = await razorpay.orders.create(options);
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       order,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error creating Razorpay order",
       error: error.message,
@@ -614,12 +615,12 @@ export const verifyRazorpayPayment = asyncHandler(async (req, res) => {
     .digest("hex");
 
   if (razorpay_signature === expectedSign) {
-    return res.status(200).json({
+    return res.status(HTTP_CODES.OK).json({
       success: true,
       message: "Payment verified successfully",
     });
   } else {
-    return res.status(400).json({
+    return res.status(HTTP_CODES.BAD_REQUEST).json({
       success: false,
       message: "Invalid signature sent",
     });
@@ -705,7 +706,7 @@ export const getSellerOrders = asyncHandler(async (req, res) => {
       trackingDetails: order.trackingDetails,
     }));
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       orders: formattedOrders,
       total,
@@ -713,7 +714,7 @@ export const getSellerOrders = asyncHandler(async (req, res) => {
       totalPages: Math.ceil(total / parseInt(limit)),
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error fetching orders",
       error: error.message,
@@ -742,7 +743,7 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
     }
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: "Order not found or unauthorized",
       });
@@ -751,7 +752,7 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
     // Prevent updates for final states
     const finalStates = ["DELIVERED", "CANCELLED", "RETURNED"];
     if (finalStates.includes(order.orderStatus) && user.role !== "admin") {
-      return res.status(400).json({
+      return res.status(HTTP_CODES.BAD_REQUEST).json({
         success: false,
         message: `Cannot update order status. Order is already ${order.orderStatus.toLowerCase()}`,
       });
@@ -770,7 +771,7 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
       !validTransitions[order.orderStatus].includes(status) &&
       user.role !== "admin"
     ) {
-      return res.status(400).json({
+      return res.status(HTTP_CODES.BAD_REQUEST).json({
         success: false,
         message: "Invalid status transition",
       });
@@ -792,7 +793,7 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
       await createOrderTransaction(order);
     }
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       message: "Order status updated successfully",
       order: {
@@ -802,7 +803,7 @@ export const sellerUpdateOrderStatus = asyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error updating order status",
       error: error.message,
@@ -818,7 +819,7 @@ export const updateOrderPaymentStatus = asyncHandler(async (req, res) => {
   try {
     const order = await Order.findById(orderId);
     if (!order) {
-      return res.status(404).json({
+      return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: "Order not found",
       });
@@ -851,7 +852,7 @@ export const updateOrderPaymentStatus = asyncHandler(async (req, res) => {
 
       await order.save();
 
-      return res.status(200).json({
+      return res.status(HTTP_CODES.OK).json({
         success: true,
         message: "Payment status updated successfully",
         order: {
@@ -861,13 +862,13 @@ export const updateOrderPaymentStatus = asyncHandler(async (req, res) => {
         },
       });
     } else {
-      return res.status(400).json({
+      return res.status(HTTP_CODES.BAD_REQUEST).json({
         success: false,
         message: "Invalid payment signature",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error updating payment status",
       error: error.message,

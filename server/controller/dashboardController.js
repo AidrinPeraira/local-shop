@@ -4,6 +4,7 @@ import Transaction from "../models/adminTransactionModel.js";
 import User from "../models/userModel.js";
 import Seller from "../models/sellerModel.js";
 import Product from "../models/productModel.js";
+import { HTTP_CODES } from "../utils/responseCodes.js";
 
 export const getDashboardStats = asyncHandler(async (req, res) => {
   const { timeRange } = req.query;
@@ -168,7 +169,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
       returns: 0,
     };
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       stats: {
         totalOrders: metrics.totalOrders,
@@ -184,7 +185,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error fetching dashboard stats",
       error: error.message,

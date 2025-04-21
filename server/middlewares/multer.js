@@ -40,14 +40,14 @@ export const upload = multer({
 //     upload(req, res, function(err) {
 //         if (err instanceof multer.MulterError) {
 //             // A Multer error occurred when uploading
-//             return res.status(400).json({
+//             return res.status(HTTP_CODES.BAD_REQUEST).json({
 //                 success: false,
 //                 message: "File upload error",
 //                 error: err.message
 //             });
 //         } else if (err) {
 //             // An unknown error occurred
-//             return res.status(500).json({
+//             return res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
 //                 success: false,
 //                 message: "Error uploading files",
 //                 error: err.message

@@ -3,6 +3,7 @@ import Transaction from "../models/adminTransactionModel.js";
 import User from "../models/userModel.js";
 import Seller from "../models/sellerModel.js";
 import SellerTransaction from "../models/sellerTransactionModel.js";
+import { HTTP_CODES } from "../utils/responseCodes.js";
 
 // Get all transactions with filters, search, sort, and pagination
 export const getAllTransactions = asyncHandler(async (req, res) => {
@@ -93,7 +94,7 @@ export const getAllTransactions = asyncHandler(async (req, res) => {
       
     }));  
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       transactions: formattedTransactions,
       total,
@@ -101,7 +102,7 @@ export const getAllTransactions = asyncHandler(async (req, res) => {
       totalPages: Math.ceil(total / parseInt(limit)),
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error fetching transactions",
       error: error.message,
@@ -166,7 +167,7 @@ export const getAdminBalance = asyncHandler(async (req, res) => {
       }
     });
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       data: {
         currentBalance: balance,
@@ -175,7 +176,7 @@ export const getAdminBalance = asyncHandler(async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error calculating admin balance",
       error: error.message
@@ -222,7 +223,7 @@ export const getSellerTransactions = asyncHandler(async (req, res) => {
       .populate("orderId", "orderId")
       .lean();
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       transactions,
       total,
@@ -230,7 +231,7 @@ export const getSellerTransactions = asyncHandler(async (req, res) => {
       totalPages: Math.ceil(total / parseInt(limit)),
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error fetching transactions",
       error: error.message,
@@ -276,7 +277,7 @@ export const getSellerBalance = asyncHandler(async (req, res) => {
       }
     });
 
-    res.status(200).json({
+    res.status(HTTP_CODES.OK).json({
       success: true,
       data: {
         currentBalance: balance,
@@ -285,7 +286,7 @@ export const getSellerBalance = asyncHandler(async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error calculating seller balance",
       error: error.message
