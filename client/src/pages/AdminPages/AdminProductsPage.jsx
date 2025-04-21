@@ -129,25 +129,25 @@ export default function SellerProducts() {
   };
 
   //function to pass to add products
-  const handleAddProduct = useCallback(async (data) => {
-    try {
-      const response = await sellerAddProductApi(data);
-      if (response.data) {
-        toast({
-          title: " Success",
-          description: "You just successfully added a new product!",
-          variant: "default",
-        });
-        fetchSellerProducts();
-      }
-    } catch (error) {
-      toast({
-        title: "Add Product Error",
-        description: error,
-        variant: "destructive",
-      });
-    }
-  }, []);
+  // const handleAddProduct = useCallback(async (data) => {
+  //   try {
+  //     const response = await sellerAddProductApi(data);
+  //     if (response.data) {
+  //       toast({
+  //         title: " Success",
+  //         description: "You just successfully added a new product!",
+  //         variant: "default",
+  //       });
+  //       fetchSellerProducts();
+  //     }
+  //   } catch (error) {
+  //     toast({
+  //       title: "Add Product Error",
+  //       description: error,
+  //       variant: "destructive",
+  //     });
+  //   }
+  // }, []);
 
   const handleEditProduct = useCallback(
     async (data) => {
@@ -238,7 +238,7 @@ export default function SellerProducts() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      {/* <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">My Products</h1>
         <Button
           className="bg-primary text-white"
@@ -246,7 +246,7 @@ export default function SellerProducts() {
         >
           <Plus className="mr-2 h-4 w-4" /> Add New Product
         </Button>
-      </div>
+      </div> */}
 
       <div className="grid gap-4 md:grid-cols-4 sm:grid-cols-2">
         {/* Sort By Filter */}
@@ -632,7 +632,7 @@ export default function SellerProducts() {
         selectedProduct={selectedProduct}
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        onSubmit={selectedProduct ? handleEditProduct : handleAddProduct}
+        onSubmit={handleEditProduct}
         categories={categories}
       />
     </div>

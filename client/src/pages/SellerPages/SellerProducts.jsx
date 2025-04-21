@@ -115,6 +115,7 @@ export default function SellerProducts() {
           variant: "default",
         });
         fetchSellerProducts();
+        setIsDialogOpen(false)
       }
     } catch (error) {
       toast({
