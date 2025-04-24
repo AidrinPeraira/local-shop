@@ -68,10 +68,12 @@ const ProfileInfo = ({ onManageAddresses }) => {
     }
   };
 
+  const dispatch = useDispatch();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const dispatch = useDispatch();
+      
 
       if (!editForm.currentPassword) {
         toast({
