@@ -16,7 +16,7 @@ export const addCartItem = asyncHandler(async (req, res) => {
   if (!product.isActive || product.isBlocked) {
     res.status(HTTP_CODES.BAD_REQUEST);
     throw new Error("Product is not available");
-
+  }
     // Validate variants stock
     for (const variantItem of variants) {
       const productVariant = product.variants.find(
@@ -84,7 +84,7 @@ export const addCartItem = asyncHandler(async (req, res) => {
       message: "Product added to cart successfully",
       cart,
     });
-  }
+  
 });
 
 export const getCartItems = asyncHandler(async (req, res) => {
