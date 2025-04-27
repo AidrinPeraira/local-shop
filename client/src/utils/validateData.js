@@ -4,7 +4,7 @@ export function validateUserData(username, email, phone, password) {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const phoneRegex = /^\d{10}$/;
   const passwordRegex =
-    /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]{6,}$/;
 
   if (!usernameRegex.test(username)) {
     return "Invalid username. Username must be 3-20 characters long. No special characters.";
@@ -19,6 +19,7 @@ export function validateUserData(username, email, phone, password) {
   }
 
   if (!passwordRegex.test(password)) {
+    console.log(password)
     return "Password must be at least 6 characters long and contain at least one number, one uppercase letter, and one special character.";
   }
 

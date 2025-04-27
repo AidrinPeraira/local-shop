@@ -433,3 +433,19 @@ Pendings:
     ✔ refund calculation coupon and platform fee @done (4/19/2025, 5:33:10 PM)
     ✔ seller excel sheet @done (4/18/2025, 4:28:41 PM)
     ✔ clear wishlist and cart badge on logout @done (4/18/2025, 4:26:55 PM)
+
+
+Pendings: 
+    ✔ Issue in adding product from admin side @done (4/27/2025, 3:22:42 PM)
+    ✔ After creating product -redirect to listing page instead of keep of modal open with same data @done (4/27/2025, 3:22:47 PM)
+    ✘ category offer @cancelled (4/27/2025, 3:23:00 PM)
+    ✔ move status code to Enum-still pending available @done (4/27/2025, 3:23:07 PM)
+    ✔ fix the password regex @done (4/27/2025, 3:54:13 PM)
+    ☐ user registration - bug
+    ☐ add to cart - bug
+    ☐ cart operations - couldn't verify
+    ☐ frequent errors in pages
+    ☐ cancel order - bug
+    ☐ add proper date validations
+    ☐ show proper messages to users
+    ☐ user block after login - bug

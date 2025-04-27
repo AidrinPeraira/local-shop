@@ -3,7 +3,7 @@ const usernameRegex = /^[a-zA-Z\s]{3,20}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const phoneRegex = /^\d{10}$/;
 const passwordRegex =
-  /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+  /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]{6,}$/;
 const nameRegex = /^[a-zA-Z\s]{3,50}$/;
 const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
 const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/;
@@ -90,45 +90,44 @@ export function validateSellerData(data) {
 
 export function validateProductData(data) {
   if (!data.productName || data.productName.trim().length < 3) {
-    return "Product name must be at least 3 characters long"
+    return "Product name must be at least 3 characters long";
   }
 
   if (!data.description || data.description.trim().length < 10) {
-    return "Description must be at least 10 characters long"
+    return "Description must be at least 10 characters long";
   }
 
   if (!data.category) {
-    return "Category is required"
+    return "Category is required";
   }
 
   if (!data.basePrice || isNaN(data.basePrice) || data.basePrice <= 0) {
-    return "Valid base price is required"
+    return "Valid base price is required";
   }
 
   // Validate images
   if (!data.images || data.images.length < 3) {
-    return "At least 3 images are required"
+    return "At least 3 images are required";
   }
 
   // Validate variants if they exist
   if (data.variantTypes && data.variantTypes.length > 0) {
     const variantTypes = JSON.parse(data.variantTypes);
-    
+
     for (const type of variantTypes) {
       if (!type.name || type.values.length === 0) {
-        return `Invalid variant type: ${type.name}`
+        return `Invalid variant type: ${type.name}`;
       }
     }
 
     // Validate variants
     const variants = JSON.parse(data.variants);
     if (!variants || variants.length === 0) {
-      return "Variants are required when variant types are specified"
+      return "Variants are required when variant types are specified";
     }
   } else if (!data.stock || isNaN(data.stock) || data.stock < 0) {
-    return "Valid stock quantity is required for non-variant products"
+    return "Valid stock quantity is required for non-variant products";
   }
 
-
-  return true
+  return true;
 }

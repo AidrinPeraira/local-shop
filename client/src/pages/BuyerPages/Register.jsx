@@ -15,7 +15,7 @@ import {
 import { useGoogleLogin } from "@react-oauth/google";
 import { useRedirectIfAuthenticated } from "../../components/hooks/useRedirectIfAuthenticated.js";
 
-export default () => {
+const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -51,6 +51,7 @@ export default () => {
         description: dataValid,
         variant: "default",
       });
+      setIsLoading(false);
       return;
     }
     const mailOTP = await sendOTP({ email: formData.email });
@@ -421,3 +422,5 @@ export default () => {
     </div>
   );
 };
+
+export default Register
