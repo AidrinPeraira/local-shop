@@ -47,9 +47,13 @@ const MainNav = () => {
     const formData = new FormData(e.currentTarget);
     const searchQuery = formData.get("search");
 
+    const sanitizedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+
     // Preserve existing query parameters
     const currentParams = new URLSearchParams();
-    currentParams.set("search", searchQuery);
+    currentParams.set("search", sanitizedQuery);
+
 
     navigate(`/shop?${currentParams.toString()}`);
   };
