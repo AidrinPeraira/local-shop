@@ -108,9 +108,10 @@ const ProductDetailContent = () => {
       const countResponse = await getWishlistCountApi();
       dispatch(setWishlistCount(countResponse.data.count));
     } catch (error) {
+      console.error('Error updating wishlist:', error);
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update wishlist",
+        description: "Failed to update wishlist",
         variant: "destructive",
       });
     }

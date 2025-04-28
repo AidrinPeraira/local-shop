@@ -82,6 +82,7 @@ const CheckoutContent = () => {
           setWalletBalance(response.data.balance);
         }
       } catch (error) {
+        console.error("Error fetching wallet balance:", error);
         toast({
           title: "Error",
           description: "Failed to fetch wallet balance",
@@ -100,9 +101,10 @@ const CheckoutContent = () => {
         const response = await getUserProfileApi(user._id);
         setUserProfile(response.data.user);
       } catch (error) {
+        console.error("Error fetching user profile:", error);
         toast({
           title: "Error",
-          description: error.message || "Failed to fetch user profile",
+          description: "Failed to fetch user profile",
           variant: "destructive",
         });
       }
@@ -129,6 +131,7 @@ const CheckoutContent = () => {
           }
         }
       } catch (error) {
+        console.error("Error fetching addresses:", error);
         toast({
           title: "Error",
           description: "Failed to fetch addresses",
@@ -149,6 +152,7 @@ const CheckoutContent = () => {
           setAvailableCoupons(response.data.coupons);
         }
       } catch (error) {
+        console.error("Error fetching coupons:", error);
         toast({
           title: "Error",
           description: "Failed to fetch available coupons",
@@ -165,6 +169,7 @@ const CheckoutContent = () => {
       "https://checkout.razorpay.com/v1/checkout.js"
     );
     if (!res) {
+      console.error("Error loading Razorpay SDK");
       toast({
         title: "Error",
         description: "Razorpay SDK failed to load",
@@ -229,9 +234,10 @@ const CheckoutContent = () => {
         });
       }
     } catch (error) {
+      console.error("Error adding address:", error);
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to add address",
+        description: "Failed to add address",
         variant: "destructive",
       });
     }
@@ -303,6 +309,7 @@ const CheckoutContent = () => {
                   setOrderSuccess("failed");
                 })
                 .catch((error) => {
+                  console.error("Error creating order:", error);
                   toast({
                     title: "Error",
                     description: "Failed to create order",
@@ -345,10 +352,10 @@ const CheckoutContent = () => {
                 setOrderSuccess("failed");
               }
             } catch (error) {
+              console.error("Error creating order:", error);
               toast({
                 title: "Error",
-                description:
-                  error.response?.data?.message || "Failed to create order",
+                description: "Failed to create order",
                 variant: "destructive",
               });
             }
@@ -444,6 +451,7 @@ const CheckoutContent = () => {
         setOrderSuccess("success");
       }
     } catch (error) {
+      console.error("Error creating order:", error);
       toast({
         title: "Error",
         description: "Failed to place order please try again later",

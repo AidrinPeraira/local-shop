@@ -44,9 +44,10 @@ const ProfileAddress = () => {
       const response = await getUserAddressesApi();
       setAddresses(response.data.addresses);
     } catch (error) {
+      console.error(error);
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'Failed to fetch addresses',
+        description: 'Failed to fetch addresses',
         variant: 'destructive',
       });
     } finally {
@@ -83,9 +84,10 @@ const ProfileAddress = () => {
       });
       await fetchAddresses();
     } catch (error) {
+      console.error(error);
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'Failed to save address',
+        description: 'Failed to save address',
         variant: 'destructive',
       });
     }

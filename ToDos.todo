@@ -441,10 +441,10 @@ Pendings:
     ✘ category offer @cancelled (4/27/2025, 3:23:00 PM)
     ✔ move status code to Enum-still pending available @done (4/27/2025, 3:23:07 PM)
     ✔ fix the password regex @done (4/27/2025, 3:54:13 PM)
-    ☐ user registration - bug
-    ☐ add to cart - bug
-    ☐ cart operations - couldn't verify
-    ☐ frequent errors in pages
+    ✔ user registration - bug @done (4/28/2025, 10:27:11 AM)
+    ✔ add to cart - bug @done (4/28/2025, 10:27:17 AM)
+    ✔ cart operations - couldn't verify @done (4/28/2025, 10:27:47 AM)
+    ✔ frequent errors in pages @done (4/28/2025, 10:27:52 AM)
     ☐ cancel order - bug
     ☐ add proper date validations
     ☐ show proper messages to users

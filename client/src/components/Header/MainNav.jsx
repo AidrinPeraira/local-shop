@@ -77,7 +77,7 @@ const MainNav = () => {
         );
         toast({
           title: "Logout Error!",
-          description: error.message,
+          description: "Some error occured. Please try again",
           variant: "destructive",
         });
       });

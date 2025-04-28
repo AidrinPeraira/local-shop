@@ -57,11 +57,12 @@ const CartContent = () => {
         throw new Error("Failed to fetch cart data");
       }
     } catch (error) {
+      console.error("Error fetching cart data:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to fetch cart data",
+        description: "Failed to fetch cart data",
         variant: "destructive",
-      });
+      }); 
     } finally {
       setLoading(false);
     }
@@ -182,9 +183,10 @@ const CartContent = () => {
         throw new Error(response.data.message || "Failed to update cart");
       }
     } catch (error) {
+      console.error("Error updating cart:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to update cart",
+        description: "Failed to update cart",
         variant: "destructive",
       });
     }

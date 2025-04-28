@@ -39,7 +39,7 @@ const LoginForm = () => {
         );
         toast({
           title: "Registration Error!",
-          description: error,
+          description: "Something went wrong. Plaese try again",
           variant: "destructive",
         });
       });
@@ -64,15 +64,16 @@ const LoginForm = () => {
             console.error("Google Auth Error: ", error);
             toast({
               title: "Google Auth Error!",
-              description: error,
+              description: "Something went wrong. Plaese try again",
               variant: "destructive",
             });
           });
       }
     } catch (error) {
+      console.error("Google Auth Error: ", error);
       toast({
         title: "Google Auth Error!",
-        description: error.response?.data?.message || "Authentication failed",
+        description: "Authentication failed",
         variant: "destructive",
       });
     }
