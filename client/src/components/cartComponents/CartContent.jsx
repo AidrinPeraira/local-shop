@@ -53,8 +53,6 @@ const CartContent = () => {
       if (response.data.success) {
         dispatch(setCart(response.data.cart));
         setCartData(response.data.cart);
-      } else {
-        throw new Error("Failed to fetch cart data");
       }
     } catch (error) {
       console.error("Error fetching cart data:", error);
