@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { XCircle } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
 import { useDispatch } from "react-redux";
-import { clearCart } from "../../redux/features/cartSlice";
+import { clearCart, setCartCount } from "../../redux/features/cartSlice";
 
 const OrderFailed = ({ orderId }) => {
   const [countdown, setCountdown] = useState(5);
@@ -12,7 +12,7 @@ const OrderFailed = ({ orderId }) => {
 
   useEffect(() => {
     let timeoutId;
-  
+    dispatch(setCartCount(0));
     if (countdown === 0) {
       navigate("/profile/orders", { replace: true });
     } else {

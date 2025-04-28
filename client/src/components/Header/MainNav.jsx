@@ -6,6 +6,8 @@ import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/features/userSlice";
 import { useToast } from "../hooks/use-toast";
+import { setWishlistCount } from "../../redux/features/wishlistSlice";
+import { setCartCount } from "../../redux/features/cartSlice";
 
 const MainNav = () => {
   const navigate = useNavigate();
@@ -63,6 +65,8 @@ const MainNav = () => {
       .unwrap()
       .then(() => {
         setIsLoggedIn(false);
+        dispatch(setCartCount(0));
+        dispatch(setWishlistCount(0));
         toast({
           title: "Logged Out",
           description: "See you later!",
