@@ -9,7 +9,7 @@ const walletTransactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["ORDER_PAYMENT", "REFUND", "REFERRAL_REWARD", "PROMO_CREDIT"],
+    enum: ["ORDER_PAYMENT", "REFUND", "REFERRAL_REWARD", "PROMO_CREDIT", "WALLET_INTITIALIZATION"],
     required: true,
     index: true
   },

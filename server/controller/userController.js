@@ -9,8 +9,6 @@ import { oauth2Client } from "../utils/googleConfig.js";
 import Wallet from "../models/walletModel.js";
 import axios from "axios";
 
-
-
 //user signup sign in actions
 export const createUser = asyncHandler(async (req, res) => {
   const { username, email, password, phone, referralCode } = req.body;
@@ -55,16 +53,39 @@ export const createUser = asyncHandler(async (req, res) => {
     await newUser.save();
 
     // Generate referral promo code
-    const userReferralCode = `REF${username.substring(0, 3).toUpperCase()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+    const userReferralCode = `REF${username
+      .substring(0, 3)
+      .toUpperCase()}${Math.random()
+      .toString(36)
+      .substring(2, 7)
+      .toUpperCase()}`;
 
     newUser.referralCode = userReferralCode;
-    
+
     // Create wallet for new user
+    let timestamp = new Date()
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .split(".")[0]
+      .replace("T", "");
+    let randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+    let newUserTransactionId = `WAL${timestamp}${randomStr}`;
+
     const wallet = new Wallet({
       user: newUser._id,
       balance: 0,
       isActive: true,
-      referralCode: userReferralCode // Add this line
+      referralCode: userReferralCode, // Add this line
+      transactions: [
+        {
+          transactionId: `WAL${timestamp}${randomStr}`,
+          type: "WALLET_INTITIALIZATION",
+          amount: 0,
+          description: "Wallet initialization",
+          status: "COMPLETED",
+          balance: 0,
+        },
+      ],
     });
     if (referralCode) {
       const referringUser = await User.findOne({ referralCode });
@@ -72,10 +93,17 @@ export const createUser = asyncHandler(async (req, res) => {
         // Set referredBy in new user's document
         newUser.referredBy = referringUser._id;
 
-        // Generate transaction ID for new user's bonus
-        const timestamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0].replace("T", "");
-        const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
-        const newUserTransactionId = `WAL${timestamp}${randomStr}`;
+        // Generate new transaction ID for new user's bonus
+        timestamp = new Date()
+          .toISOString()
+          .replace(/[-:]/g, "")
+          .split(".")[0]
+          .replace("T", "");
+        randomStr = Math.random()
+          .toString(36)
+          .substring(2, 7)
+          .toUpperCase();
+        newUserTransactionId = `WAL${timestamp}${randomStr}`;
 
         // Add referral bonus to new user's wallet
         wallet.balance = 1000;
@@ -86,17 +114,26 @@ export const createUser = asyncHandler(async (req, res) => {
           description: "Sign up referral bonus",
           status: "COMPLETED",
           balance: 1000,
-          referralCode
+          referralCode,
         });
 
         // Add bonus to referring user's wallet
-        const referringUserWallet = await Wallet.findOne({ user: referringUser._id });
+        const referringUserWallet = await Wallet.findOne({
+          user: referringUser._id,
+        });
         if (referringUserWallet) {
           const newBalance = referringUserWallet.balance + 500;
-          
+
           // Generate transaction ID for referring user's bonus
-          const refTimestamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0].replace("T", "");
-          const refRandomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+          const refTimestamp = new Date()
+            .toISOString()
+            .replace(/[-:]/g, "")
+            .split(".")[0]
+            .replace("T", "");
+          const refRandomStr = Math.random()
+            .toString(36)
+            .substring(2, 7)
+            .toUpperCase();
           const refTransactionId = `WAL${refTimestamp}${refRandomStr}`;
 
           referringUserWallet.balance = newBalance;
@@ -107,7 +144,7 @@ export const createUser = asyncHandler(async (req, res) => {
             description: `Referral bonus for referring ${username}`,
             status: "COMPLETED",
             balance: newBalance,
-            referralCode: userReferralCode
+            referralCode: userReferralCode,
           });
           await referringUserWallet.save();
         }
@@ -126,7 +163,7 @@ export const createUser = asyncHandler(async (req, res) => {
       email: newUser.email,
       phone: newUser.phone,
       role: "buyer",
-      referralCode: userReferralCode
+      referralCode: userReferralCode,
     });
   } catch (error) {
     console.error("Error creating user:", error);
@@ -197,18 +234,18 @@ export const googleAuthController = asyncHandler(async (req, res) => {
     `https://www.googleapis.com/oauth2/v3/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
   );
 
-  const { email, name } = userRes.data; 
+  const { email, name } = userRes.data;
   let user = await User.findOne({ email });
 
   if (!user.isActive) {
     res.status(HTTP_CODES.BAD_REQUEST);
     throw new Error("Account Blocked! Please contact admin!");
   }
-  
+
   const randomPassword =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
-    
+
   if (!user) {
     user = await User.create({
       username: name,
@@ -424,7 +461,6 @@ export const deactivateUser = asyncHandler(async (req, res) => {
   });
 });
 
-
 //add edit and delte user address
 export const getUserAddresses = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -432,7 +468,7 @@ export const getUserAddresses = asyncHandler(async (req, res) => {
   const addresses = await Address.find({ userId });
 
   res.status(HTTP_CODES.OK).json({
-    addresses
+    addresses,
   });
 });
 
@@ -448,10 +484,7 @@ export const addUserAddress = asyncHandler(async (req, res) => {
 
   // If this is default address, remove default from other addresses
   if (isDefault) {
-    await Address.updateMany(
-      { userId },
-      { $set: { isDefault: false } }
-    );
+    await Address.updateMany({ userId }, { $set: { isDefault: false } });
   }
 
   // Create new address
@@ -461,7 +494,7 @@ export const addUserAddress = asyncHandler(async (req, res) => {
     city,
     state,
     pincode,
-    isDefault
+    isDefault,
   });
 
   // If this is the first address, make it default
@@ -473,7 +506,7 @@ export const addUserAddress = asyncHandler(async (req, res) => {
 
   res.status(HTTP_CODES.CREATED).json({
     message: "Address added successfully",
-    address: newAddress
+    address: newAddress,
   });
 });
 
@@ -491,10 +524,7 @@ export const updateUserAddress = asyncHandler(async (req, res) => {
 
   // If setting as default, remove default from other addresses
   if (isDefault && !address.isDefault) {
-    await Address.updateMany(
-      { userId },
-      { $set: { isDefault: false } }
-    );
+    await Address.updateMany({ userId }, { $set: { isDefault: false } });
   }
 
   // Update address
@@ -508,7 +538,7 @@ export const updateUserAddress = asyncHandler(async (req, res) => {
 
   res.status(HTTP_CODES.OK).json({
     message: "Address updated successfully",
-    address
+    address,
   });
 });
 
@@ -535,23 +565,19 @@ export const deleteUserAddress = asyncHandler(async (req, res) => {
   const remainingAddresses = await Address.countDocuments({ userId });
   if (remainingAddresses === 1) {
     // Make the remaining address default
-    await Address.updateOne(
-      { userId },
-      { $set: { isDefault: true } }
-    );
+    await Address.updateOne({ userId }, { $set: { isDefault: true } });
   }
 
   res.status(HTTP_CODES.OK).json({
-    message: "Address deleted successfully"
+    message: "Address deleted successfully",
   });
 });
-
 
 //show edit user profile info and change password
 export const getUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  
-  const user = await User.findById(userId).select('-password');
+
+  const user = await User.findById(userId).select("-password");
   if (!user) {
     res.status(HTTP_CODES.NOT_FOUND);
     throw new Error("User not found");
@@ -563,8 +589,8 @@ export const getUserProfile = asyncHandler(async (req, res) => {
   res.status(HTTP_CODES.OK).json({
     user: {
       ...user.toObject(),
-      defaultAddress
-    }
+      defaultAddress,
+    },
   });
 });
 
@@ -631,7 +657,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
       emailVerified: user.emailVerified,
       phoneVerified: user.phoneVerified,
       role: user.role,
-    }
+    },
   });
 });
 
@@ -654,10 +680,13 @@ export const changePassword = asyncHandler(async (req, res) => {
   }
 
   // Validate new password
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
   if (!passwordRegex.test(newPassword)) {
     res.status(HTTP_CODES.BAD_REQUEST);
-    throw new Error("Password must be at least 6 characters long and contain at least one uppercase letter, one number, and one special character");
+    throw new Error(
+      "Password must be at least 6 characters long and contain at least one uppercase letter, one number, and one special character"
+    );
   }
 
   // Check if new password is same as current
@@ -673,8 +702,6 @@ export const changePassword = asyncHandler(async (req, res) => {
   await user.save();
 
   res.status(HTTP_CODES.OK).json({
-    message: "Password changed successfully"
+    message: "Password changed successfully",
   });
 });
-
-
