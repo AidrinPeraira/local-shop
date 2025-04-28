@@ -104,7 +104,7 @@ const Register = () => {
           console.error("Reg Dispatch Error:", error);
           toast({
             title: "Registration Error!",
-            description: error.message || "Failed to register user",
+            description: error || "Failed to register user",
             variant: "destructive",
           });
         }

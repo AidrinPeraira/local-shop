@@ -99,10 +99,7 @@ export const createUser = asyncHandler(async (req, res) => {
           .replace(/[-:]/g, "")
           .split(".")[0]
           .replace("T", "");
-        randomStr = Math.random()
-          .toString(36)
-          .substring(2, 7)
-          .toUpperCase();
+        randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
         newUserTransactionId = `WAL${timestamp}${randomStr}`;
 
         // Add referral bonus to new user's wallet
@@ -482,6 +479,51 @@ export const addUserAddress = asyncHandler(async (req, res) => {
     throw new Error("All fields are required");
   }
 
+  if (!street?.trim() || !city?.trim() || !state?.trim() || !pincode?.trim()) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("All fields are required");
+  }
+
+  // Validate pincode format
+  const pincodeRegex = /^\d{6}$/;
+  const streetRegex = /^[a-zA-Z0-9\s,.-]{3,}$/;
+  const cityStateRegex = /^[a-zA-Z\s]{2,}$/;
+  
+  if (!streetRegex.test(street?.trim())) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("Invalid street address format");
+  }
+  
+  if (!cityStateRegex.test(city?.trim())) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("Invalid city name format");
+  }
+  
+  if (!cityStateRegex.test(state?.trim())) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("Invalid state name format");
+  }
+  if (!pincodeRegex.test(pincode)) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("Please enter a valid 6-digit pincode");
+  }
+
+  // Validate string lengths
+  if (street.length > 100) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("Street address is too long (max 100 characters)");
+  }
+
+  if (city.length > 50) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("City name is too long (max 50 characters)");
+  }
+
+  if (state.length > 50) {
+    res.status(HTTP_CODES.BAD_REQUEST);
+    throw new Error("State name is too long (max 50 characters)");
+  }
+
   // If this is default address, remove default from other addresses
   if (isDefault) {
     await Address.updateMany({ userId }, { $set: { isDefault: false } });
@@ -516,11 +558,75 @@ export const updateUserAddress = asyncHandler(async (req, res) => {
   const { street, city, state, pincode, isDefault } = req.body;
 
   // Find address and verify ownership
-  const address = await Address.findOne({ _id: addressId, userId });
-  if (!address) {
-    res.status(HTTP_CODES.NOT_FOUND);
-    throw new Error("Address not found");
-  }
+ // Find address and verify ownership
+ const address = await Address.findOne({ _id: addressId, userId });
+ if (!address) {
+   res.status(HTTP_CODES.NOT_FOUND);
+   throw new Error("Address not found");
+ }
+
+ // Validate fields if they are being updated
+ if (street || city || state || pincode) {
+   const streetRegex = /^[a-zA-Z0-9\s,.-]{3,}$/;
+   const cityStateRegex = /^[a-zA-Z\s]{2,}$/;
+   const pincodeRegex = /^\d{6}$/;
+
+   if (street) {
+     if (!street.trim()) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("Street address cannot be empty");
+     }
+     if (!streetRegex.test(street.trim())) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("Invalid street address format");
+     }
+     if (street.length > 100) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("Street address is too long (max 100 characters)");
+     }
+   }
+
+   if (city) {
+     if (!city.trim()) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("City cannot be empty");
+     }
+     if (!cityStateRegex.test(city.trim())) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("City name should only contain letters");
+     }
+     if (city.length > 50) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("City name is too long (max 50 characters)");
+     }
+   }
+
+   if (state) {
+     if (!state.trim()) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("State cannot be empty");
+     }
+     if (!cityStateRegex.test(state.trim())) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("State name should only contain letters");
+     }
+     if (state.length > 50) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("State name is too long (max 50 characters)");
+     }
+   }
+
+   if (pincode) {
+     if (!pincode.trim()) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("Pincode cannot be empty");
+     }
+     if (!pincodeRegex.test(pincode)) {
+       res.status(HTTP_CODES.BAD_REQUEST);
+       throw new Error("Please enter a valid 6-digit pincode");
+     }
+   }
+ }
 
   // If setting as default, remove default from other addresses
   if (isDefault && !address.isDefault) {

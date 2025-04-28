@@ -203,6 +203,91 @@ const CheckoutContent = () => {
     e.preventDefault();
     e.stopPropagation();
 
+    // Validate address data
+    if (!addressForm.street.trim()) {
+      toast({
+        title: "Error",
+        description: "Street address is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!addressForm.city.trim()) {
+      toast({
+        title: "Error",
+        description: "City is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!addressForm.state.trim()) {
+      toast({
+        title: "Error",
+        description: "State is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!addressForm.pincode.trim()) {
+      toast({
+        title: "Error",
+        description: "Pincode is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate pincode format (6 digits)
+    const pincodeRegex = /^\d{6}$/;
+    const streetRegex = /^[a-zA-Z0-9\s,.-]{3,}$/;
+    const cityStateRegex = /^[a-zA-Z\s]{2,}$/;
+
+    if (!addressForm.street.trim()) {
+      toast({
+        title: "Error",
+        description: "Street address is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!streetRegex.test(addressForm.street.trim())) {
+      toast({
+        title: "Error",
+        description: "Invalid street address format",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!addressForm.city.trim()) {
+      toast({
+        title: "Error",
+        description: "City is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!cityStateRegex.test(addressForm.city.trim())) {
+      toast({
+        title: "Error",
+        description: "City name should only contain letters",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!pincodeRegex.test(addressForm.pincode)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid 6-digit pincode",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       const response = await addUserAddressApi(addressForm);
       if (response.data) {

@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Plus, Edit, Trash2 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Card, CardContent } from '../ui/card';
+import React, { useState, useEffect } from "react";
+import { MapPin, Plus, Edit, Trash2 } from "lucide-react";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { useToast } from '../hooks/use-toast';
-import { PageLoading } from '../ui/PageLoading';
-import { 
-  getUserAddressesApi, 
-  addUserAddressApi, 
-  editUserAddressApi, 
-  deleteUserAddressApi 
-} from '../../api/userDataApi';
+} from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { useToast } from "../hooks/use-toast";
+import { PageLoading } from "../ui/PageLoading";
+import {
+  getUserAddressesApi,
+  addUserAddressApi,
+  editUserAddressApi,
+  deleteUserAddressApi,
+} from "../../api/userDataApi";
 
 const ProfileAddress = () => {
   const [addresses, setAddresses] = useState(null);
@@ -26,10 +26,10 @@ const ProfileAddress = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [addressForm, setAddressForm] = useState({
-    street: '',
-    city: '',
-    state: '',
-    pincode: '',
+    street: "",
+    city: "",
+    state: "",
+    pincode: "",
     isDefault: false,
   });
   const { toast } = useToast();
@@ -46,9 +46,9 @@ const ProfileAddress = () => {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Error',
-        description: 'Failed to fetch addresses',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to fetch addresses",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -57,38 +57,120 @@ const ProfileAddress = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validation regex patterns
+    const streetRegex = /^[a-zA-Z0-9\s,.-]{3,}$/;
+    const cityStateRegex = /^[a-zA-Z\s]{2,}$/;
+    const pincodeRegex = /^\d{6}$/;
+
+    // Validate street
+    if (!addressForm.street.trim()) {
+      toast({
+        title: "Error",
+        description: "Street address is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!streetRegex.test(addressForm.street.trim())) {
+      toast({
+        title: "Error",
+        description: "Invalid street address format",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate city
+    if (!addressForm.city.trim()) {
+      toast({
+        title: "Error",
+        description: "City is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!cityStateRegex.test(addressForm.city.trim())) {
+      toast({
+        title: "Error",
+        description: "City name should only contain letters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate state
+    if (!addressForm.state.trim()) {
+      toast({
+        title: "Error",
+        description: "State is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!cityStateRegex.test(addressForm.state.trim())) {
+      toast({
+        title: "Error",
+        description: "State name should only contain letters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate pincode
+    if (!addressForm.pincode.trim()) {
+      toast({
+        title: "Error",
+        description: "Pincode is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!pincodeRegex.test(addressForm.pincode)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid 6-digit pincode",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       if (editingAddress) {
         await editUserAddressApi({
           addressId: editingAddress._id,
-          ...addressForm
+          ...addressForm,
         });
       } else {
         await addUserAddressApi(addressForm);
       }
 
       toast({
-        title: 'Success',
-        description: editingAddress 
-          ? 'Address updated successfully'
-          : 'Address added successfully',
+        title: "Success",
+        description: editingAddress
+          ? "Address updated successfully"
+          : "Address added successfully",
       });
       setIsAddingNew(false);
       setEditingAddress(null);
       setAddressForm({
-        street: '',
-        city: '',
-        state: '',
-        pincode: '',
+        street: "",
+        city: "",
+        state: "",
+        pincode: "",
         isDefault: false,
       });
       await fetchAddresses();
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Error',
-        description: 'Failed to save address',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to save address",
+        variant: "destructive",
       });
     }
   };
@@ -97,16 +179,17 @@ const ProfileAddress = () => {
     try {
       await deleteUserAddressApi({ addressId });
       toast({
-        title: 'Success',
-        description: 'Address deleted successfully',
+        title: "Success",
+        description: "Address deleted successfully",
       });
       await fetchAddresses();
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Failed to delete address',
-        variant: 'destructive',
+        title: "Error",
+        description:
+          error.response?.data?.message || "Failed to delete address",
+        variant: "destructive",
       });
     }
   };
@@ -133,7 +216,7 @@ const ProfileAddress = () => {
           <MapPin className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">My Addresses</h1>
         </div>
-        
+
         {/* add address diualog */}
         <Dialog open={isAddingNew} onOpenChange={setIsAddingNew}>
           <DialogTrigger asChild>
@@ -151,7 +234,9 @@ const ProfileAddress = () => {
                 <Input
                   id="street"
                   value={addressForm.street}
-                  onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
+                  onChange={(e) =>
+                    setAddressForm({ ...addressForm, street: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -161,7 +246,9 @@ const ProfileAddress = () => {
                   <Input
                     id="city"
                     value={addressForm.city}
-                    onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                    onChange={(e) =>
+                      setAddressForm({ ...addressForm, city: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -170,7 +257,9 @@ const ProfileAddress = () => {
                   <Input
                     id="state"
                     value={addressForm.state}
-                    onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                    onChange={(e) =>
+                      setAddressForm({ ...addressForm, state: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -180,7 +269,9 @@ const ProfileAddress = () => {
                 <Input
                   id="pincode"
                   value={addressForm.pincode}
-                  onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value })}
+                  onChange={(e) =>
+                    setAddressForm({ ...addressForm, pincode: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -189,15 +280,20 @@ const ProfileAddress = () => {
                   type="checkbox"
                   id="isDefault"
                   checked={addressForm.isDefault}
-                  onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
+                  onChange={(e) =>
+                    setAddressForm({
+                      ...addressForm,
+                      isDefault: e.target.checked,
+                    })
+                  }
                   className="rounded border-gray-300"
                 />
                 <Label htmlFor="isDefault">Set as default address</Label>
               </div>
               <div className="flex justify-end gap-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => {
                     setIsAddingNew(false);
                     setEditingAddress(null);
@@ -257,7 +353,10 @@ const ProfileAddress = () => {
 
       {/* Edit Address Dialog */}
       {editingAddress && (
-        <Dialog open={!!editingAddress} onOpenChange={() => setEditingAddress(null)}>
+        <Dialog
+          open={!!editingAddress}
+          onOpenChange={() => setEditingAddress(null)}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit Address</DialogTitle>
@@ -268,7 +367,9 @@ const ProfileAddress = () => {
                 <Input
                   id="edit-street"
                   value={addressForm.street}
-                  onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
+                  onChange={(e) =>
+                    setAddressForm({ ...addressForm, street: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -278,7 +379,9 @@ const ProfileAddress = () => {
                   <Input
                     id="edit-city"
                     value={addressForm.city}
-                    onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                    onChange={(e) =>
+                      setAddressForm({ ...addressForm, city: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -287,7 +390,9 @@ const ProfileAddress = () => {
                   <Input
                     id="edit-state"
                     value={addressForm.state}
-                    onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                    onChange={(e) =>
+                      setAddressForm({ ...addressForm, state: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -297,7 +402,9 @@ const ProfileAddress = () => {
                 <Input
                   id="edit-pincode"
                   value={addressForm.pincode}
-                  onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value })}
+                  onChange={(e) =>
+                    setAddressForm({ ...addressForm, pincode: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -306,15 +413,20 @@ const ProfileAddress = () => {
                   type="checkbox"
                   id="edit-isDefault"
                   checked={addressForm.isDefault}
-                  onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
+                  onChange={(e) =>
+                    setAddressForm({
+                      ...addressForm,
+                      isDefault: e.target.checked,
+                    })
+                  }
                   className="rounded border-gray-300"
                 />
                 <Label htmlFor="edit-isDefault">Set as default address</Label>
               </div>
               <div className="flex justify-end gap-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setEditingAddress(null)}
                 >
                   Cancel
@@ -325,7 +437,6 @@ const ProfileAddress = () => {
           </DialogContent>
         </Dialog>
       )}
-      
     </div>
   );
 };
