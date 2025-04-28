@@ -13,6 +13,7 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await userRegApi(userData); //this is the aasync api call
+      localStorage.setItem("user", JSON.stringify(response.data))
       return response.data; //this is the payload given when the dispatch is called
     } catch (error) {
       return rejectWithValue(error.response.data.message);
