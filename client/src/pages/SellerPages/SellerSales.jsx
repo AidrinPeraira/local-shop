@@ -317,7 +317,14 @@ export default function SellerSales() {
                 <Input
                   type="date"
                   value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  max={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    setStartDate(e.target.value);
+                    // Reset end date if it's before new start date
+                    if (endDate && endDate < e.target.value) {
+                      setEndDate(e.target.value);
+                    }
+                  }}
                 />
               </div>
               <div>
@@ -325,6 +332,8 @@ export default function SellerSales() {
                 <Input
                   type="date"
                   value={endDate}
+                  min={startDate}
+                  max={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </div>
