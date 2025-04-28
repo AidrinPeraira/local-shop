@@ -66,8 +66,6 @@ const CartContent = () => {
     }
   };
 
-
-
   const updateLocalQuantity = (productId, variantId, newQuantity) => {
     if (newQuantity < 1) return;
 
