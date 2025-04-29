@@ -303,17 +303,18 @@ const ProfileInfo = ({ onManageAddresses }) => {
         {/* Default Address Card */}
         <Card>
           <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Default Address</h2>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2"
-                onClick={onManageAddresses}
-              >
-                Manage Addresses
-              </Button>
-            </div>
-
+              <Link to="/profile/addresses">
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2"
+                  onClick={onManageAddresses}
+                >
+                  Manage Addresses
+                </Button>
+              </Link>
+            </div> 
             {user.defaultAddress ? (
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-gray-500 mt-1" />
