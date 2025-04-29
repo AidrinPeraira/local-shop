@@ -18,6 +18,10 @@ export const getVendorPayouts = asyncHandler(async (req, res) => {
     dateRange = "all",
   } = req.query;
 
+  console.log("dateRange", dateRange);
+  console.log("status", status);
+  console.log("search", search);
+
   try {
     // Build base query for delivered orders
     const query = {
@@ -169,11 +173,11 @@ export const getVendorPayouts = asyncHandler(async (req, res) => {
           status: existingTransaction ? existingTransaction.status : "PENDING",
         };
       })
-    );
+    )
 
     // Apply pagination
     const startIndex = (page - 1) * limit;
-    const paginatedPayouts = payouts.slice(
+    const paginatedPayouts = payouts.filter(payout => payout.status == status).slice(
       startIndex,
       startIndex + parseInt(limit)
     );
