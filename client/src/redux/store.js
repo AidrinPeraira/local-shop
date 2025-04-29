@@ -4,7 +4,6 @@ import categoriesReducer from './features/categoriesSlice'
 import cartReducer from './features/cartSlice';
 import wishlistReducer from './features/wishlistSlice';
 
-
 const store = configureStore({
     reducer : {
         user : userReducer,

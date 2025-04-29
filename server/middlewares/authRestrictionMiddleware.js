@@ -3,82 +3,52 @@ import Seller from "../models/sellerModel.js";
 import Admin from "../models/adminModel.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 import { asyncHandler } from "./asyncHandler.js";
+import jwt from "jsonwebtoken";
 
 export const checkUserBlocked = asyncHandler(async (req, res, next) => {
-  // Skip check for non-authenticated routes
-  if (!req.user || !req.user._id) {
+  let token = req.cookies.jwt;
+
+  if (!token) {
     return next();
   }
 
-  const userId = req.user._id;
-  const userRole = req.user.role;
-
-  let user;
-  
   try {
-    switch (userRole) {
-      case 'buyer':
-        user = await User.findById(userId);
-        break;
-      case 'seller':
-        user = await Seller.findById(userId);
-        break;
-      case 'admin':
-        user = await Admin.findById(userId);
-        break;
-      default:
-        // Skip check for unknown roles
-        return next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    let user = await User.findById(decoded.userId).select("-password");
+    
+    if (!user) {
+      user = await Seller.findById(decoded.userId).select("-password");
     }
 
     if (!user) {
-      // Clear the JWT cookie
-      res.cookie('jwt', '', {
-        httpOnly: true,
-        expires: new Date(0),
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
-      });
-
-      return res.status(HTTP_CODES.NOT_FOUND).json({
-        success: false,
-        message: 'User not found',
-        logout: true
-      });
+      return next();
     }
 
+    // Check if user is blocked
     if (!user.isActive) {
-      // Clear the JWT cookie
-      res.cookie('jwt', '', {
+      // Clear the cookie
+      res.cookie("jwt", "", {
         httpOnly: true,
         expires: new Date(0),
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       });
 
-      return res.status(HTTP_CODES.FORBIDDEN).json({
-        success: false,
-        message: userRole === 'admin' 
-          ? 'Account Blocked! Please contact your supervisor!'
-          : 'Account Blocked! Please contact admin!',
-        logout: true
+      return res.status(HTTP_CODES.UNAUTHORIZED).json({
+        blocked: true,
+        role: user.role,
+        message: "Your account has been blocked. Please contact admin for more details"
       });
     }
 
+    // Store user in request for later use
+    req.user = user;
     next();
   } catch (error) {
-    // Only clear cookie and return error for authenticated routes
-    res.cookie('jwt', '', {
-      httpOnly: true,
-      expires: new Date(0),
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
-    });
-
-    return res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: 'Authentication error',
-      logout: true
+    // Handle JWT verification errors
+    return res.status(HTTP_CODES.UNAUTHORIZED).json({
+      message: "Invalid or expired token"
     });
   }
 });

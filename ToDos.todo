@@ -445,7 +445,7 @@ Pendings:
     ✔ add to cart - bug @done (4/28/2025, 10:27:17 AM)
     ✔ cart operations - couldn't verify @done (4/28/2025, 10:27:47 AM)
     ✔ frequent errors in pages @done (4/28/2025, 10:27:52 AM)
-    ☐ cancel order - bug
+    ✔ cancel order - bug @done (4/28/2025, 5:10:40 PM)
     ✔ add proper date validations in slaes report @done (4/28/2025, 2:12:38 PM)
     ✔ show proper messages to users @done (4/28/2025, 11:29:30 AM)
     ☐ user block after login - bug
