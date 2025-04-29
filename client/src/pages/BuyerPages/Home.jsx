@@ -21,10 +21,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../../components/ui/carousel";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getShopProductsApi } from "../../api/productApi";
+import { useToast } from "../../components/hooks/use-toast";
 
 export default function Home() {
   
@@ -32,6 +33,18 @@ export default function Home() {
   
   const { categories } = useSelector((state) => state.categories);
   const [categoryProducts, setCategoryProducts] = useState({});
+  const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  
+  useEffect(() => {
+    if (searchParams.get('blocked') === 'true') {
+      toast({
+        variant: "destructive",
+        title: "Account Blocked",
+        description: "Your account has been blocked. Please contact admin for assistance",
+      });
+    }
+  }, [searchParams, toast]);
 
   // Get level 3 categories
   const level3Categories = categories.flatMap((l1) => {

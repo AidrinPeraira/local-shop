@@ -74,7 +74,7 @@ API.interceptors.response.use(
   
       if (error.response?.status === 401 && error.response?.data?.blocked) {
         localStorage.removeItem('user');
-        window.location.href = '/';
+        window.location.href = '/?blocked=true';
       }
 
     return Promise.reject(error);
