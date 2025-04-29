@@ -47,7 +47,7 @@ const ProfileAddress = () => {
       console.error(error);
       toast({
         title: "Error",
-        description: "Failed to fetch addresses",
+        description: error.response?.data?.message || "Failed to fetch addresses",
         variant: "destructive",
       });
     } finally {
@@ -169,7 +169,7 @@ const ProfileAddress = () => {
       console.error(error);
       toast({
         title: "Error",
-        description: "Failed to save address",
+        description: error.response?.data?.message || "Failed to save address",
         variant: "destructive",
       });
     }

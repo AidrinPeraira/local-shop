@@ -45,7 +45,7 @@ export function AdminLayout() {
         );
         toast({
           title: "Logout Error!",
-          description: "Some error occured. Please try again",
+          description: error.message ||  "Some error occured. Please try again",
           variant: "destructive",
         });
       });

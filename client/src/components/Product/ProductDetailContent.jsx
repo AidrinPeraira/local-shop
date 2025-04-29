@@ -111,7 +111,7 @@ const ProductDetailContent = () => {
       console.error('Error updating wishlist:', error);
       toast({
         title: "Error",
-        description: "Failed to update wishlist",
+        description: error.response?.data?.message || "Failed to update wishlist",
         variant: "destructive",
       });
     }

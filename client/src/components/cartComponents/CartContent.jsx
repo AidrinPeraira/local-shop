@@ -58,7 +58,7 @@ const CartContent = () => {
       console.error("Error fetching cart data:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch cart data",
+        description: error?.message || "Failed to fetch cart data",
         variant: "destructive",
       }); 
     } finally {
@@ -182,7 +182,7 @@ const CartContent = () => {
       console.error("Error updating cart:", error);
       toast({
         title: "Error",
-        description: "Failed to update cart",
+        description: error?.message ||"Failed to update cart",
         variant: "destructive",
       });
     }

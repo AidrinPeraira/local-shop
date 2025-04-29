@@ -85,7 +85,7 @@ const CheckoutContent = () => {
         console.error("Error fetching wallet balance:", error);
         toast({
           title: "Error",
-          description: "Failed to fetch wallet balance",
+          description: error?.message || "Failed to fetch wallet balance",
           variant: "destructive",
         });
       }
@@ -322,7 +322,7 @@ const CheckoutContent = () => {
       console.error("Error adding address:", error);
       toast({
         title: "Error",
-        description: "Failed to add address",
+        description: error.response?.data?.message || "Failed to add address",
         variant: "destructive",
       });
     }
@@ -397,7 +397,7 @@ const CheckoutContent = () => {
                   console.error("Error creating order:", error);
                   toast({
                     title: "Error",
-                    description: "Failed to create order",
+                    description: error.response?.data?.message || "Failed to create order",
                     variant: "destructive",
                   });
                 });
