@@ -26,6 +26,7 @@ const transactionTypes = [
   "REFUND",
   "REFERRAL_REWARD",
   "PROMO_CREDIT",
+  "WALLET_INTITIALIZATION"
 ];
 
 export default function AdminWallets() {
