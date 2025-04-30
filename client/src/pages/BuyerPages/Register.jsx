@@ -62,6 +62,7 @@ const Register = () => {
         variant: "default",
       });
       setIsLoading(false);
+      setUserOTP("")
       setShowPopup(true); // Show the popup for email verification
     } else {
       toast({

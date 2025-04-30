@@ -17,6 +17,7 @@ import { getUserProfileApi, updateUserProfileApi } from "../../api/userDataApi";
 import { validateUserData } from "../../utils/validateData";
 import { useDispatch } from "react-redux";
 import { updateUserProfile } from "../../redux/features/userSlice";
+import { Link } from "react-router-dom";
 
 // In the props
 const ProfileInfo = ({ onManageAddresses }) => {
