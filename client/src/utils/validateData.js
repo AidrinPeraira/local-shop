@@ -2,7 +2,7 @@ export function validateUserData(username, email, phone, password) {
 
   const usernameRegex = /^[a-zA-Z\s]{3,20}$/;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const phoneRegex = /^\d{10}$/;
+  const phoneRegex = /^[6-9]\d{9}$/;
   const passwordRegex =
     /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]{6,}$/;
 
