@@ -158,7 +158,7 @@ export const getCartItems = asyncHandler(async (req, res) => {
         variantDiscount: variantDiscountTotal,
         variantTotal,
         stock: productVariant ? productVariant.stock : product.stock,
-        inStock: productVariant ? productVariant.inStock : product.inStock,
+        inStock: (productVariant ? productVariant.inStock : product.inStock) >= quantity,
       };
     });
 

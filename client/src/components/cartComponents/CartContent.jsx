@@ -182,7 +182,7 @@ const CartContent = () => {
       console.error("Error updating cart:", error);
       toast({
         title: "Error",
-        description: error?.message ||"Failed to update cart",
+        description: error?.response?.data?.message ||"Failed to update cart",
         variant: "destructive",
       });
     }

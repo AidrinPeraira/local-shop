@@ -20,7 +20,6 @@ export const checkOrderItemValid = asyncHandler(async (req, res) => {
   
   const invalidProducts = [];
 
-  // Check each product in the cart
   for (const item of cart.items) {
     const product = await Product.findById(item.productId).populate('category');
     
@@ -32,7 +31,7 @@ export const checkOrderItemValid = asyncHandler(async (req, res) => {
       continue;
     }
 
-    // Check if product or category is blocked/inactive
+    // check blocked
     if (!product.isActive || product.isBlocked || !product.category.isActive) {
       invalidProducts.push({
         productId: item.productId,
@@ -44,18 +43,64 @@ export const checkOrderItemValid = asyncHandler(async (req, res) => {
       continue;
     }
 
-    // Check variant stock
+    const totalQuantityRequested = item.variants.reduce((sum, variant) => 
+      sum + variant.quantity, 0
+    );
+
+    // Check if product has enough total stock
+    if (product.stock < totalQuantityRequested) {
+      invalidProducts.push({
+        productId: item.productId,
+        productName: product.productName,
+        reason: `Insufficient total stock. Available: ${product.stock}, Requested: ${totalQuantityRequested}`
+      });
+      continue;
+    }
+
+    // Check each variant's stock
+    let hasInvalidVariant = false;
     for (const variant of item.variants) {
       const productVariant = product.variants.find(v => v.variantId === variant.variantId);
-      if (!productVariant || !productVariant.inStock || productVariant.stock < variant.quantity) {
+      
+      if (!productVariant) {
         invalidProducts.push({
           productId: item.productId,
           productName: product.productName,
-          reason: "Some variants are out of stock or have insufficient quantity"
+          variantId: variant.variantId,
+          reason: "Variant no longer exists"
         });
+        hasInvalidVariant = true;
+        break;
+      }
+
+      if (!productVariant.inStock) {
+        invalidProducts.push({
+          productId: item.productId,
+          productName: product.productName,
+          variantId: variant.variantId,
+          attributes: variant.attributes,
+          reason: "Variant is out of stock"
+        });
+        hasInvalidVariant = true;
+        break;
+      }
+
+      if (productVariant.stock < variant.quantity) {
+        invalidProducts.push({
+          productId: item.productId,
+          productName: product.productName,
+          variantId: variant.variantId,
+          attributes: variant.attributes,
+          available: productVariant.stock,
+          requested: variant.quantity,
+          reason: `Insufficient variant stock. Available: ${productVariant.stock}, Requested: ${variant.quantity}`
+        });
+        hasInvalidVariant = true;
         break;
       }
     }
+
+    if (hasInvalidVariant) continue;
   }
 
   if (invalidProducts.length > 0) {
