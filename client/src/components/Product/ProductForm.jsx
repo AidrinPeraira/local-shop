@@ -28,7 +28,9 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   const [variantError, setVariantError] = useState("");
   const [images, setImages] = useState(initialData.images || []);
   const [variantTypes, setVariantTypes] = useState(
-    initialData.variantTypes || [{ id: Date.now().toString(), name: "Type", values: ["Universal"] }]
+    initialData.variantTypes || [
+      { id: Date.now().toString(), name: "Type", values: ["Universal"] },
+    ]
   );
   const [variants, setVariants] = useState(initialData.variants || []);
   const [tierPrices, setTierPrices] = useState(
@@ -100,10 +102,8 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   const useVariants = watch("useVariants");
   const basePrice = watch("basePrice");
   const stock = watch("stock");
-  const {toast} = useToast();
+  const { toast } = useToast();
 
-
-  
   // Validate variants
   useEffect(() => {
     if (useVariants) {
@@ -270,36 +270,36 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
         variantAttributes[vt.name] = combination[i];
       });
 
-      console.log(variantAttributes)
-      console.log(variants)
-
       function findVariantByAttributes(variants, variantAttributes) {
         const attributesToFind = Object.entries(variantAttributes);
-        
+
         for (const variant of variants) {
           if (!variant.attributes || !Array.isArray(variant.attributes)) {
             continue;
           }
-          
+
           const firstAttribute = variant.attributes[0];
-          
+
           if (!firstAttribute) {
             continue;
           }
-          
-          const isMatch = attributesToFind.every(([key, value]) => 
-            firstAttribute[key] === value
+
+          const isMatch = attributesToFind.every(
+            ([key, value]) => firstAttribute[key] === value
           );
-          
+
           if (isMatch) {
             return variant.id;
           }
         }
-        
+
         return `variant-${Date.now()}-${index}`;
       }
 
-      const matchingVariantId = findVariantByAttributes(variants, variantAttributes);
+      const matchingVariantId = findVariantByAttributes(
+        variants,
+        variantAttributes
+      );
 
       return {
         id: matchingVariantId,
@@ -334,7 +334,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   // Final Submit
   const handleFormSubmit = async (formData) => {
     try {
-      // Image validation
+      // Image coount check
       if (images.length < 3) {
         toast({
           title: "Validation Error",
@@ -358,7 +358,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
           return;
         }
 
-        // Check for empty variant type names
+        //check empty variant name
         const emptyNameTypes = variantTypes.filter((vt) => !vt.name.trim());
         if (emptyNameTypes.length > 0) {
           toast({
@@ -369,7 +369,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
           return;
         }
 
-        // Check for variant types without values
+        // check empty variant data
         const emptyValueTypes = variantTypes.filter(
           (vt) => vt.values.length === 0
         );
@@ -382,15 +382,17 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
           return;
         }
 
-        // Validate variant prices and stock
+        // check for invalid variant data
+      
         const invalidVariants = variants.filter(
           (v) => !v.price || v.price <= 0 || !v.stock || v.stock < 0
         );
+
         if (invalidVariants.length > 0) {
           toast({
             title: "Variant Error",
             description:
-              "All variants must have valid price (> 0) and stock (≥ 0) values",
+              "All variants must have valid price and stock values, greater than 0",
             variant: "destructive",
           });
           return;
@@ -409,7 +411,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
       setIsSubmitting(true);
       const submitFormData = new FormData();
 
-      // Add all the basic form fields
+      // set form data
       submitFormData.append("productName", formData.productName);
       submitFormData.append("description", formData.description);
       submitFormData.append("category", formData.category);
@@ -482,7 +484,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
             className={errors.productName ? "border-red-500" : ""}
             {...register("productName", {
               required: "Product name is required",
-              onChange: () => trigger("productName")
+              onChange: () => trigger("productName"),
             })}
           />
           {errors.productName && (
@@ -496,9 +498,9 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
           <Controller
             name="description"
             control={control}
-            rules={{ 
+            rules={{
               required: "Description is required",
-              onChange: () => trigger("description")
+              onChange: () => trigger("description"),
             }}
             render={({ field }) => (
               <div
@@ -959,63 +961,66 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
                         <th className="border p-2 text-left">
                           Variant Combination
                         </th>
-                        <th className="border p-2 text-left">Price ($)</th>
+                        <th className="border p-2 text-left">Price</th>
                         <th className="border p-2 text-left">Stock</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {variants.map((variant) => (
-                        <tr key={variant.id}>
-                          <td className="border p-2">
-                            {Object.entries(variant.attributes).map(
-                              ([key, value], idx, arr) => (
-                                <span key={key}>
-                                  <span className="font-medium">{key}:</span>{" "}
-                                  {String(value)}
-                                  {idx < arr.length - 1 ? ", " : ""}
-                                </span>
-                              )
-                            )}
-                          </td>
-                          <td className="border p-2">
-                            <Input
-                              type="number"
-                              min="0.01"
-                              step="0.01"
-                              value={variant.price}
-                              onChange={(e) => {
-                                const newPrice =
-                                  parseFloat(e.target.value) || 0;
-                                setVariants(
-                                  variants.map((v) =>
-                                    v.id === variant.id
-                                      ? { ...v, price: newPrice }
-                                      : v
-                                  )
-                                );
-                              }}
-                            />
-                          </td>
-                          <td className="border p-2">
-                            <Input
-                              type="number"
-                              min="0"
-                              step="1"
-                              value={variant.stock}
-                              onChange={(e) => {
-                                const newStock = parseInt(e.target.value) || 0;
-                                setVariants(
-                                  variants.map((v) =>
-                                    v.id === variant.id
-                                      ? { ...v, stock: newStock }
-                                      : v
-                                  )
-                                );
-                              }}
-                            />
-                          </td>
-                        </tr>
-                      ))}
+                      {variants.map((variant) => {
+                        return (
+                          <tr key={variant.id}>
+                            <td className="border p-2">
+                              {Object.entries(variant.attributes).map(
+                                ([key, value], idx, arr) => (
+                                  <span key={key}>
+                                    <span className="font-medium">{key}:</span>{" "}
+                                    {String(value)}
+                                    {idx < arr.length - 1 ? ", " : ""}
+                                  </span>
+                                )
+                              )}
+                            </td>
+                            <td className="border p-2">
+                              <Input
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                defaultValue={variant.price}
+                                onChange={(e) => {
+                                  const newPrice =
+                                    parseFloat(e.target.value) || 0;
+                                  setVariants(
+                                    variants.map((v) =>
+                                      v.id === variant.id
+                                        ? { ...v, price: newPrice }
+                                        : v
+                                    )
+                                  );
+                                }}
+                              />
+                            </td>
+                            <td className="border p-2">
+                              <Input
+                                type="number"
+                                min="0"
+                                step="1"
+                                defaultValue={variant.stock}
+                                onChange={(e) => {
+                                  const newStock =
+                                    parseInt(e.target.value) || 0;
+                                  setVariants(
+                                    variants.map((v) =>
+                                      v.id === variant.id
+                                        ? { ...v, stock: newStock }
+                                        : v
+                                    )
+                                  );
+                                }}
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
