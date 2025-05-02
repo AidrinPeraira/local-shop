@@ -20,6 +20,15 @@ export const adminCreateCoupon = asyncHandler(
     // Check if coupon code already exists
     const existingCoupon = await Coupon.findOne({ code });
     if (existingCoupon) {
+
+      // Check if coupon is already active
+      if (existingCoupon.isActive) {
+        return res.status(HTTP_CODES.CONFLICT).json({
+          success: false,
+          message: "Coupon already exists",
+        });
+      }
+
       // Update existing coupon instead of creating new one
       const updatedCoupon = await Coupon.findByIdAndUpdate(
         existingCoupon._id,
