@@ -91,24 +91,34 @@ export const getCartItems = asyncHandler(async (req, res) => {
 
   const cart = await Cart.findOne({ user: userId }).populate({
     path: "items.product",
-    select: "productName images variants bulkDiscount basePrice isActive isBlocked seller category",
+    select:
+      "productName images variants bulkDiscount basePrice isActive isBlocked seller category",
     populate: [
       {
         path: "seller",
         model: "Seller",
-        select: "sellerName"
+        select: "sellerName",
       },
       {
         path: "category",
         model: "Category",
-        select: "name isActive"
-      }
-    ]
+        select: "name isActive",
+      },
+    ],
   });
 
+
+
   if (!cart) {
-    res.status(HTTP_CODES.NOT_FOUND);
-    throw new Error("Cart not found");
+    try {
+      cart = await Cart.create({
+        user: userId,
+        items: [],
+      });
+    } catch (error) {
+      res.status(HTTP_CODES.NOT_FOUND);
+      throw new Error("Cart not found");
+    }
   }
 
   const processedItems = cart.items.map((item) => {
@@ -158,7 +168,9 @@ export const getCartItems = asyncHandler(async (req, res) => {
         variantDiscount: variantDiscountTotal,
         variantTotal,
         stock: productVariant ? productVariant.stock : product.stock,
-        inStock: (productVariant ? productVariant.inStock : product.inStock) >= quantity,
+        inStock:
+          (productVariant ? productVariant.inStock : product.inStock) >=
+          quantity,
       };
     });
 
