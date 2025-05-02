@@ -141,7 +141,9 @@ const ProductDetailContent = () => {
     return (
       <main className="py-6 lg:py-10">
         <Container>
-          <div>Loading...</div>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+          </div>
         </Container>
       </main>
     );
@@ -151,17 +153,47 @@ const ProductDetailContent = () => {
     return (
       <main className="py-6 lg:py-10">
         <Container>
-          <div>Error: {error}</div>
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <div className="w-16 h-16 mb-4 text-red-500">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Oops! Something went wrong</h2>
+            <p className="text-gray-500 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="text-primary hover:text-primary/80 font-medium flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Try Again
+            </button>
+          </div>
         </Container>
       </main>
     );
   }
-
   if (!product) {
     return (
       <main className="py-6 lg:py-10">
         <Container>
-          <div>Product not found</div>
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <div className="w-16 h-16 mb-4 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Product Not Found</h2>
+            <p className="text-gray-500 mb-4">The product you're looking for doesn't exist or has been removed.</p>
+            <button 
+              onClick={() => window.history.back()} 
+              className="text-primary hover:text-primary/80 font-medium"
+            >
+              Go Back
+            </button>
+          </div>
         </Container>
       </main>
     );

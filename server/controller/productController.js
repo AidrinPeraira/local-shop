@@ -378,7 +378,7 @@ export const getShopProducts = asyncHandler(async (req, res) => {
     const selectedCategory = await Category.findById(category);
 
     if (selectedCategory) {
-      if (selectedCategory.level === 3) {
+      if (selectedCategory.level === 3 ) {
         // if level three no change
         baseQuery.category = category;
       }
@@ -510,13 +510,13 @@ export const getProductDetails = asyncHandler(async (req, res) => {
   const product = await Product.findOne({
     _id: id,
     isActive: true,
-    isBlocked: false,
+    isBlocked: false
   })
-    .populate("category", "name")
+    .populate("category", "name isActive")
     .populate("seller", "sellerName")
     .select("-isBlocked -__v");
 
-  if (!product) {
+  if (!product || !product.category.isActive) {
     res.status(HTTP_CODES.NOT_FOUND);
     throw new Error("This product is currently unavailable. Please try later");
   }
@@ -530,6 +530,7 @@ export const getProductDetails = asyncHandler(async (req, res) => {
     category: {
       _id: product.category._id,
       name: product.category.name,
+      isActive: product.category.isActive,
     },
     images: product.images,
     avgRating: product.avgRating,

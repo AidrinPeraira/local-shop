@@ -91,13 +91,19 @@ export const getCartItems = asyncHandler(async (req, res) => {
 
   const cart = await Cart.findOne({ user: userId }).populate({
     path: "items.product",
-    select:
-      "productName images variants bulkDiscount basePrice isActive isBlocked seller",
-    populate: {
-      path: "seller",
-      model: "Seller",
-      select: "sellerName",
-    },
+    select: "productName images variants bulkDiscount basePrice isActive isBlocked seller category",
+    populate: [
+      {
+        path: "seller",
+        model: "Seller",
+        select: "sellerName"
+      },
+      {
+        path: "category",
+        model: "Category",
+        select: "name isActive"
+      }
+    ]
   });
 
   if (!cart) {
@@ -181,7 +187,7 @@ export const getCartItems = asyncHandler(async (req, res) => {
       productTotal: productSubtotal - productDiscount,
       totalQuantity: totalProductQuantity,
       isActive: product.isActive,
-      isBlocked: product.isBlocked,
+      isBlocked: product.isBlocked || !product.category.isActive,
     };
   });
 
