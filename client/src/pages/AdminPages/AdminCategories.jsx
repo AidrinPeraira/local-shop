@@ -28,6 +28,7 @@ import { useToast } from "../../components/hooks/use-toast";
 import { CategoryDialog } from "../../components/admin/CategoryDialog";
 import { DeleteCategoryDialog } from "../../components/admin/DeleteCategoryDialog";
 import {
+  activateCurrentCategoryAPI,
   createNewCategoryAPI,
   deleteCurrentCategoryAPI,
   editCurrentCategoryAPI,
@@ -205,6 +206,26 @@ export default function Categories() {
     }
   }, []);
 
+  const handleActivate = useCallback(async (category) => {
+    try {
+      const response = await activateCurrentCategoryAPI(category);
+      fetchCategories();
+      toast({
+        title: "Success!",
+        description: response.data.message,
+        variant: "default",
+      });
+    } catch (error) {
+      console.log("Error activating category: ", error);
+      toast({
+        title: "Error!",
+        description:
+          error.response?.data?.message || "Failed to activate category",
+        variant: "destructive",
+      });
+    }
+  }, []);
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -349,6 +370,7 @@ export default function Categories() {
                     >
                       {category.isActive ? "Active" : "Inactive"}
                     </span>
+
                     <span className="text-sm text-muted-foreground">
                       Level {category.level}
                     </span>
@@ -370,6 +392,20 @@ export default function Categories() {
                         handleDelete={handleDelete}
                         category={category}
                       />
+
+                      {!category.isActive && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-green-600 hover:text-green-700"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleActivate(category);
+                          }}
+                        >
+                          Activate
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -428,6 +464,20 @@ export default function Categories() {
                                   handleDelete={handleDelete}
                                   category={subcategory}
                                 />
+
+                                {!subcategory.isActive && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-green-600 hover:text-green-700"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleActivate(subcategory);
+                                    }}
+                                  >
+                                    Activate
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -486,6 +536,20 @@ export default function Categories() {
                                           handleDelete={handleDelete}
                                           category={subSubCategory}
                                         />
+
+                                        {!subSubCategory.isActive && (
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="text-green-600 hover:text-green-700"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleActivate(subSubCategory);
+                                            }}
+                                          >
+                                            Activate
+                                          </Button>
+                                        )}
                                       </div>
                                     </div>
                                   </div>

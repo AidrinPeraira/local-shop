@@ -8,7 +8,8 @@ import {
   getAllCategories,
   getActiveCategories,
   editCategory,
-  deleteCategory
+  deleteCategory,
+  activateCategory
 } from "../controller/categoryController.js";
 
 const categoryRoute = express.Router();
@@ -33,6 +34,10 @@ categoryRoute
 categoryRoute
   .route("/delete/:id")
   .delete(authenticateAdmin, authorizeAdmin, deleteCategory);
+
+categoryRoute
+  .route("/activate/:id")
+  .delete(authenticateAdmin, authorizeAdmin, activateCategory);
 
 categoryRoute
   .route("/")
