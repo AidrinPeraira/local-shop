@@ -15,6 +15,64 @@ import { getUTCDateTime } from "../utils/dateUtillServerSide.js";
 import { HTTP_CODES } from "../utils/responseCodes.js";
 //buyer side controllers
 
+export const checkOrderItemValid = asyncHandler(async (req, res) => {
+  const { cart } = req.body;
+  
+  const invalidProducts = [];
+
+  // Check each product in the cart
+  for (const item of cart.items) {
+    const product = await Product.findById(item.productId).populate('category');
+    
+    if (!product) {
+      invalidProducts.push({
+        productId: item.productId,
+        reason: "Product not found"
+      });
+      continue;
+    }
+
+    // Check if product or category is blocked/inactive
+    if (!product.isActive || product.isBlocked || !product.category.isActive) {
+      invalidProducts.push({
+        productId: item.productId,
+        productName: product.productName,
+        reason: !product.category.isActive 
+          ? "Category is no longer available"
+          : "Product is no longer available"
+      });
+      continue;
+    }
+
+    // Check variant stock
+    for (const variant of item.variants) {
+      const productVariant = product.variants.find(v => v.variantId === variant.variantId);
+      if (!productVariant || !productVariant.inStock || productVariant.stock < variant.quantity) {
+        invalidProducts.push({
+          productId: item.productId,
+          productName: product.productName,
+          reason: "Some variants are out of stock or have insufficient quantity"
+        });
+        break;
+      }
+    }
+  }
+
+  if (invalidProducts.length > 0) {
+    res.status(HTTP_CODES.OK).json({
+      success: false,
+      message: "Some products are invalid or unavailable",
+      invalidProducts
+    });
+    return;
+  }
+
+  res.status(HTTP_CODES.OK).json({
+    success: true,
+    message: "All products are valid"
+  });
+});
+
 export const createUserOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const {

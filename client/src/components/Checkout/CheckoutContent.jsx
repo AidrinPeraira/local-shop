@@ -27,6 +27,7 @@ import {
 } from "../../api/userDataApi";
 import { getBuyerCouponsApi } from "../../api/couponApi";
 import {
+  checkItemValidApi,
   createOrderApi,
   createRazorpayOrderApi,
   verifyRazorpayPaymentApi,
@@ -70,6 +71,7 @@ const CheckoutContent = () => {
     pincode: "",
     isDefault: false,
   });
+  const cartCount = useSelector((state) => state.cart.count);
 
   const [walletBalance, setWalletBalance] = useState(0);
 
@@ -335,6 +337,29 @@ const CheckoutContent = () => {
       toast({
         title: "Error",
         description: "Please select a shipping address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+     // Check if products are valid before proceeding
+     try {
+      const validationResponse = await checkItemValidApi({ cart });
+      // console.log("Validation Response:", validationResponse);  
+      if (!validationResponse.data.success) {
+        toast({
+          title: "Invalid Products",
+          description: "Some products in your cart are no longer available. Please review your cart.",
+          variant: "destructive",
+        });
+        navigate(cartCount === 0 ? '/' : '/cart');
+        return;
+      }
+    } catch (error) {
+      console.error("Error validating cart items:", error);
+      toast({
+        title: "Error",
+        description: "Failed to validate cart items. Please try again.",
         variant: "destructive",
       });
       return;

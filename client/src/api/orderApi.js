@@ -1,6 +1,8 @@
 import API from "./apiConfig";
 
 //need apis for the following for user
+export const checkItemValidApi = (data) => API.post("/orders/check", data);
+
 export const createOrderApi = (data) => API.post("/orders/create", data);
 
 export const getUserOrdersApi = (
