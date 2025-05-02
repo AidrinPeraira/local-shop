@@ -110,17 +110,10 @@ export const getCartItems = asyncHandler(async (req, res) => {
 
 
   if (!cart) {
-    try {
-      cart = await Cart.create({
-        user: userId,
-        items: [],
-      });
-    } catch (error) {
       res.status(HTTP_CODES.NOT_FOUND);
       throw new Error("Cart not found");
-    }
   }
-
+  
   const processedItems = cart.items.map((item) => {
     const product = item.product;
 
@@ -168,9 +161,9 @@ export const getCartItems = asyncHandler(async (req, res) => {
         variantDiscount: variantDiscountTotal,
         variantTotal,
         stock: productVariant ? productVariant.stock : product.stock,
-        inStock:
-          (productVariant ? productVariant.inStock : product.inStock) >=
-          quantity,
+        inStock: productVariant 
+          ? (productVariant.inStock && productVariant.stock >= quantity)
+          : (product.inStock && product.stock >= quantity),
       };
     });
 

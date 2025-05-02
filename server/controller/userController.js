@@ -8,6 +8,7 @@ import { validateUserData } from "../utils/validateData.js";
 import { oauth2Client } from "../utils/googleConfig.js";
 import Wallet from "../models/walletModel.js";
 import axios from "axios";
+import Cart from "../models/cartModel.js";
 
 //user signup sign in actions
 export const createUser = asyncHandler(async (req, res) => {
@@ -150,6 +151,12 @@ export const createUser = asyncHandler(async (req, res) => {
 
     await wallet.save();
     await newUser.save();
+
+    //create cart
+    const cart = await Cart.create({
+      user: newUser._id,
+      items: [],
+    });
 
     //call a utility function to create a jwt token and store it in a cookie
     generateToken(res, newUser._id);
