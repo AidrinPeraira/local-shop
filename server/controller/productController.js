@@ -318,7 +318,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
   if (!existingProduct) {
     res.status(HTTP_CODES.NOT_FOUND);
-    throw new Error("Product not Found!!");
+    throw new Error("Produt Unavailable. Contact Admin!");
   }
 
   try {

@@ -219,12 +219,6 @@ export default function AdminProducts() {
       );
     } else if (!product.inStock) {
       return <Badge variant="destructive">Out of Stock</Badge>;
-    } else if (product.stock <= 10) {
-      return (
-        <Badge variant="warning" className="bg-yellow-500">
-          Low Stock
-        </Badge>
-      );
     } else {
       return (
         <Badge variant="success" className="bg-green-500">
@@ -374,9 +368,7 @@ export default function AdminProducts() {
                 <th className="text-left p-3 w-10"></th>
                 <th className="text-left p-3">Image</th>
                 <th className="text-left p-3">Product Name</th>
-                <th className="text-left p-3">Price</th>
-                <th className="text-left p-3">Stock</th>
-                <th className="text-left p-3">Status</th>
+                <th className="text-left p-3">Stock Status</th>
                 <th className="text-right p-3">Actions</th>
               </tr>
             </thead>
@@ -394,9 +386,7 @@ export default function AdminProducts() {
                 products.map((product) => (
                   <React.Fragment key={product._id}>
                     <tr
-                      className={`border-b hover:bg-gray-50 ${
-                        !product.isActive ? "opacity-60" : ""
-                      }`}
+                      className={`border-b hover:bg-gray-50`}
                     >
                       {/* if inactive show dim row */}
                       <td className="p-3">
@@ -423,8 +413,6 @@ export default function AdminProducts() {
                         )}
                       </td>
                       <td className="p-3">{product.productName}</td>
-                      <td className="p-3">₹{product.basePrice}</td>
-                      <td className="p-3">{product.stock}</td>
                       <td className="p-3">{getStockStatusBadge(product)}</td>
                       <td className="p-3 text-right space-x-2 whitespace-nowrap">
                         {/* <Button

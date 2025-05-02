@@ -196,12 +196,6 @@ export default function SellerProducts() {
       );
     } else if (!product.inStock) {
       return <Badge variant="destructive">Out of Stock</Badge>;
-    } else if (product.stock <= 10) {
-      return (
-        <Badge variant="warning" className="bg-yellow-500">
-          Low Stock
-        </Badge>
-      );
     } else {
       return (
         <Badge variant="success" className="bg-green-500">
@@ -352,9 +346,7 @@ export default function SellerProducts() {
                 <th className="text-left p-3 w-10"></th>
                 <th className="text-left p-3">Image</th>
                 <th className="text-left p-3">Product Name</th>
-                <th className="text-left p-3">Price</th>
-                <th className="text-left p-3">Stock</th>
-                <th className="text-left p-3">Status</th>
+                <th className="text-left p-3">Stock Status</th>
                 <th className="text-right p-3">Actions</th>
               </tr>
             </thead>
@@ -415,14 +407,14 @@ export default function SellerProducts() {
                           )}
                         </div>
                       </td>
-                      <td className="p-3">₹{product.basePrice}</td>
-                      <td className="p-3">{product.stock}</td>
                       <td className="p-3">{getStockStatusBadge(product)}</td>
                       <td className="p-3 text-right space-x-2 whitespace-nowrap">
-                        <Button
+                      <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenDialog("edit", product)}
+                          disabled={!product.isActive}
+                          className={!product.isActive ? "opacity-50 cursor-not-allowed" : ""}
                         >
                           <Edit className="h-4 w-4 mr-1" /> Edit
                         </Button>
