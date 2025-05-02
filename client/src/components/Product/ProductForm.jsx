@@ -301,15 +301,17 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
         variantAttributes
       );
 
+
+      const matchingVariant = variants.find(variant =>  variant.id === matchingVariantId);
       return {
         id: matchingVariantId,
         attributes: variantAttributes,
-        price: basePrice,
-        stock: stock,
+        price: matchingVariant ? matchingVariant.price : basePrice,
+        stock: matchingVariant ? matchingVariant.stock : stock,
       };
     });
-
     setVariants(newVariants);
+
   }, [useVariants, variantTypes, basePrice, stock]);
 
   // this is MOQ PRICING
@@ -990,10 +992,14 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
                                   const newPrice =
                                     parseFloat(e.target.value) || 0;
                                   setVariants(
-                                    variants.map((v) =>
-                                      v.id === variant.id
-                                        ? { ...v, price: newPrice }
-                                        : v
+                                    variants.map((v) => {
+
+                                      console.log("varrr", v, variant.id)
+                                      return v.id === variant.id
+                                      ? { ...v, price: newPrice }
+                                      : v
+                                    }
+                                     
                                     )
                                   );
                                 }}
