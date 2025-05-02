@@ -30,7 +30,7 @@ const ProductDialogs = ({ selectedProduct, isOpen, onOpenChange, onSubmit, categ
       values: vType.values || vType.variationValues
     })),
     variants: selectedProduct.variants.map(variant => ({
-      id: variant._id || variant.variantId,
+      id: variant.variantId,
       attributes: typeof variant.attributes === 'object' ? 
         variant.attributes : 
         variant.attributes[0],

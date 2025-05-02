@@ -261,7 +261,6 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
           (vt, i) => v.attributes[vt.name] === combination[i]
         );
       });
-
       if (existingVariant) {
         return existingVariant;
       }
@@ -271,8 +270,39 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
         variantAttributes[vt.name] = combination[i];
       });
 
+      console.log(variantAttributes)
+      console.log(variants)
+
+      function findVariantByAttributes(variants, variantAttributes) {
+        const attributesToFind = Object.entries(variantAttributes);
+        
+        for (const variant of variants) {
+          if (!variant.attributes || !Array.isArray(variant.attributes)) {
+            continue;
+          }
+          
+          const firstAttribute = variant.attributes[0];
+          
+          if (!firstAttribute) {
+            continue;
+          }
+          
+          const isMatch = attributesToFind.every(([key, value]) => 
+            firstAttribute[key] === value
+          );
+          
+          if (isMatch) {
+            return variant.id;
+          }
+        }
+        
+        return `variant-${Date.now()}-${index}`;
+      }
+
+      const matchingVariantId = findVariantByAttributes(variants, variantAttributes);
+
       return {
-        id: `variant-${Date.now()}-${index}`,
+        id: matchingVariantId,
         attributes: variantAttributes,
         price: basePrice,
         stock: stock,
