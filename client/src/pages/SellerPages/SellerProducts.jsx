@@ -392,15 +392,29 @@ export default function SellerProducts() {
                         </Button>
                       </td>
                       <td className="p-3">
-                        {product.images && product.images.length > 0 && (
-                          <img
-                            src={product.images[0]}
-                            alt={product.productName}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                        )}
+                        <div className="relative">
+                          {product.images && product.images.length > 0 && (
+                            <img
+                              src={product.images[0]}
+                              alt={product.productName}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                          )}
+                          {!product.isActive && (
+                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
+                              <span className="text-white text-xs font-medium">Blocked</span>
+                            </div>
+                          )}
+                        </div>
                       </td>
-                      <td className="p-3">{product.productName}</td>
+                      <td className="p-3">
+                        <div className="flex items-center">
+                          <span>{product.productName}</span>
+                          {!product.isActive && (
+                            <span className="ml-2 text-xs text-red-500">(Blocked)</span>
+                          )}
+                        </div>
+                      </td>
                       <td className="p-3">₹{product.basePrice}</td>
                       <td className="p-3">{product.stock}</td>
                       <td className="p-3">{getStockStatusBadge(product)}</td>

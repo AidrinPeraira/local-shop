@@ -39,8 +39,6 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   );
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [tempFile, setTempFile] = useState(null);
-  
-
   // Validate images count
   useEffect(() => {
     setImageError(images.length < 3 ? "At least 3 images are required" : "");
@@ -102,7 +100,7 @@ const ProductForm = ({ initialData = {}, onSubmit, categories }) => {
   const useVariants = watch("useVariants");
   const basePrice = watch("basePrice");
   const stock = watch("stock");
-  const toast = useToast();
+  const {toast} = useToast();
 
 
   

@@ -35,7 +35,7 @@ import { useOutletContext } from "react-router-dom";
 
 
 
-export default function SellerProducts() {
+export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -149,32 +149,32 @@ export default function SellerProducts() {
   //   }
   // }, []);
 
-  const handleEditProduct = useCallback(
-    async (data) => {
-      try {
-        const response = await sellerEditProductApi(data, selectedProduct._id);
-        if (response.data) {
-          toast({
-            title: "Success",
-            description: "Product updated successfully!",
-            variant: "default",
-          });
-          // Refresh the products list
-          const updatedProducts = await getSellerProductsApi();
-          setProducts(updatedProducts.data.products);
-          setIsDialogOpen(false);
-        }
-      } catch (error) {
-        toast({
-          title: "Edit Product Error",
-          description:
-            error.response?.data?.message || "Failed to update product",
-          variant: "destructive",
-        });
-      }
-    },
-    [selectedProduct]
-  );
+  // const handleEditProduct = useCallback(
+  //   async (data) => {
+  //     try {
+  //       const response = await sellerEditProductApi(data, selectedProduct._id);
+  //       if (response.data) {
+  //         toast({
+  //           title: "Success",
+  //           description: "Product updated successfully!",
+  //           variant: "default",
+  //         });
+  //         // Refresh the products list
+  //         const updatedProducts = await getSellerProductsApi();
+  //         setProducts(updatedProducts.data.products);
+  //         setIsDialogOpen(false);
+  //       }
+  //     } catch (error) {
+  //       toast({
+  //         title: "Edit Product Error",
+  //         description:
+  //           error.response?.data?.message || "Failed to update product",
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   },
+  //   [selectedProduct]
+  // );
 
   const handleDeleteProduct = async (id) => {
     try {
@@ -427,13 +427,13 @@ export default function SellerProducts() {
                       <td className="p-3">{product.stock}</td>
                       <td className="p-3">{getStockStatusBadge(product)}</td>
                       <td className="p-3 text-right space-x-2 whitespace-nowrap">
-                        <Button
+                        {/* <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenDialog("edit", product)}
                         >
                           <Edit className="h-4 w-4 mr-1" /> Edit
-                        </Button>
+                        </Button> */}
                         {product.isBlocked ? (
                           <Button
                             variant="outline"
@@ -628,13 +628,13 @@ export default function SellerProducts() {
       </div>
 
       {/* Product Dialogs */}
-      <ProductDialogs
+      {/* <ProductDialogs
         selectedProduct={selectedProduct}
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onSubmit={handleEditProduct}
         categories={categories}
-      />
+      /> */}
     </div>
   );
 }
