@@ -61,7 +61,6 @@ initializeCronJobs();
 const tokens = new csrf();
 
 app.use((req, res, next) => {
-  next() //temporary csrf override
   // Skip CSRF for GET requests and csrf-token endpoint
   if (req.method === 'GET' || req.path === '/api/csrf-token') {
       return next();
