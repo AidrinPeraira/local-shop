@@ -58,44 +58,33 @@ initializeCronJobs();
 //csrf protection
 
 const tokens = new csrf();
+const disableCsrf = true || process.env.DISABLE_CSRF === 'true';
 
 app.use((req, res, next) => {
-  // Skip CSRF for GET requests and csrf-token endpoint
+  if (disableCsrf) {
+    return next(); // CSRF globally disabled
+  }
+
+  // Skip CSRF for safe methods and token endpoint
   if (req.method === 'GET' || req.path === '/api/csrf-token') {
-      return next();
+    return next();
   }
 
   const token = req.headers['x-csrf-token'];
   const secret = req.cookies['csrf-secret'];
-  
 
   if (!token || !secret) {
-      return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
+    return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
   }
 
   try {
-      if (tokens.verify(secret, token)) {
-          return next();
-      }
-      return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
+    if (tokens.verify(secret, token)) {
+      return next();
+    }
+    return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
   } catch (error) {
-      return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
+    return res.status(HTTP_CODES.FORBIDDEN).json({ message: 'Invalid CSRF token' });
   }
-});
-
-app.get('/api/csrf-token', (req, res) => {
-  const secret = tokens.secretSync();
-  const token = tokens.create(secret);
-  
-  res.cookie('csrf-secret', secret, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-      maxAge: 24 * 60 * 60 * 1000 ,// 24 hours
-      path: '/',
-  });
-  
-  res.json({ csrfToken: token });
 });
 
 //google auth crooss-origin error fix
